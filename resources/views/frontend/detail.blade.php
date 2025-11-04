@@ -91,26 +91,11 @@
         </div>
 
         <div class="lg:grid lg:grid-cols-12 lg:gap-8">
+
             <div class="lg:col-span-7 space-y-4">
                 {{-- Product Image Gallery --}}
-                <div class="flex space-x-4">
-                    <div class="hidden sm:flex flex-col space-y-3">
-                        <div class="thumbnail w-16 h-16 bg-light-bg border-2 border-primary rounded-lg cursor-pointer flex items-center justify-center"
-                            data-image=" https://image1ws.indotrading.com/s3/productimages/webp/co228746/p778217/w600-h600/385b7c34-ae39-462c-b059-a3f2b9122566.png"
-                            tabindex="0" role="button" aria-label="Gambar Produk 1: Sofa Bed Moduler Kiri">
-                            <span class="text-xs text-light-grey">Gbr 1</span>
-                        </div>
-                        <div class="thumbnail w-16 h-16 bg-light-bg border border-light-grey rounded-lg cursor-pointer flex items-center justify-center"
-                            data-image="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSV_4jimNfbjtF9fOFwBQKsuUMly0IF6-L3NA&s"
-                            tabindex="0" role="button" aria-label="Gambar Produk 2: Detail Sandaran">
-                            <span class="text-xs text-light-grey">Gbr 2</span>
-                        </div>
-                        <div class="thumbnail w-16 h-16 bg-light-bg border border-light-grey rounded-lg cursor-pointer flex items-center justify-center"
-                            data-image="https://image1ws.indotrading.com/s3/productimages/webp/co228746/p778217/w600-h600/65a1dec1-58a1-4cfb-94bd-26454d0750ec.png"
-                            tabindex="0" role="button" aria-label="Gambar Produk 3: Sofa Dalam Mode Tidur">
-                            <span class="text-xs text-light-grey">Gbr 3</span>
-                        </div>
-                    </div>
+                <div class="flex flex-col space-y-4">
+                    {{-- Main Image Area --}}
                     <div class="flex-grow">
                         <div class="w-full aspect-square bg-light-bg rounded-lg shadow-md flex items-center justify-center overflow-hidden">
                             <img id="main-product-image"
@@ -119,6 +104,28 @@
                                 class="object-cover w-full h-full transition-opacity duration-300">
                         </div>
                     </div>
+
+                    <div class="flex space-x-4">
+                        <div class=" flex space-x-2 overflow-x-auto w-full pb-1">
+                            <div class="thumbnail flex-shrink-0 w-16 h-16 bg-light-bg border-2 border-primary rounded-lg cursor-pointer flex items-center justify-center"
+                                data-image="https://image1ws.indotrading.com/s3/productimages/webp/co228746/p778217/w600-h600/385b7c34-ae39-462c-b059-a3f2b9122566.png"
+                                tabindex="0" role="button" aria-label="Gambar Produk 1: Sofa Bed Moduler Kiri">
+                                <span class="text-xs text-light-grey">Gbr 1</span>
+                            </div>
+                            <div class="thumbnail flex-shrink-0 w-16 h-16 bg-light-bg border border-light-grey rounded-lg cursor-pointer flex items-center justify-center"
+                                data-image="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSV_4jimNfbjtF9fOFwBQKsuUMly0IF6-L3NA&s"
+                                tabindex="0" role="button" aria-label="Gambar Produk 2: Detail Sandaran">
+                                <span class="text-xs text-light-grey">Gbr 2</span>
+                            </div>
+                            <div class="thumbnail flex-shrink-0 w-16 h-16 bg-light-bg border border-light-grey rounded-lg cursor-pointer flex items-center justify-center"
+                                data-image="https://image1ws.indotrading.com/s3/productimages/webp/co228746/p778217/w600-h600/65a1dec1-58a1-4cfb-94bd-26454d0750ec.png"
+                                tabindex="0" role="button" aria-label="Gambar Produk 3: Sofa Dalam Mode Tidur">
+                                <span class="text-xs text-light-grey">Gbr 3</span>
+                            </div>
+                           
+                        </div>
+                    </div>
+
                 </div>
 
                 <div class="p-0 sm:p-4">
@@ -162,7 +169,7 @@
                         </div>
                     </div>
 
-                    {{-- Tabs for Specs and Info (A11y improved structure) --}}
+                   
                     <div class="mt-6">
                         <div class="flex border-b border-light-grey/50 text-sm font-semibold" role="tablist">
                             <button id="tab-spesifikasi"
@@ -212,6 +219,7 @@
                     </div>
                 </div>
             </div>
+
 
             {{-- Order Summary/Action Buttons (Made sticky on large screens) --}}
             <div class="lg:col-span-5 mt-6 lg:mt-0 lg:order-last lg:sticky lg:top-10 self-start">
@@ -304,7 +312,7 @@
             </div>
         </div>
 
-       
+
         {{-- Related Products --}}
         <div class="mt-12">
             <div class="flex justify-between items-center mb-4">
@@ -315,7 +323,7 @@
 
             <div class="flex overflow-x-scroll space-x-4 pb-4">
                 @php
-                // Data asli (untuk simulasi) dari array JS yang diberikan, ditambahkan url_img.
+
                 // Asumsi old_price adalah harga sekarang + 20% dari harga sekarang, untuk menunjukkan diskon.
                 $products_data = [
                 ['id' => 'P001', 'name' => 'Panel Ceiling A', 'price' => 120000, 'category' => 'Dekoratif / Arsitektural', 'rating' => 4.8, 'url_img' => 'https://id.pvcpanelchina.com/uploads/202334835/white-pvc-ceiling-panelsc71d0f4e-4fed-441a-88b3-144a09284153.jpg'],

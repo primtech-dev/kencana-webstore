@@ -167,364 +167,338 @@
                 </svg>
             </button>
 
-            <!-- Scrollable Category List Container -->
-            <div id="category-list"
-                class="flex flex-1 mx-10 px-2 lg:mx-12 overflow-x-auto whitespace-nowrap scrollbar-hide scroll-smooth py-3">
+          <div id="category-list"
+    class="flex flex-1 mx-10 px-2 lg:mx-12 overflow-x-auto whitespace-nowrap scrollbar-hide scroll-smooth py-3">
 
-                <!-- KATEGORI 1: KENCANA BISNIS -->
-                <div class="group flex-shrink-0 category-link-container">
-                    <a href="#"
-                        class="category-link hover:text-primary font-medium py-1 inline-block transition duration-150 text-dark-grey">
-                        Kencana Bisnis <span class="text-xs bg-primary text-white px-1 ml-1 rounded">NEW</span>
-                    </a>
-                    <!-- DROP DOWN SOURCE -->
-                    <div id="dropdown-1" data-width="384px" class="js-dropdown-source hidden">
-                        <div class="flex p-5 text-dark-grey">
-                            <div class="w-1/2 pr-4 border-r border-light-grey">
-                                <h4 class="font-bold mb-2 text-sm">Layanan B2B</h4>
-                                <ul class="space-y-1 text-sm">
-                                    <li><a href="#" class="block hover:text-primary">Corporate Gift</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Pengadaan Barang</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Invoice & Pajak</a></li>
-                                </ul>
-                            </div>
-                            <div class="w-1/2 pl-4">
-                                <h4 class="font-bold mb-2 text-sm">Keuntungan</h4>
-                                <ul class="space-y-1 text-sm">
-                                    <li><a href="#" class="block hover:text-primary">Harga Khusus</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Konsultan Bisnis</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Prioritas Pengiriman</a></li>
-                                </ul>
-                            </div>
-                        </div>
+    <div class="group flex-shrink-0 category-link-container">
+        <a href="#"
+            class="category-link hover:text-primary font-medium py-1 inline-block transition duration-150 text-dark-grey">
+            Kencana Bisnis <span class="text-xs bg-primary text-white px-1 ml-1 rounded">NEW</span>
+        </a>
+        <div id="dropdown-1" data-width="384px" class="js-dropdown-source hidden">
+            <div class="flex p-5 text-dark-grey">
+                <div class="w-1/2 pr-4 border-r border-light-grey">
+                    <h4 class="font-bold mb-2 text-sm">Layanan B2B</h4>
+                    <ul class="space-y-1 text-sm">
+                        <li><a href="#" class="block hover:text-primary">Pengadaan Proyek</a></li>
+                        <li><a href="#" class="block hover:text-primary">Invoice & Pajak</a></li>
+                        <li><a href="#" class="block hover:text-primary">Kredit Term Of Payment</a></li>
+                    </ul>
+                </div>
+                <div class="w-1/2 pl-4">
+                    <h4 class="font-bold mb-2 text-sm">Keuntungan</h4>
+                    <ul class="space-y-1 text-sm">
+                        <li><a href="#" class="block hover:text-primary">Harga Distributor</a></li>
+                        <li><a href="#" class="block hover:text-primary">Konsultasi Teknis</a></li>
+                        <li><a href="#" class="block hover:text-primary">Prioritas Pengiriman</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="group flex-shrink-0 category-link-container">
+        <a href="#"
+            class="category-link hover:text-primary font-medium py-1 inline-block transition duration-150 text-dark-grey">
+            Official Partner
+        </a>
+        <div id="dropdown-2" data-width="384px" class="js-dropdown-source hidden">
+            <div class="flex p-5 text-dark-grey">
+                <div class="w-1/2 pr-4 border-r border-light-grey">
+                    <h4 class="font-bold mb-2 text-sm">Brand Baja</h4>
+                    <ul class="space-y-1 text-sm">
+                        <li><a href="#" class="block hover:text-primary">Krakatau Steel</a></li>
+                        <li><a href="#" class="block hover:text-primary">Gunung Garuda</a></li>
+                        <li><a href="#" class="block hover:text-primary">Taso & Canal C</a></li>
+                    </ul>
+                </div>
+                <div class="w-1/2 pl-4">
+                    <h4 class="font-bold mb-2 text-sm">Layanan Partner</h4>
+                    <ul class="space-y-1 text-sm">
+                        <li><a href="#" class="block hover:text-primary">Sertifikat SNI</a></li>
+                        <li><a href="#" class="block hover:text-primary">Program Loyalti</a></li>
+                        <li><a href="#" class="block hover:text-primary">Dukungan Garansi</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="group flex-shrink-0 category-link-container">
+        <a href="#"
+            class="category-link hover:text-primary font-medium py-1 inline-block transition duration-150 text-dark-grey">
+            Promo Hari Ini
+        </a>
+        <div id="dropdown-3" data-width="384px" class="js-dropdown-source hidden">
+            <div class="flex p-5 text-dark-grey">
+                <div class="w-1/2 pr-4 border-r border-light-grey">
+                    <h4 class="font-bold mb-2 text-sm">Diskon Baja</h4>
+                    <ul class="space-y-1 text-sm">
+                        <li><a href="#" class="block hover:text-primary">Baja Ringan Promo</a></li>
+                        <li><a href="#" class="block hover:text-primary">Flash Sale Besi Beton</a></li>
+                        <li><a href="#" class="block hover:text-primary">Voucher Pengiriman</a></li>
+                    </ul>
+                </div>
+                <div class="w-1/2 pl-4">
+                    <h4 class="font-bold mb-2 text-sm">Penawaran Spesial</h4>
+                    <div
+                        class="relative rounded-lg overflow-hidden h-20 bg-primary flex items-center justify-center text-center text-white p-2 shadow-md">
+                        <h5 class="font-bold text-sm">Beli 5 Ton, Gratis 1 Kawat!</h5>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
 
-                <!-- KATEGORI 2: OFFICIAL PARTNER -->
-                <div class="group flex-shrink-0 category-link-container">
-                    <a href="#"
-                        class="category-link hover:text-primary font-medium py-1 inline-block transition duration-150 text-dark-grey">
-                        Official Partner
-                    </a>
-                    <!-- DROP DOWN SOURCE -->
-                    <div id="dropdown-2" data-width="384px" class="js-dropdown-source hidden">
-                        <div class="flex p-5 text-dark-grey">
-                            <div class="w-1/2 pr-4 border-r border-light-grey">
-                                <h4 class="font-bold mb-2 text-sm">Tren Produk</h4>
-                                <ul class="space-y-1 text-sm">
-                                    <li><a href="#" class="block hover:text-primary">Produk Terbaru</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Terlaris Bulan Ini</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Brand Pilihan</a></li>
-                                </ul>
+    <div class="group flex-shrink-0 category-link-container">
+        <a href="#"
+            class="category-link hover:text-primary font-medium py-1 inline-block transition duration-150 text-dark-grey">
+            Baja Ringan & Plafon
+        </a>
+        <div id="dropdown-4" data-width="384px" class="js-dropdown-source hidden">
+            <div class="flex p-5 text-dark-grey">
+                <div class="w-1/2 pr-4 border-r border-light-grey">
+                    <h4 class="font-bold mb-2 text-sm">Rangka Atap</h4>
+                    <ul class="space-y-1 text-sm">
+                        <li><a href="#" class="block hover:text-primary">Kanal C / Truss</a></li>
+                        <li><a href="#" class="block hover:text-primary">Reng Baja Ringan</a></li>
+                        <li><a href="#" class="block hover:text-primary">Sekrup Baja Ringan</a></li>
+                    </ul>
+                </div>
+                <div class="w-1/2 pl-4">
+                    <h4 class="font-bold mb-2 text-sm">Material Plafon</h4>
+                    <ul class="space-y-1 text-sm">
+                        <li><a href="#" class="block hover:text-primary">Hollow</a></li>
+                        <li><a href="#" class="block hover:text-primary">Papan Gypsum</a></li>
+                        <li><a href="#" class="block hover:text-primary">Aksesoris Plafon</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="group flex-shrink-0 category-link-container">
+        <a href="#"
+            class="category-link hover:text-primary font-medium py-1 inline-block text-primary border-b-2 border-primary transition duration-150">
+            Besi Beton & Tulangan
+        </a>
+        <div id="dropdown-5" data-width="900px" data-layout="center" class="js-dropdown-source hidden">
+            <div class="flex p-6 text-dark-grey">
+                <div class="w-1/5 pr-4 border-r border-light-grey">
+                    <h4 class="font-bold text-primary mb-3">Besi Beton</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="block hover:text-primary">Besi Polos SNI</a></li>
+                        <li><a href="#" class="block hover:text-primary">Besi Ulir SNI</a></li>
+                        <li><a href="#" class="block hover:text-primary">Besi Non-SNI</a></li>
+                        <li><a href="#" class="block hover:text-primary">Begel (Cincin)</a></li>
+                    </ul>
+
+                    <h4 class="font-bold text-primary mb-3 mt-4">Kawat & Mesh</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="block hover:text-primary">Kawat Bendrat</a></li>
+                        <li><a href="#" class="block hover:text-primary">Wiremesh</a></li>
+                    </ul>
+                </div>
+                <div class="w-1/5 px-4 border-r border-light-grey">
+                    <h4 class="font-bold text-primary mb-3">Baja Struktural</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="block hover:text-primary">Besi WF (Wide Flange)</a></li>
+                        <li><a href="#" class="block hover:text-primary">Besi H-Beam</a></li>
+                        <li><a href="#" class="block hover:text-primary">Plat Besi</a></li>
+                        <li><a href="#" class="block hover:text-primary">Besi Siku</a></li>
+                    </ul>
+
+                    <h4 class="font-bold text-primary mb-3 mt-4">Material Pondasi</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="block hover:text-primary">Semen</a></li>
+                        <li><a href="#" class="block hover:text-primary">Pasir & Agregat</a></li>
+                    </ul>
+                </div>
+                <div class="w-1/5 px-4 border-r border-light-grey">
+                    <h4 class="font-bold text-primary mb-3">Pipa & Profil</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="block hover:text-primary">Pipa Hitam</a></li>
+                        <li><a href="#" class="block hover:text-primary">Pipa Galvanis</a></li>
+                        <li><a href="#" class="block hover:text-primary">Besi UNP (Kanal U)</a></li>
+                        <li><a href="#" class="block hover:text-primary">Besi CNP (Kanal C)</a></li>
+                    </ul>
+                    
+                    <h4 class="font-bold text-primary mb-3 mt-4">Pagar & Tralis</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="block hover:text-primary">Pagar BRC</a></li>
+                        <li><a href="#" class="block hover:text-primary">Material Tralis</a></li>
+                    </ul>
+                </div>
+                <div class="w-2/5 pl-6">
+                    <h4 class="font-bold mb-3">Panduan dan Inspirasi Proyek</h4>
+                    <div class="space-y-4">
+                        <div
+                            class="flex items-center space-x-3 bg-light-bg rounded-lg p-3 hover:bg-light-bg/70 transition">
+                            <div class="h-16 w-16 bg-light-grey rounded-lg flex-shrink-0">
+                                
+
+[Image]
+
                             </div>
-                            <div class="w-1/2 pl-4">
-                                <h4 class="font-bold mb-2 text-sm">Layanan Partner</h4>
-                                <ul class="space-y-1 text-sm">
-                                    <li><a href="#" class="block hover:text-primary">Program Loyalti</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Promosi Eksklusif</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Dukungan Garansi</a></li>
-                                </ul>
+                            <div>
+                                <p class="font-semibold text-sm">Cara Menghitung Kebutuhan Besi Beton</p>
+                                <span class="text-xs text-primary">Lihat Kalkulator →</span>
                             </div>
                         </div>
-                    </div>
-                </div>
+                        <div
+                            class="flex items-center space-x-3 bg-light-bg rounded-lg p-3 hover:bg-light-bg/70 transition">
+                            <div class="h-16 w-16 bg-light-grey rounded-lg flex-shrink-0">
+                                
 
-                <!-- KATEGORI 3: BEST DEALS -->
-                <div class="group flex-shrink-0 category-link-container">
-                    <a href="#"
-                        class="category-link hover:text-primary font-medium py-1 inline-block transition duration-150 text-dark-grey">
-                        Best Deals
-                    </a>
-                    <!-- DROP DOWN SOURCE -->
-                    <div id="dropdown-3" data-width="384px" class="js-dropdown-source hidden">
-                        <div class="flex p-5 text-dark-grey">
-                            <div class="w-1/2 pr-4 border-r border-light-grey">
-                                <h4 class="font-bold mb-2 text-sm">Diskon Hari Ini</h4>
-                                <ul class="space-y-1 text-sm">
-                                    <li><a href="#" class="block hover:text-primary">Flash Sale</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Voucher Terbaru</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Promo Bank</a></li>
-                                </ul>
-                            </div>
-                            <div class="w-1/2 pl-4">
-                                <h4 class="font-bold mb-2 text-sm">Penawaran Spesial</h4>
-                                <div
-                                    class="relative rounded-lg overflow-hidden h-20 bg-primary flex items-center justify-center text-center text-white p-2 shadow-md">
-                                    <h5 class="font-bold text-sm">Gratis Ongkir!</h5>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+[Image]
 
-                <!-- KATEGORI 4: FURNITUR -->
-                <div class="group flex-shrink-0 category-link-container">
-                    <a href="#"
-                        class="category-link hover:text-primary font-medium py-1 inline-block transition duration-150 text-dark-grey">
-                        Furnitur
-                    </a>
-                    <!-- DROP DOWN SOURCE -->
-                    <div id="dropdown-4" data-width="384px" class="js-dropdown-source hidden">
-                        <div class="flex p-5 text-dark-grey">
-                            <div class="w-1/2 pr-4 border-r border-light-grey">
-                                <h4 class="font-bold mb-2 text-sm">Kategori Utama</h4>
-                                <ul class="space-y-1 text-sm">
-                                    <li><a href="#" class="block hover:text-primary">Sofa & Kursi</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Meja Makan</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Tempat Tidur</a></li>
-                                </ul>
                             </div>
-                            <div class="w-1/2 pl-4">
-                                <h4 class="font-bold mb-2 text-sm">Berdasarkan Ruangan</h4>
-                                <ul class="space-y-1 text-sm">
-                                    <li><a href="#" class="block hover:text-primary">Ruang Tamu</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Kamar Tidur</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Dapur</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- KATEGORI 5: RAK DAN PENYIMPANAN -->
-                <div class="group flex-shrink-0 category-link-container">
-                    <a href="#"
-                        class="category-link hover:text-primary font-medium py-1 inline-block text-primary border-b-2 border-primary transition duration-150">
-                        Rak dan Penyimpanan
-                    </a>
-                    <!-- DROP DOWN SOURCE -->
-                    <div id="dropdown-5" data-width="900px" data-layout="center" class="js-dropdown-source hidden">
-                        <div class="flex p-6 text-dark-grey">
-                            <div class="w-1/5 pr-4 border-r border-light-grey">
-                                <h4 class="font-bold text-primary mb-3">Rak</h4>
-                                <ul class="space-y-2 text-sm">
-                                    <li><a href="#" class="block hover:text-primary">Rak Buku</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Racking System</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Rak Dapur</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Rak Troli dan Rak Tingkat</a>
-                                    </li>
-                                    <li><a href="#" class="block hover:text-primary">Rak Dinding</a></li>
-                                </ul>
-
-                                <h4 class="font-bold text-primary mb-3 mt-4">Laci</h4>
-                                <ul class="space-y-2 text-sm">
-                                    <li><a href="#" class="block hover:text-primary">Laci Pakaian</a></li>
-                                </ul>
-                            </div>
-                            <div class="w-1/5 px-4 border-r border-light-grey">
-                                <h4 class="font-bold text-primary mb-3">Gantungan</h4>
-                                <ul class="space-y-2 text-sm">
-                                    <li><a href="#" class="block hover:text-primary">Gantungan Baju</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Hanger Baju</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Jemuran</a></li>
-                                </ul>
-
-                                <h4 class="font-bold text-primary mb-3 mt-4">Lemari dan Loker</h4>
-                                <ul class="space-y-2 text-sm">
-                                    <li><a href="#" class="block hover:text-primary">Kitchen Set</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Lemari dan Sekat Pembatas</a>
-                                    </li>
-                                    <li><a href="#" class="block hover:text-primary">Lemari Kamar Mandi</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Lemari Kantor</a></li>
-                                </ul>
-                            </div>
-                            <div class="w-1/5 px-4 border-r border-light-grey">
-                                <h4 class="font-bold text-primary mb-3">Keranjang</h4>
-                                <ul class="space-y-2 text-sm">
-                                    <li><a href="#" class="block hover:text-primary">Keranjang Pakaian</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Keranjang Penyimpanan</a></li>
-                                </ul>
-                                <h4 class="font-bold text-primary mb-3 mt-4">Box dan Organizer</h4>
-                                <ul class="space-y-2 text-sm">
-                                    <li><a href="#" class="block hover:text-primary">Kotak Perhiasan</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Penyimpanan Multifungsi</a>
-                                    </li>
-                                    <li><a href="#" class="block hover:text-primary">Penyimpanan Sepatu</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Organizer Kamar Mandi</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Organizer Meja</a></li>
-                                </ul>
-                            </div>
-                            <div class="w-2/5 pl-6">
-                                <h4 class="font-bold mb-3">Inspirasi Terbaik untukmu</h4>
-                                <div class="space-y-4">
-                                    <div
-                                        class="flex items-center space-x-3 bg-light-bg rounded-lg p-3 hover:bg-light-bg/70 transition">
-                                        <div class="h-16 w-16 bg-light-grey rounded-lg flex-shrink-0">
-                                            <img src="https://placehold.co/100x100/EE0D0D/ffffff?text=STORAGE"
-                                                alt="Organizer Storage Must Haves"
-                                                onerror="this.onerror=null;this.src='https://placehold.co/100x100/EE0D0D/ffffff?text=Error';"
-                                                class="rounded-lg object-cover w-full h-full">
-                                        </div>
-                                        <div>
-                                            <p class="font-semibold text-sm">Organizer Storage Must Haves</p>
-                                            <span class="text-xs text-primary">Lihat Inspirasi →</span>
-                                        </div>
-                                    </div>
-                                    <div
-                                        class="flex items-center space-x-3 bg-light-bg rounded-lg p-3 hover:bg-light-bg/70 transition">
-                                        <div class="h-16 w-16 bg-light-grey rounded-lg flex-shrink-0">
-                                            <img src="https://placehold.co/100x100/CBCBCB/31311E?text=RAK+DINDING"
-                                                alt="Solusi Ruang Sempit"
-                                                onerror="this.onerror=null;this.src='https://placehold.co/100x100/CBCBCB/31311E?text=Error';"
-                                                class="rounded-lg object-cover w-full h-full">
-                                        </div>
-                                        <div>
-                                            <p class="font-semibold text-sm">Solusi Rak Dinding untuk Ruang Sempit
-                                            </p>
-                                            <span class="text-xs text-primary">Baca Artikel →</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- KATEGORI 6: DAPUR MINIMALIS -->
-                <div class="group flex-shrink-0 category-link-container">
-                    <a href="#"
-                        class="category-link hover:text-primary font-medium py-1 inline-block transition duration-150 text-dark-grey">
-                        Dapur Minimalis
-                    </a>
-                    <!-- DROP DOWN SOURCE -->
-                    <div id="dropdown-6" data-width="384px" class="js-dropdown-source hidden">
-                        <div class="flex p-5 text-dark-grey">
-                            <div class="w-1/2 pr-4 border-r border-light-grey">
-                                <h4 class="font-bold mb-2 text-sm">Peralatan Masak</h4>
-                                <ul class="space-y-1 text-sm">
-                                    <li><a href="#" class="block hover:text-primary">Panci & Wajan</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Alat Baking</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Pisau Dapur</a></li>
-                                </ul>
-                            </div>
-                            <div class="w-1/2 pl-4">
-                                <h4 class="font-bold mb-2 text-sm">Perlengkapan Saji</h4>
-                                <ul class="space-y-1 text-sm">
-                                    <li><a href="#" class="block hover:text-primary">Piring & Mangkok</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Gelas & Mug</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Sendok Garpu</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- KATEGORI 7: ELEKTRONIK & GADGET -->
-                <div class="group flex-shrink-0 category-link-container">
-                    <a href="#"
-                        class="category-link hover:text-primary font-medium py-1 inline-block transition duration-150 text-dark-grey">
-                        Elektronik & Gadget
-                    </a>
-                    <!-- DROP DOWN SOURCE -->
-                    <div id="dropdown-7" data-width="384px" class="js-dropdown-source hidden">
-                        <div class="flex p-5 text-dark-grey">
-                            <div class="w-1/2 pr-4 border-r border-light-grey">
-                                <h4 class="font-bold mb-2 text-sm">Home Appliances</h4>
-                                <ul class="space-y-1 text-sm">
-                                    <li><a href="#" class="block hover:text-primary">Pembersih Udara</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Kipas Angin</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Vacuum Cleaner</a></li>
-                                </ul>
-                            </div>
-                            <div class="w-1/2 pl-4">
-                                <h4 class="font-bold mb-2 text-sm">Gadget & Hiburan</h4>
-                                <ul class="space-y-1 text-sm">
-                                    <li><a href="#" class="block hover:text-primary">Speaker Bluetooth</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Smartwatch</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Aksesoris Gadget</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- KATEGORI 8: RUMAH TANGGA -->
-                <div class="group flex-shrink-0 category-link-container">
-                    <a href="#"
-                        class="category-link hover:text-primary font-medium py-1 inline-block transition duration-150 text-dark-grey">
-                        Rumah Tangga
-                    </a>
-                    <!-- DROP DOWN SOURCE -->
-                    <div id="dropdown-8" data-width="384px" class="js-dropdown-source hidden">
-                        <div class="flex p-5 text-dark-grey">
-                            <div class="w-1/2 pr-4 border-r border-light-grey">
-                                <h4 class="font-bold mb-2 text-sm">Pembersihan</h4>
-                                <ul class="space-y-1 text-sm">
-                                    <li><a href="#" class="block hover:text-primary">Alat Pel</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Deterjen</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Pembersih Lantai</a></li>
-                                </ul>
-                            </div>
-                            <div class="w-1/2 pl-4">
-                                <h4 class="font-bold mb-2 text-sm">Perawatan Pakaian</h4>
-                                <ul class="space-y-1 text-sm">
-                                    <li><a href="#" class="block hover:text-primary">Setrika</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Jemuran</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Pewangi</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- KATEGORI 9: HOME IMPROVEMENT -->
-                <div class="group flex-shrink-0 category-link-container">
-                    <a href="#"
-                        class="category-link hover:text-primary font-medium py-1 inline-block transition duration-150 text-dark-grey">
-                        Home Improvement
-                    </a>
-                    <!-- DROP DOWN SOURCE -->
-                    <div id="dropdown-9" data-width="384px" class="js-dropdown-source hidden">
-                        <div class="flex p-5 text-dark-grey">
-                            <div class="w-1/2 pr-4 border-r border-light-grey">
-                                <h4 class="font-bold mb-2 text-sm">Perkakas & Alat</h4>
-                                <ul class="space-y-1 text-sm">
-                                    <li><a href="#" class="block hover:text-primary">Bor & Obeng</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Tang & Kunci</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Material Bangunan</a></li>
-                                </ul>
-                            </div>
-                            <div class="w-1/2 pl-4">
-                                <h4 class="font-bold mb-2 text-sm">Perawatan Kebun</h4>
-                                <ul class="space-y-1 text-sm">
-                                    <li><a href="#" class="block hover:text-primary">Pot & Media Tanam</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Alat Berkebun</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Benih Tanaman</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- KATEGORI 10: BED & BATH -->
-                <div class="group flex-shrink-0 category-link-container">
-                    <a href="#"
-                        class="category-link hover:text-primary font-medium py-1 inline-block transition duration-150 text-dark-grey">
-                        Bed & Bath
-                    </a>
-                    <!-- DROP DOWN SOURCE -->
-                    <div id="dropdown-10" data-width="384px" class="js-dropdown-source hidden">
-                        <div class="flex p-5 text-dark-grey">
-                            <div class="w-1/2 pr-4 border-r border-light-grey">
-                                <h4 class="font-bold mb-2 text-sm">Kamar Tidur</h4>
-                                <ul class="space-y-1 text-sm">
-                                    <li><a href="#" class="block hover:text-primary">Sprei & Bed Cover</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Bantal & Guling</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Selimut</a></li>
-                                </ul>
-                            </div>
-                            <div class="w-1/2 pl-4">
-                                <h4 class="font-bold mb-2 text-sm">Kamar Mandi</h4>
-                                <ul class="space-y-1 text-sm">
-                                    <li><a href="#" class="block hover:text-primary">Handuk</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Karpet Kamar Mandi</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Shower & Keran</a></li>
-                                </ul>
+                            <div>
+                                <p class="font-semibold text-sm">Perbedaan Baja WF, H-Beam, dan Kanal C</p>
+                                <span class="text-xs text-primary">Baca Artikel Teknis →</span>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <div class="group flex-shrink-0 category-link-container">
+        <a href="#"
+            class="category-link hover:text-primary font-medium py-1 inline-block transition duration-150 text-dark-grey">
+            Atap & Penutup
+        </a>
+        <div id="dropdown-6" data-width="384px" class="js-dropdown-source hidden">
+            <div class="flex p-5 text-dark-grey">
+                <div class="w-1/2 pr-4 border-r border-light-grey">
+                    <h4 class="font-bold mb-2 text-sm">Atap Metal</h4>
+                    <ul class="space-y-1 text-sm">
+                        <li><a href="#" class="block hover:text-primary">Spandek</a></li>
+                        <li><a href="#" class="block hover:text-primary">Genteng Metal</a></li>
+                        <li><a href="#" class="block hover:text-primary">Seng Galvalum</a></li>
+                    </ul>
+                </div>
+                <div class="w-1/2 pl-4">
+                    <h4 class="font-bold mb-2 text-sm">Material Lain</h4>
+                    <ul class="space-y-1 text-sm">
+                        <li><a href="#" class="block hover:text-primary">Genteng Beton</a></li>
+                        <li><a href="#" class="block hover:text-primary">Insulasi Atap</a></li>
+                        <li><a href="#" class="block hover:text-primary">Material Talang</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="group flex-shrink-0 category-link-container">
+        <a href="#"
+            class="category-link hover:text-primary font-medium py-1 inline-block transition duration-150 text-dark-grey">
+            Alat Kerja & Safety
+        </a>
+        <div id="dropdown-7" data-width="384px" class="js-dropdown-source hidden">
+            <div class="flex p-5 text-dark-grey">
+                <div class="w-1/2 pr-4 border-r border-light-grey">
+                    <h4 class="font-bold mb-2 text-sm">Alat & Mesin</h4>
+                    <ul class="space-y-1 text-sm">
+                        <li><a href="#" class="block hover:text-primary">Mesin Las</a></li>
+                        <li><a href="#" class="block hover:text-primary">Gerinda Pemotong</a></li>
+                        <li><a href="#" class="block hover:text-primary">Perkakas Tangan</a></li>
+                    </ul>
+                </div>
+                <div class="w-1/2 pl-4">
+                    <h4 class="font-bold mb-2 text-sm">Perlengkapan K3</h4>
+                    <ul class="space-y-1 text-sm">
+                        <li><a href="#" class="block hover:text-primary">Helm Proyek</a></li>
+                        <li><a href="#" class="block hover:text-primary">Sarung Tangan Safety</a></li>
+                        <li><a href="#" class="block hover:text-primary">Sepatu Safety</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="group flex-shrink-0 category-link-container">
+        <a href="#"
+            class="category-link hover:text-primary font-medium py-1 inline-block transition duration-150 text-dark-grey">
+            Finishing & Pengecatan
+        </a>
+        <div id="dropdown-8" data-width="384px" class="js-dropdown-source hidden">
+            <div class="flex p-5 text-dark-grey">
+                <div class="w-1/2 pr-4 border-r border-light-grey">
+                    <h4 class="font-bold mb-2 text-sm">Cat & Pelapis</h4>
+                    <ul class="space-y-1 text-sm">
+                        <li><a href="#" class="block hover:text-primary">Cat Anti Karat</a></li>
+                        <li><a href="#" class="block hover:text-primary">Cat Dasar (Primer)</a></li>
+                        <li><a href="#" class="block hover:text-primary">Cat Besi/Kayu</a></li>
+                    </ul>
+                </div>
+                <div class="w-1/2 pl-4">
+                    <h4 class="font-bold mb-2 text-sm">Aksesoris</h4>
+                    <ul class="space-y-1 text-sm">
+                        <li><a href="#" class="block hover:text-primary">Kuas & Roller</a></li>
+                        <li><a href="#" class="block hover:text-primary">Tiner & Pelarut</a></li>
+                        <li><a href="#" class="block hover:text-primary">Amplifier</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="group flex-shrink-0 category-link-container">
+        <a href="#"
+            class="category-link hover:text-primary font-medium py-1 inline-block transition duration-150 text-dark-grey">
+            Pintu & Jendela
+        </a>
+        <div id="dropdown-9" data-width="384px" class="js-dropdown-source hidden">
+            <div class="flex p-5 text-dark-grey">
+                <div class="w-1/2 pr-4 border-r border-light-grey">
+                    <h4 class="font-bold mb-2 text-sm">Pintu</h4>
+                    <ul class="space-y-1 text-sm">
+                        <li><a href="#" class="block hover:text-primary">Pintu Baja</a></li>
+                        <li><a href="#" class="block hover:text-primary">Pintu PVC/Aluminium</a></li>
+                        <li><a href="#" class="block hover:text-primary">Kunci & Engsel</a></li>
+                    </ul>
+                </div>
+                <div class="w-1/2 pl-4">
+                    <h4 class="font-bold mb-2 text-sm">Jendela</h4>
+                    <ul class="space-y-1 text-sm">
+                        <li><a href="#" class="block hover:text-primary">Kusen Aluminium</a></li>
+                        <li><a href="#" class="block hover:text-primary">Jendela Kaca</a></li>
+                        <li><a href="#" class="block hover:text-primary">Aksesoris Jendela</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="group flex-shrink-0 category-link-container">
+        <a href="#"
+            class="category-link hover:text-primary font-medium py-1 inline-block transition duration-150 text-dark-grey">
+            Peralatan Plumbing
+        </a>
+        <div id="dropdown-10" data-width="384px" class="js-dropdown-source hidden">
+            <div class="flex p-5 text-dark-grey">
+                <div class="w-1/2 pr-4 border-r border-light-grey">
+                    <h4 class="font-bold mb-2 text-sm">Pipa</h4>
+                    <ul class="space-y-1 text-sm">
+                        <li><a href="#" class="block hover:text-primary">Pipa PVC</a></li>
+                        <li><a href="#" class="block hover:text-primary">Pipa Air Panas</a></li>
+                        <li><a href="#" class="block hover:text-primary">Fitting Pipa</a></li>
+                    </ul>
+                </div>
+                <div class="w-1/2 pl-4">
+                    <h4 class="font-bold mb-2 text-sm">Sanitasi</h4>
+                    <ul class="space-y-1 text-sm">
+                        <li><a href="#" class="block hover:text-primary">Keran & Valve</a></li>
+                        <li><a href="#" class="block hover:text-primary">Wastafel</a></li>
+                        <li><a href="#" class="block hover:text-primary">Saluran Air</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
             <!-- Panah Kanan Slider Kategori (Fungsional) -->
             <button id="category-scroll-right"

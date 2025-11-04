@@ -29,9 +29,9 @@
                     <h3 class="font-extrabold text-lg mb-4 text-dark-grey">Layanan Konsumen</h3>
                     <ul class="space-y-2 text-sm text-dark-grey/80">
                         <li><a href="#" class="hover:text-primary transition">Pusat Bantuan</a></li>
-                        <li><a href="#" class="hover:text-primary transition">Program Cicilan & Paylater</a></li>
+                        <!-- <li><a href="#" class="hover:text-primary transition">Program Cicilan & Paylater</a></li> -->
                         <li><a href="#" class="hover:text-primary transition">kencana bisnis</a></li>
-                        <li><a href="#" class="hover:text-primary transition">Custom Furniture</a></li>
+                        <!-- <li><a href="#" class="hover:text-primary transition">Custom Furniture</a></li> -->
                     </ul>
                 </div>
 
@@ -76,8 +76,8 @@
                 </div>
 
                 <div class="col-span-2 md:col-span-1">
-                    <h3 class="font-extrabold text-lg mb-4 text-dark-grey">Download Aplikasi kencana</h3>
-                    <div class="flex space-x-3 mb-6">
+                    <!-- <h3 class="font-extrabold text-lg mb-4 text-dark-grey">Download Aplikasi kencana</h3> -->
+                    <!-- <div class="flex space-x-3 mb-6">
                         <a href="#" aria-label="Download App Store">
                             <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg"
                                 alt="App Store" class="h-10">
@@ -86,21 +86,21 @@
                             <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"
                                 alt="Google Play" class="h-10">
                         </a>
-                    </div>
+                    </div> -->
 
                     <h3 class="font-extrabold text-lg mb-4 text-dark-grey">Daftar Newsletter</h3>
                     <p class="text-sm mb-3 text-dark-grey/80">
                         Jadilah orang pertama yang mendapatkan informasi diskon dan penawaran menarik dari kencana
                     </p>
 
-                    <div class="flex">
+                    <!-- <div class="flex">
                         <input type="email" placeholder="Email kamu di sini"
                             class="p-3 border border-light-grey rounded-l-lg flex-grow text-sm focus:ring-primary focus:border-primary">
                         <button
                             class="bg-primary text-white font-bold px-5 py-3 rounded-r-lg text-sm hover:bg-primary-dark transition duration-150">
                             Kirim
                         </button>
-                    </div>
+                    </div> -->
                 </div>
             </div>
         </div>
