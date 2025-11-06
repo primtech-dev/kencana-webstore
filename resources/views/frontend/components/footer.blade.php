@@ -4,13 +4,13 @@
             <div
                 class="flex flex-col md:flex-row justify-between items-start md:items-center pb-8 border-b border-light-grey/50">
                 <div class="flex items-center space-x-4 mb-4 md:mb-0">
-                    <div class="flex items-center">
+                    <div class="flex flex-col items-center">
                         <span class="text-2xl font-extrabold text-primary">KENCANA</span>
-                        <span class="text-sm ml-1 text-dark-grey/80">rumahnyarumah</span>
+                        <span class="text-sm ml-1 text-dark-grey/80">sahabat bangunan anda</span>
                     </div>
-                    <p class="text-sm text-dark-grey/80 hidden sm:block">
+                    <!-- <p class="text-sm text-dark-grey/80 hidden sm:block">
                         Solusi Omnichannel Kebutuhan Rumah Tangga, Gaya Hidup, dan Hobi Terlengkap dan Berkualitas
-                    </p>
+                    </p> -->
                 </div>
 
                 <div class="flex space-x-3 text-dark-grey/80 text-xl">

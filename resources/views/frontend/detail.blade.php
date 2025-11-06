@@ -122,7 +122,7 @@
                                 tabindex="0" role="button" aria-label="Gambar Produk 3: Sofa Dalam Mode Tidur">
                                 <span class="text-xs text-light-grey">Gbr 3</span>
                             </div>
-                           
+
                         </div>
                     </div>
 
@@ -169,7 +169,7 @@
                         </div>
                     </div>
 
-                   
+
                     <div class="mt-6">
                         <div class="flex border-b border-light-grey/50 text-sm font-semibold" role="tablist">
                             <button id="tab-spesifikasi"
@@ -320,45 +320,58 @@
                 <a href="#" class="text-primary text-sm font-semibold">Lihat Semua ></a>
             </div>
             <p class="text-sm text-dark-grey/80 mb-4">Direkomendasikan berdasarkan produk terbaru, harga terendah pada halaman detail produk</p>
+            @php
+            // Data produk
+            $products_data = [
+            ['id' => 'P001', 'name' => 'Panel Ceiling 3d pu 4@1.5x', 'price' => 120000, 'category' => 'Dekoratif / Arsitektural', 'rating' => 4.8, 'ulasan' => 10, 'stok' => 'Tersedia', 'url_img' => asset('/asset/produk/ceiling 3d pu 4@1.5x.png')],
+            ['id' => 'P002', 'name' => 'Louvre Vent 100', 'price' => 85000, 'category' => 'Dekoratif / Arsitektural', 'rating' => 4.5, 'ulasan' => 15, 'stok' => 'Tersedia', 'url_img' => asset('/asset/produk/Louvre.png')],
+            ['id' => 'P003', 'name' => 'Pintu Steel Door Motif Kayu', 'price' => 450000, 'category' => 'Dekoratif / Arsitektural', 'rating' => 4.0, 'ulasan' => 3, 'stok' => 'Terbatas', 'url_img' => 'https://image1ws.indotrading.com/s3/productimages/webp/co228746/p778244/w300-h300/fe89573f-0209-4c1b-8899-94e65e2fa858.png'],
+            ['id' => 'P101', 'name' => 'Genteng Metal Roof', 'price' => 220000, 'category' => 'Roofing & Walling', 'rating' => 4.9, 'ulasan' => 200, 'stok' => 'Tersedia', 'url_img' => 'https://agenbajaringan.com/img/genteng-metal.png'],
+            ['id' => 'P102', 'name' => 'Kanal C75 baja ringan', 'price' => 75000, 'category' => 'Dekoratif & Arsitektural', 'rating' => 4.2, 'ulasan' => 58, 'stok' => 'Tersedia', 'url_img' => asset('/asset/produk/1. Kanal C75-1.png')],
+            ['id' => 'P201', 'name' => 'Reng Asimetris', 'price' => 45000, 'category' => 'Kerangka Green House', 'rating' => 3.5, 'ulasan' => 1, 'stok' => 'Tersedia', 'url_img' => asset('/asset/produk/reng-asimetris-1.jpg')],
+            ];
+
+            $products = array_map(function($product) {
+            $price_int = $product['price'];
+            $old_price_int = round($price_int / 0.8, -3);
+
+            $product['price'] = number_format($price_int, 0, ',', '.');
+            $product['old_price'] = number_format($old_price_int, 0, ',', '.');
+            return $product;
+            }, $products_data);
+            @endphp
 
             <div class="flex overflow-x-scroll space-x-4 pb-4">
-                @php
-
-                // Asumsi old_price adalah harga sekarang + 20% dari harga sekarang, untuk menunjukkan diskon.
-                $products_data = [
-                ['id' => 'P001', 'name' => 'Panel Ceiling A', 'price' => 120000, 'category' => 'Dekoratif / Arsitektural', 'rating' => 4.8, 'url_img' => 'https://id.pvcpanelchina.com/uploads/202334835/white-pvc-ceiling-panelsc71d0f4e-4fed-441a-88b3-144a09284153.jpg'],
-                ['id' => 'P002', 'name' => 'Louvre Vent 100', 'price' => 85000, 'category' => 'Dekoratif / Arsitektural', 'rating' => 4.5, 'url_img' => 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRnfxIEAPNi00H1vA5Ydp5Duz6AsTjxdfxu_g&s'],
-                ['id' => 'P003', 'name' => 'Pintu Steel Series', 'price' => 450000, 'category' => 'Dekoratif / Arsitektural', 'rating' => 4.0, 'url_img' => 'https://image1ws.indotrading.com/s3/productimages/webp/co228746/p778244/w300-h300/fe89573f-0209-4c1b-8899-94e65e2fa858.png'],
-                ['id' => 'P101', 'name' => 'Genteng Metal Roof', 'price' => 220000, 'category' => 'Roofing & Walling', 'rating' => 4.9, 'url_img' => 'https://agenbajaringan.com/img/genteng-metal.png'],
-                ['id' => 'P102', 'name' => 'Atap Insulasi 5mm', 'price' => 175000, 'category' => 'Roofing & Walling', 'rating' => 4.2, 'url_img' => 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQezJFWtbbuMTX18v7CaDS-_jv93an4e5h18A&s'],
-                ['id' => 'P201', 'name' => 'Spring Clip Green', 'price' => 45000, 'category' => 'Kerangka Green House', 'rating' => 3.5, 'url_img' => 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSmb-HFHwIl4XasXloHWmq4puQ1U46_gDQjkw&s'],
-                ['id' => 'P301', 'name' => 'Rangka Baja Ringan 4m', 'price' => 680000, 'category' => 'Struktural', 'rating' => 5.0, 'url_img' => 'https://kontainerindonesia.co.id/blog/wp-content/uploads/2024/08/Profil-Baja-Ringan-U-600x375.webp'],
-                ['id' => 'P302', 'name' => 'Pipa Galvanis 2"', 'price' => 150000, 'category' => 'Struktural', 'rating' => 4.7, 'url_img' => 'https://image.menarasinarbaja.co.id/s3/productimages/webp/co244175/p1201966/w600-h600/1a763e6f-bb8d-4996-93b4-67e28d92afd0.jpg'],
-                ];
-
-                $products = array_map(function($product) {
-                $price_int = $product['price'];
-                // Asumsi diskon 20%, jadi harga lama (old_price) adalah harga sekarang / (1 - 0.2)
-                $old_price_int = round($price_int / 0.8, -3); // Dibulatkan ke ribuan terdekat
-
-                // Format harga ke string dengan titik sebagai pemisah ribuan
-                $product['price'] = number_format($price_int, 0, ',', '.');
-                $product['old_price'] = number_format($old_price_int, 0, ',', '.');
-                return $product;
-                }, $products_data);
-                @endphp
-
                 @foreach ($products as $product)
-                <div class="flex-shrink-0 w-40 sm:w-48 bg-white p-3 rounded-lg shadow-sm border border-light-grey/50 hover:shadow-md transition duration-200">
-                    <div class="w-full aspect-square bg-light-bg mb-2 rounded-md overflow-hidden">
-                        {{-- GAMBAR DIGANTI MENGGUNAKAN url_img DARI DATA PRODUK --}}
-                        <img src="{{ $product['url_img'] }}" alt="{{ $product['name'] }}" class="object-cover w-full h-full">
+                <div
+                    class="flex-shrink-0 w-40 sm:w-48 bg-white p-3 rounded-lg shadow-sm border border-light-grey/50 hover:shadow-md transition duration-200 cursor-pointer">
+                    <div class="relative">
+                        <div class="w-full aspect-square bg-light-bg mb-2 rounded-md overflow-hidden">
+                            <img
+                                src="{{ $product['url_img'] }}"
+                                alt="{{ $product['name'] }}"
+                                onerror="this.onerror=null;this.src='https://placehold.co/600x400/000/ffffff?text=Product+Image';"
+                                class="h-32 sm:h-40 md:h-48 w-full object-cover rounded-t-lg">
+                        </div>
+                        <div
+                            class="absolute top-2 right-2 {{ $product['stok'] == 'Tersedia' ? 'bg-primary' : 'bg-discount' }} text-white text-xs font-bold px-2 py-1 rounded">
+                            {{ $product['stok'] == 'Tersedia' ? 'Stok Tersedia' : 'Stok Terbatas' }}
+                        </div>
                     </div>
-                    <p class="text-xs text-dark-grey/80 truncate mb-1">{{ $product['name'] }}</p>
-                    <p class="text-sm font-extrabold text-primary">Rp{{ $product['price'] }}</p>
-                    <p class="text-xs text-light-grey line-through">Rp{{ $product['old_price'] }}</p>
-                    <div class="flex items-center text-xs text-light-grey mt-1" aria-label="Rating {{ $product['rating'] }}">
-                        <span class="text-yellow-500" aria-hidden="true">★</span> {{ $product['rating'] }}
+                    <div class="p-1">
+                        <p class="text-xs text-dark-grey/80 truncate mb-1">{{ $product['category'] }}</p>
+                        <p
+                            class="text-sm font-semibold text-dark-grey line-clamp-2 min-h-[1.5rem]">
+                            {{ $product['name'] }}
+                        </p>
+
+                        <p class="text-xs text-light-grey line-through mt-2">Rp{{ $product['old_price'] }}</p>
+                        <p class="text-base font-bold text-discount">Rp{{ $product['price'] }}</p>
+
+                        <div class="flex items-center text-xs text-dark-grey mt-2" aria-label="Rating {{ $product['rating'] }}">
+                            <span class="text-primary" aria-hidden="true">★</span><span class="ml-1">{{ $product['rating'] }}</span><span
+                                class="ml-2 text-dark-grey">| {{ $product['ulasan'] }} (ulasan)</span>
+                        </div>
                     </div>
                 </div>
                 @endforeach
