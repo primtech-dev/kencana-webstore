@@ -2,7 +2,12 @@
     <div id="mobile-menu-drawer"
         class="w-72 sm:w-80 h-full bg-white shadow-2xl p-4 transform -translate-x-full transition-transform duration-300 ease-in-out overflow-y-auto">
         <div class="flex justify-between items-center pb-4 border-b border-light-grey">
-            <a href="{{ url('/') }}" class="text-lg font-extrabold text-primary">KENCANA</a>
+            <!-- <a href="{{ url('/') }}" class="text-lg font-extrabold text-primary">KENCANA</a> -->
+             <!-- ganti logo -->
+            <a href="{{ url('/') }}" class="text-lg font-extrabold text-primary">
+                <img src="{{asset('asset/Kencana Store.png')}}" alt="" class="w-20">
+            </a>
+
             <button id="close-menu-btn"
                 class="text-dark-grey hover:text-primary p-2 rounded-full hover:bg-light-bg transition">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -23,7 +28,7 @@
             <a href="{{url('/')}}" class="block p-3 font-semibold text-primary bg-light-bg rounded-lg">Kategori Produk</a>
             <a href="{{url('/promo')}}" class="block p-3 font-semibold text-dark-grey hover:bg-light-bg rounded-lg">Promo</a>
             <a href="{{url('/keranjang')}}" class="block p-3 font-semibold text-dark-grey hover:bg-light-bg rounded-lg">Keranjang</a>
-            <!-- <a href="#" class="block p-3 font-semibold text-dark-grey hover:bg-light-bg rounded-lg">Inspirasi & Ide</a> -->
+            <a href="{{url('/faq')}}" class="block p-3 font-semibold text-dark-grey hover:bg-light-bg rounded-lg">FAQ</a>
             <a href="#" class="block p-3 font-semibold text-dark-grey hover:bg-light-bg rounded-lg">Pusat
                 Bantuan</a>
         </nav>
@@ -62,10 +67,8 @@
             <div class="flex items-center space-x-2 md:space-x-6 flex-shrink-0">
                 <button id="open-menu-btn" class="md:hidden text-white p-1 hover:text-primary">☰</button>
 
-                <a href="#" class="flex flex-col items-center leading-none flex-shrink-0 mr-4">
-                    <div class="flex items-center bg-transparent p-1 rounded-md">
-                        <span class="text-2xl font-extrabold text-white ml-1">KENCANA</span>
-                    </div>
+                <a href="{{url('/')}}" class="flex flex-col items-center leading-none flex-shrink-0 mr-4">
+                   <img src="{{asset('asset/Kencana Store Putih.png')}}" alt="" class="w-20">
                     <span class="text-xs text-white mt-0.5 hidden sm:block">sahabat bangunan anda</span>
                 </a>
 
