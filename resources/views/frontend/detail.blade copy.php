@@ -4,7 +4,7 @@
 
 {{-- ... MODAL LOKASI & LIGHTBOX (Bagian ini TIDAK BERUBAH) ... --}}
 
-<div class="modal-location fixed inset-0 bg-light-grey bg-opacity-75 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-opacity duration-300"
+<div class="modal-location fixed inset-0 bg-transparent bg-opacity-50 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-opacity duration-300"
     id="location-modal"
     role="dialog"
     aria-modal="true"
@@ -58,7 +58,7 @@
                     <p class="text-xs text-dark-grey/80">{{ $data['branch_address'] }}</p>
                     <p class="text-xs text-primary font-semibold mt-1">{{ $distance }}</p> {{-- Jarak sudah ada --}}
                     <p class="text-xs {{ $statusColor }} font-semibold mt-1">
-                        {{ $data['status_label'] }} ({{ $data['total_available_stock'] }} unit)
+                        {{ $data['status_label'] }} ({{ $data['total_available_stock'] }} Unit)
                     </p>
                 </div>
                 <div class="flex-shrink-0">
@@ -252,45 +252,13 @@
                     <h1 class="text-2xl font-extrabold text-dark-grey mb-1">
                         {{ $product->name }}
                     </h1>
-                    <span class="font-bold">{{ 0 }}</span> Ulasan | variant: <span class="font-bold text-primary" id="current-variant-name">{{$product->variants[0]->variant_name ?? 'Tidak Diketahui' }}</span></span>
+
+                    <!-- <p class="text-sm text-dark-grey/80 mb-3"> -->
+                    <span class="font-bold">{{ 0 }}</span> Ulasan | variant: <span class="font-bold text-primary">{{$product->variants[0]->variant_name ?? 'Tidak Diketahui' }}</span>
                     </p>
 
                     {{-- GANTI: Harga Dinamis --}}
                     <p class="text-3xl font-extrabold text-primary mb-4" id="current-price">Rp {{ $product->price_formatted ?? number_format($subtotal_price, 0, ',', '.') }}</p>
-
-                    {{-- START: BARU DITAMBAHKAN - PEMILIHAN VARIAN --}}
-                    @if(count($product->variants) > 0)
-                    <div class="mb-4 pt-2">
-                        <p class="text-dark-grey font-semibold text-sm mb-2">Pilih Varian:</p>
-                        <div class="flex flex-wrap gap-3 variant-selection" role="radiogroup" aria-label="Pilihan Varian Produk">
-                            @foreach ($product->variants as $index => $variant)
-                            @php
-                            $isChecked = $index === 0; // Pilih yang pertama secara default
-                            $image_url = env('APP_URL_BE') . '/' . $variant->images[0]->url ?? $product_main_image;
-                            @endphp
-                            <label class="
-                                p-3 border rounded-lg cursor-pointer transition duration-150 ease-in-out 
-                                flex items-center space-x-2 text-sm font-semibold
-                                {{ $isChecked ? 'border-primary bg-primary/10' : 'border-light-grey hover:border-dark-grey/50' }}">
-
-                                <input type="radio"
-                                    name="product_variant"
-                                    value="{{ $variant->id }}"
-                                    data-price="{{ $variant->price }}"
-                                    data-image-url="{{ $image_url }}"
-                                    data-variant-name="{{ $variant->variant_name }}"
-                                    class="text-primary focus:ring-primary h-4 w-4 border-light-grey sr-only"
-                                    {{ $isChecked ? 'checked' : '' }}>
-
-                                <img src="{{ $image_url }}" alt="{{ $variant->variant_name }}" class="w-8 h-8 object-cover rounded-md flex-shrink-0">
-                                <span class="text-dark-grey">{{ $variant->variant_name }} ({{ $variant->unit->name ?? '-' }})</span>
-                            </label>
-                            @endforeach
-                        </div>
-                    </div>
-
-                    @endif
-                    {{-- END: BARU DITAMBAHKAN - PEMILIHAN VARIAN --}}
 
                     <div class="divider h-px bg-light-grey/50 mb-4"></div>
 
@@ -445,9 +413,10 @@
 
                     {{-- Action Buttons --}}
                     <div class="space-y-3 mb-4">
-                        <button type="button" id="buyNowButton" class="w-full py-3 rounded-xl bg-primary text-white font-bold text-lg hover:bg-primary-dark transition duration-150 shadow-lg shadow-primary/50">
-                            Beli Sekarang
-
+                        <button type="button" class="w-full py-3 rounded-xl bg-primary text-white font-bold text-lg hover:bg-primary-dark transition duration-150 shadow-lg shadow-primary/50">
+                            <a href="{{url('checkout')}}">
+                                Beli Sekarang
+                            </a>
                         </button>
                         <div class="flex space-x-3">
                             <input type="hidden" id="product-variant-id" value="{{$product->variants[0]->id}}">
@@ -532,6 +501,7 @@
         const productQtyInput = document.getElementById('product-qty-input');
         const subtotalPrice = document.getElementById('subtotal-price');
 
+
         // Lightbox/Modal Gambar
         const lightbox = document.getElementById('image-lightbox');
         const lightboxImage = document.getElementById('lightbox-image-content');
@@ -543,26 +513,10 @@
         // Tambahkan Elemen baru
         const addToCartButton = document.getElementById('add-to-cart-button');
 
-        // BARU: Elemen untuk pilihan varian
-        const variantRadios = document.querySelectorAll('input[name="product_variant"]');
-        // BARU: Elemen untuk menyimpan ID Varian yang dipilih
-        const productVariantIdInput = document.getElementById('product-variant-id');
-
-        // BARU: Variabel untuk menyimpan harga dasar yang dipilih
-        let currentBasePrice = 0;
-
-        // Elemen untuk menampilkan harga dasar
-        const basePriceTextElement = document.getElementById('current-price');
-
-        // ✨ BARU: Elemen untuk menampilkan Nama Varian
-        const currentVariantNameElement = document.getElementById('current-variant-name');
-
-
         // --- Logika Helper ---
 
-        /** Memperbarui gambar utama produk (diperbaiki agar sinkron dengan varian) */
+        /** Memperbarui gambar utama produk */
         function updateMainImage(imageUrl) {
-            if (!mainImage) return;
             mainImage.style.opacity = '0';
             setTimeout(() => {
                 mainImage.src = imageUrl;
@@ -573,28 +527,13 @@
                     // Update fungsi openLightbox pada container gambar utama
                     mainImageContainer.setAttribute('onclick', `openLightbox('${imageUrl}')`);
                 }
-
-                // Hapus border dari semua thumbnail
-                thumbnails.forEach(t => {
-                    t.classList.remove('border-primary', 'border-2');
-                    t.classList.add('border-light-grey', 'border');
-                });
-                // Tambahkan border pada thumbnail yang sesuai (jika ada)
-                const activeThumbnail = document.querySelector(`.thumbnail[data-image="${imageUrl}"]`);
-                if (activeThumbnail) {
-                    activeThumbnail.classList.add('border-primary', 'border-2');
-                    activeThumbnail.classList.remove('border-light-grey', 'border');
-                }
-
             }, 100);
         }
 
         /** Memformat angka menjadi Rupiah */
         function formatRupiah(number) {
-            // Kita asumsikan number di sini adalah harga dalam bentuk integer/number,
-            // bukan string yang sudah diformat Rupiah.
             const cleanNumber = parseInt(number);
-            if (isNaN(cleanNumber)) return 'Rp' + (0).toLocaleString('id-ID');
+            if (isNaN(cleanNumber)) return 'Rp0';
             return 'Rp' + cleanNumber.toLocaleString('id-ID');
         }
 
@@ -602,105 +541,18 @@
         function updateSubtotal(currentQty) {
             let finalQty = parseInt(currentQty) || 1;
             if (finalQty < 1) finalQty = 1;
-            if (finalQty > 100) finalQty = 100; // Batas maksimal
 
             productQtyInput.value = finalQty;
 
-            // Gunakan harga dasar yang sudah diupdate oleh variantChangeListener
-            const basePrice = currentBasePrice || 0;
-
-            // Update elemen harga dasar di UI
-            if (basePriceTextElement) {
-                basePriceTextElement.textContent = formatRupiah(basePrice);
-            }
-
-            // Memastikan subtotalPrice ada sebelum diakses
-            if (subtotalPrice) {
-                subtotalPrice.textContent = formatRupiah(finalQty * basePrice);
-            }
-        }
-
-        // --- Logika Pemilihan Varian (MODIFIKASI: Varian + Harga + Gambar + UI) ---
-
-        function variantChangeListener() {
-            let variantSelected = false;
-
-            // 1. ✨ PERBAIKAN: Hapus class aktif (border-primary, bg-primary/10) dari SEMUA label varian
-            document.querySelectorAll('.variant-selection label').forEach(label => {
-                label.classList.remove('border-primary', 'bg-primary/10');
-                label.classList.add('border-light-grey', 'hover:border-dark-grey/50');
-            });
-
-            variantRadios.forEach(radio => {
-                if (radio.checked) {
-                    // Ambil semua data
-                    const newPrice = parseInt(radio.dataset.price.replace(/\./g, '')) || 0; // Pastikan harga adalah INT/Number
-                    const variantId = radio.value;
-                    const variantImageUrl = radio.dataset.imageUrl;
-                    const variantName = radio.dataset.variantName; // ✨ BARU: Ambil nama varian
-
-                    // 1.1. ✨ PERBAIKAN: Update Tampilan Label Varian (Background/Border)
-                    const currentLabel = radio.closest('label');
-                    if (currentLabel) {
-                        currentLabel.classList.add('border-primary', 'bg-primary/10');
-                        currentLabel.classList.remove('border-light-grey', 'hover:border-dark-grey/50');
-                    }
-
-                    // 2. Update Harga Dasar Global
-                    currentBasePrice = newPrice;
-
-                    // 3. Update Input Varian ID Tersembunyi
-                    if (productVariantIdInput) {
-                        productVariantIdInput.value = variantId;
-                    }
-
-                    // 4. Update Gambar Utama
-                    if (variantImageUrl) {
-                        updateMainImage(variantImageUrl);
-                    } else if (thumbnails.length > 0) {
-                        updateMainImage(thumbnails[0].getAttribute('data-image'));
-                    }
-
-                    // 5. ✨ BARU: Update Nama Varian di UI
-                    if (currentVariantNameElement) {
-                        currentVariantNameElement.textContent = variantName;
-                    }
-
-                    variantSelected = true;
-                }
-            });
-
-            // Pastikan subtotal dihitung ulang dengan harga baru
-            updateSubtotal(productQtyInput.value);
-
-            // Inisialisasi default jika belum ada yang terpilih (mungkin hanya saat load pertama)
-            if (!variantSelected && variantRadios.length > 0) {
-                // Pilih yang pertama secara default
-                variantRadios[0].checked = true;
-                // Memicu ulang change event untuk memuat harga/gambar yang pertama
-                variantRadios[0].dispatchEvent(new Event('change'));
-            }
-        }
-
-        // Event listener untuk radio buttons varian
-        if (variantRadios.length > 0) {
-            variantRadios.forEach(radio => {
-                radio.addEventListener('change', variantChangeListener);
-            });
-
-            // Panggil sekali untuk inisialisasi saat DOMContentLoaded
-            variantChangeListener();
-        } else {
-            // Jika tidak ada varian sama sekali, inisialisasi harga default dari UI statis
+            const basePriceTextElement = document.getElementById('current-price');
             const basePriceText = basePriceTextElement ? basePriceTextElement.textContent.replace('Rp', '').replace(/\./g, '') : '0';
-            currentBasePrice = parseInt(basePriceText) || 0;
-            updateSubtotal(productQtyInput.value);
+            const basePrice = parseInt(basePriceText) || 0;
+
+            subtotalPrice.textContent = formatRupiah(finalQty * basePrice);
         }
 
-        // ... (Logika Input QTY, Lightbox, Lokasi, Tabs, Add to Cart, dan Escape tetap sama) ...
 
-
-        // --- Logika Input QTY ---
+        // --- Logika Input QTY (Sudah Berjalan Baik) ---
         if (productQtyInput) {
             productQtyInput.addEventListener('change', function() {
                 let val = parseInt(this.value);
@@ -736,9 +588,10 @@
                 }
             });
         }
+        updateSubtotal(productQtyInput.value);
 
 
-        // --- Logika Image Lightbox/Popup ---
+        // --- Logika Image Lightbox/Popup (DIPERBAIKI) ---
 
         /** Membuka Lightbox */
         window.openLightbox = function(imageUrl) {
@@ -762,7 +615,7 @@
 
         // Listener untuk tombol Escape pada Lightbox
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && lightbox && !lightbox.classList.contains('pointer-events-none') && !locationModal.classList.contains('opacity-100')) {
+            if (e.key === 'Escape' && lightbox && !lightbox.classList.contains('pointer-events-none')) {
                 closeLightbox();
             }
         });
@@ -777,7 +630,7 @@
         }
 
 
-        // --- Logika Galeri Thumbnail (Dipertahankan untuk sinkronisasi) ---
+        // --- Logika Galeri Thumbnail (DIPERBAIKI) ---
 
         thumbnails.forEach(thumb => {
             thumb.addEventListener('click', function() {
@@ -795,8 +648,6 @@
 
                 // Update gambar utama
                 updateMainImage(imageUrl);
-
-                // Catatan: Jika Anda ingin thumbnail memilih varian, Anda harus menambahkan logika di sini
             });
 
             // Tambahkan fungsionalitas keyboard
@@ -809,20 +660,18 @@
         });
 
 
-        // --- Logika Modal Lokasi (Sorting dan Pemilihan Toko) ---
+        // --- Logika Modal Lokasi (Global & Ditingkatkan) ---
 
         // Fungsi Modal Visibility (Global)
         window.openLocationModal = function() {
             if (!locationModal) return;
             locationModal.classList.remove('pointer-events-none', 'opacity-0');
             locationModal.classList.add('opacity-100');
-            const modalDialog = locationModal.querySelector('[role="document"]');
-            if (modalDialog) {
-                modalDialog.classList.remove('scale-95');
-                modalDialog.classList.add('scale-100');
-            }
+            locationModal.querySelector('[role="document"]').classList.remove('scale-95');
+            locationModal.querySelector('[role="document"]').classList.add('scale-100');
             document.body.style.overflow = 'hidden';
 
+            // Panggil fungsi untuk sorting dan memilih yang terdekat saat modal dibuka
             sortAndHighlightClosestStore();
         }
 
@@ -830,11 +679,8 @@
             if (!locationModal) return;
             locationModal.classList.remove('opacity-100');
             locationModal.classList.add('opacity-0');
-            const modalDialog = locationModal.querySelector('[role="document"]');
-            if (modalDialog) {
-                modalDialog.classList.remove('scale-100');
-                modalDialog.classList.add('scale-95');
-            }
+            locationModal.querySelector('[role="document"]').classList.remove('scale-100');
+            locationModal.querySelector('[role="document"]').classList.add('scale-95');
 
             setTimeout(() => {
                 locationModal.classList.add('pointer-events-none');
@@ -842,15 +688,17 @@
             }, 300);
         }
 
+        /**
+         * Menggunakan data-distance-value (numerik) untuk memastikan
+         * toko terdekat muncul paling atas dan dipilih secara default
+         */
         function sortAndHighlightClosestStore() {
             const tabStoreList = document.getElementById('tab-store-list');
             const locationListContainer = tabStoreList ? tabStoreList.querySelector('.flex-grow.overflow-y-auto') : null;
 
-            if (!locationListContainer || !selectStoreButton) {
-                if (selectStoreButton) {
-                    selectStoreButton.disabled = true;
-                    selectStoreButton.classList.add('opacity-50', 'cursor-not-allowed');
-                }
+            if (!locationListContainer) {
+                selectStoreButton.disabled = true;
+                selectStoreButton.classList.add('opacity-50', 'cursor-not-allowed');
                 return;
             }
 
@@ -876,13 +724,12 @@
 
             // 3. Masukkan kembali yang sudah disortir, tambahkan label 'Terdekat', dan pilih radio button yang pertama
             labels.forEach((label, index) => {
+                // Hapus label terdekat sebelumnya
                 let closestSpan = label.querySelector('.closest-badge');
                 if (closestSpan) closestSpan.remove();
 
                 const radio = label.querySelector('input[name="selected_store"]');
                 const nameParagraph = label.querySelector('p:first-child');
-
-                if (radio) radio.checked = false;
 
                 if (index === 0 && radio) {
                     // Tambahkan badge 'Terdekat'
@@ -898,8 +745,11 @@
                     firstRadio = radio;
 
                 } else if (nameParagraph) {
+                    // Hapus badge jika bukan yang pertama
                     const existingBadge = nameParagraph.querySelector('.closest-badge');
                     if (existingBadge) existingBadge.remove();
+                    // Pastikan radio button lainnya tidak terpilih
+                    if (radio) radio.checked = false;
                 }
 
                 locationListContainer.appendChild(label);
@@ -916,16 +766,19 @@
         }
 
 
-        // Event Listeners Logika Lokasi
+        // --- Event Listeners Logika Lokasi ---
+
+        // Radio button cabang
         storeRadioButtons.forEach(radio => {
             radio.addEventListener('change', function() {
-                if (this.checked && selectStoreButton) {
+                if (this.checked) {
                     selectStoreButton.disabled = false;
                     selectStoreButton.classList.remove('opacity-50', 'cursor-not-allowed');
                 }
             });
         });
 
+        // Tombol Pilih Toko
         if (selectStoreButton) {
             selectStoreButton.addEventListener('click', function() {
                 const selectedRadio = document.querySelector('input[name="selected_store"]:checked');
@@ -939,7 +792,7 @@
                     // Update UI utama
                     currentStoreDisplay.innerHTML = `<span class="${statusColorClass} font-bold">${storeStatus}</span> di ${storeName}`;
 
-                    const distanceText = distanceDisplay && distanceDisplay !== 'N/A' ?
+                    const distanceText = distanceDisplay !== 'N/A' ?
                         `${distanceDisplay} dari lokasi Anda` :
                         'Produk dapat diambil atau dikirim';
 
@@ -951,9 +804,15 @@
             });
         }
 
+        // Event listener untuk menutup modal ketika klik di luar area modal atau tombol Escape
         if (locationModal) {
             locationModal.addEventListener('click', function(e) {
                 if (e.target.id === 'location-modal') {
+                    closeLocationModal();
+                }
+            });
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && !locationModal.classList.contains('pointer-events-none')) {
                     closeLocationModal();
                 }
             });
@@ -963,6 +822,7 @@
         // --- Logika Inisialisasi Tampilan Lokasi Utama ---
 
         function initializeMainLocationDisplay() {
+            // Kita ambil label pertama, yang sudah disortir dan merupakan toko terdekat di Controller
             const firstLabel = document.querySelector('label[data-store-id]');
 
             if (firstLabel) {
@@ -970,12 +830,14 @@
                 const storeStatus = firstLabel.dataset.storeFullStatus;
                 const statusColorClass = firstLabel.dataset.statusColor;
 
+                // Ambil jarak dari radio button di dalam label pertama
                 const firstRadio = firstLabel.querySelector('input[name="selected_store"]');
                 const distanceDisplay = firstRadio ? firstRadio.dataset.storeDistance : 'N/A';
 
+                // Update UI utama
                 currentStoreDisplay.innerHTML = `<span class="${statusColorClass} font-bold">${storeStatus}</span> di ${storeName}`;
 
-                const distanceText = distanceDisplay && distanceDisplay !== 'N/A' ?
+                const distanceText = distanceDisplay !== 'N/A' ?
                     `${distanceDisplay} dari lokasi Anda` :
                     'Produk dapat diambil atau dikirim';
 
@@ -1010,6 +872,7 @@
 
                 document.getElementById(targetId).classList.remove('hidden');
 
+                // Jika pindah ke tab store list, panggil sorting lagi
                 if (targetId === 'tab-store-list') {
                     sortAndHighlightClosestStore();
                 }
@@ -1028,6 +891,43 @@
             });
         }
 
+        // --- BARU: Logika Modal Alamat Pelanggan ---
+
+        // Event listener untuk radio buttons alamat
+        customerAddressRadioButtons.forEach(radio => {
+            radio.addEventListener('change', function() {
+                if (this.checked) {
+                    confirmAddressButton.disabled = false;
+                    confirmAddressButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                }
+            });
+        });
+
+        // Tombol Konfirmasi Alamat (SIMULASI/AJAX TRIGGER)
+        if (confirmAddressButton) {
+            confirmAddressButton.addEventListener('click', function() {
+                const selectedAddressRadio = document.querySelector('input[name="selected_customer_address"]:checked');
+                if (selectedAddressRadio) {
+                    const lat = selectedAddressRadio.dataset.lat;
+                    const lon = selectedAddressRadio.dataset.lon;
+
+                    // *SIMULASI PENGGANTIAN ALAMAT*
+                    // Jika Anda ingin ini memicu perhitungan ulang Jarak Haversine di backend
+                    // Anda harus mengirimkan lat/lon ini melalui AJAX ke endpoint controller/API.
+
+                    // Untuk saat ini, kita hanya melakukan simulasi dengan beralih tab.
+                    console.log(`Alamat baru dipilih: LAT ${lat}, LON ${lon}. Perlu hitung ulang jarak di server.`);
+
+                    // Ganti ke tab daftar toko
+                    const storeListTabButton = document.querySelector('[data-target="tab-store-list"]');
+                    if (storeListTabButton) {
+                        storeListTabButton.click();
+                        // Asumsi: Jika AJAX berhasil, storeList akan di-render ulang
+                    }
+                }
+            });
+        }
+
         // --- Logika Add to Cart (AJAX) ---
         if (addToCartButton) {
             addToCartButton.addEventListener('click', function(e) {
@@ -1039,16 +939,17 @@
                 const selectedStoreRadio = document.querySelector('input[name="selected_store"]:checked');
                 const branchId = selectedStoreRadio ? selectedStoreRadio.value : null;
 
-                // MENGAMBIL ID VARIAN YANG DIPILIH DARI INPUT TERSEMBUNYI
-                const productVariantId = productVariantIdInput ? productVariantIdInput.value : null;
+                // ASUMSI: Anda harus mendapatkan ID Varian Produk dari suatu elemen input tersembunyi/data atribut
+                const productVariantId = document.getElementById('product-variant-id').value; // Ganti dengan ID elemen yang benar
 
                 if (!branchId) {
-                    //  sweetalert
+                    //    sweetalert
                     Swal.fire({
                         icon: 'error',
                         title: 'Oops...',
                         text: 'Silakan pilih lokasi toko/cabang terlebih dahulu.',
                     })
+
                     return;
                 }
 
@@ -1056,7 +957,7 @@
                     Swal.fire({
                         icon: 'error',
                         title: 'Oops...',
-                        text: 'Silakan pilih varian produk terlebih dahulu.',
+                        text: 'Data produk tidak lengkap (Varian ID hilang).',
                     })
                     return;
                 }
@@ -1069,8 +970,7 @@
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            // ASUMSI: CSRF token ada di tag meta
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') // Penting untuk Laravel
                         },
                         body: JSON.stringify({
                             variant_id: productVariantId,
@@ -1088,94 +988,30 @@
                                     timer: 4000,
                                     showConfirmButton: true,
                                     confirmButtonColor: '#ee0d0dd6',
+                                  
                                 })
                                 .then((result) => {
                                     if (result.dismiss === Swal.DismissReason.timer || result.isConfirmed) {
-                                        window.location.reload();
+                                        window.location.reload(); // ⬅️ Melakukan refresh halaman
                                     }
                                 });
 
                         } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Gagal!',
-                                text: data.message || 'Terjadi kesalahan server.',
-                                confirmButtonColor: '#ee0d0dd6',
-                            });
+                            alert('Gagal: ' + (data.message || 'Terjadi kesalahan server.'));
                             console.error(data.error);
                         }
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error Koneksi!',
-                            text: 'Terjadi kesalahan koneksi saat menambahkan ke keranjang.',
-                            confirmButtonColor: '#ee0d0dd6',
-                        });
+                        alert('Terjadi kesalahan koneksi.');
                     })
                     .finally(() => {
-                        addToCartButton.textContent = '+  Keranjang';
+                        // Kembalikan tombol ke kondisi awal
+                        addToCartButton.textContent = '+  Keranjang';
                         addToCartButton.disabled = false;
                     });
             });
         }
-
-
-        // logika beli sekarang dan langsung lempar data tanpa kirim ke tabel cart dahulu
-        const buyNowButton = document.getElementById('buyNowButton');
-
-if (buyNowButton) {
-    buyNowButton.addEventListener('click', function(e) {
-        e.preventDefault();
-
-        // Ambil data yang sama seperti add to cart
-        const quantity = parseInt(productQtyInput.value) || 1;
-
-        const selectedStoreRadio = document.querySelector('input[name="selected_store"]:checked');
-        const branchId = selectedStoreRadio ? selectedStoreRadio.value : null;
-
-        const productVariantId = productVariantIdInput ? productVariantIdInput.value : null;
-
-        if (!branchId) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: 'Silakan pilih lokasi toko/cabang terlebih dahulu.',
-            });
-            return;
-        }
-
-        if (!productVariantId) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: 'Silakan pilih varian produk terlebih dahulu.',
-            });
-            return;
-        }
-
-        // LANGSUNG REDIRECT KE CHECKOUT
-        const url = `{{ route('checkout.now') }}?variant_id=${productVariantId}&quantity=${quantity}&branch_id=${branchId}`;
-
-        window.location.href = url;
-    });
-}
-
-
-
-       
-
-
-        // --- Logika Tambahan untuk Escape (Jika modal alamat ada) ---
-
-        // Listener untuk tombol Escape pada Modal Lokasi (diulang untuk memastikan tertutup)
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && locationModal && !locationModal.classList.contains('pointer-events-none')) {
-                closeLocationModal();
-            }
-        });
-
 
     });
 </script>

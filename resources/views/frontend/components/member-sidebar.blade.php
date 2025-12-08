@@ -23,21 +23,22 @@
     <nav class="space-y-1">
         
         {{-- Link: Profil Saya --}}
-        <a href="{{ url('/profile') }}" class="{{ $isActive('profile') ? $activeClass : $inactiveClass }}">
+        <a href="{{ route('member.index') }}" class="{{ $isActive('profile') ? $activeClass : $inactiveClass }}">
             <i class="fas fa-user-circle w-5 mr-3"></i>
             <span>Profil Saya</span>
         </a>
         
-        {{-- Link: Riwayat Transaksi --}}
-        <a href="{{ url('/transaksi') }}" class="{{ $isActive('transaksi') ? $activeClass : $inactiveClass }}">
-            <i class="fas fa-history w-5 mr-3"></i>
-            <span>Riwayat Transaksi</span>
-        </a>
 
         {{-- Link: Daftar Alamat --}}
-        <a href="{{ url('/daftar-alamat') }}" class="{{ $isActive('daftar-alamat') ? $activeClass : $inactiveClass }}">
+        <a href="{{route('member.addresses.index')}}" class="{{ $isActive('daftar-alamat') ? $activeClass : $inactiveClass }}">
             <i class="fas fa-map-marked-alt w-5 mr-3"></i>
             <span>Daftar Alamat</span>
+        </a>
+
+          {{-- Link: Riwayat Transaksi --}}
+        <a href="{{ route('history.transactions.index') }}" class="{{ $isActive('transaksi') ? $activeClass : $inactiveClass }}">
+            <i class="fas fa-history w-5 mr-3"></i>
+            <span>Riwayat Transaksi</span>
         </a>
 
         {{-- Link: Wishlist --}}
@@ -52,15 +53,13 @@
             <span>Poin & Rewards</span>
         </a>
 
-        <div class="pt-2 border-t mt-2">
-             {{-- Link: Keluar --}}
-             <a href="{{ url('logout') }}" class="
-                flex items-center p-3 text-red-600 font-semibold rounded-lg transition 
-                hover:bg-red-50 hover:text-red-700
-            ">
-                <i class="fas fa-sign-out-alt w-5 mr-3"></i>
-                <span>Keluar</span>
-            </a>
-        </div>
+        <!-- perbaiki pangggil route post logout customer.logout -->
+        <form action="{{ route('customer.logout') }}" method="POST" class="mt-2">
+            @csrf
+            <button type="submit" aria-label="Keluar dari Akun"
+                class="w-full text-white bg-primary font-bold py-2.5 rounded-xl transition duration-150 hover:bg-gray-300 shadow-sm">
+                Keluar
+            </button>
+        </form>
     </nav>
 </div>

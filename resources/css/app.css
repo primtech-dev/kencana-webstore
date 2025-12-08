@@ -1,16 +1,10 @@
 @import "tailwindcss";
 
-/* ================================================= */
-/* DIREKTIF @source UNTUK SCANNING CLASS */
-/* ================================================= */
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 @source '../**/*.blade.php';
 @source '../**/*.js';
 
-/* ================================================= */
-/* 1. KONFIGURASI TEMA KUSTOM DENGAN @theme */
-/* ================================================= */
 @theme {
     /* MENGGANTI FONT DEFAULT (Menggantikan var(--font-main)) */
     --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif,
@@ -25,7 +19,7 @@
     --color-light-bg: #f5f5f0;
     --color-discount: #31311e;
 
-    /* Mendefinisikan warna kustom agar bisa diakses dengan 'bg-kencana-cream' */
+    
     --color-kencana-cream: var(--color-background);
     --color-dark-grey: var(--color-text-dark);
     --color-light-grey: var(--color-text-secondary);
@@ -34,9 +28,6 @@
     --color-primary-dark: #d60b0b;
 }
 
-/* ================================================= */
-/* 2. UTILITAS KUSTOM (Menggantikan blok <style> di HTML) */
-/* ================================================= */
 
 @layer utilities {
     /* Utilitas untuk menyembunyikan scrollbar */
@@ -55,13 +46,11 @@ body {
     font-family: var(--font-main);
     /* background-color: var(--color-background); */
 
-    background-color: var(--color-kencana-cream);
-    /* Mengganti bg-gray-50 */
+    /* background-color: #F3E7E7; */
+
     color: var(--color-text-dark);
-    /* Mengatur warna teks default */
 }
 
-/* Jarak antar link kategori di desktop */
 .category-link-container {
     padding-left: 0.75rem;
     /* px-3 */

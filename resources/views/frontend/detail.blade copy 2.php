@@ -4,7 +4,7 @@
 
 {{-- ... MODAL LOKASI & LIGHTBOX (Bagian ini TIDAK BERUBAH) ... --}}
 
-<div class="modal-location fixed inset-0 bg-light-grey bg-opacity-75 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-opacity duration-300"
+<div class="modal-location fixed inset-0 bg-transparent bg-opacity-50 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-opacity duration-300"
     id="location-modal"
     role="dialog"
     aria-modal="true"
@@ -58,7 +58,7 @@
                     <p class="text-xs text-dark-grey/80">{{ $data['branch_address'] }}</p>
                     <p class="text-xs text-primary font-semibold mt-1">{{ $distance }}</p> {{-- Jarak sudah ada --}}
                     <p class="text-xs {{ $statusColor }} font-semibold mt-1">
-                        {{ $data['status_label'] }} ({{ $data['total_available_stock'] }} unit)
+                        {{ $data['status_label'] }} ({{ $data['total_available_stock'] }} Unit)
                     </p>
                 </div>
                 <div class="flex-shrink-0">
@@ -283,7 +283,7 @@
                                     {{ $isChecked ? 'checked' : '' }}>
 
                                 <img src="{{ $image_url }}" alt="{{ $variant->variant_name }}" class="w-8 h-8 object-cover rounded-md flex-shrink-0">
-                                <span class="text-dark-grey">{{ $variant->variant_name }} ({{ $variant->unit->name ?? '-' }})</span>
+                                <span class="text-dark-grey">{{ $variant->variant_name }}</span>
                             </label>
                             @endforeach
                         </div>
@@ -445,7 +445,7 @@
 
                     {{-- Action Buttons --}}
                     <div class="space-y-3 mb-4">
-                        <button type="button" id="buyNowButton" class="w-full py-3 rounded-xl bg-primary text-white font-bold text-lg hover:bg-primary-dark transition duration-150 shadow-lg shadow-primary/50">
+                        <button type="button" id="buy-now-button" class="w-full py-3 rounded-xl bg-primary text-white font-bold text-lg hover:bg-primary-dark transition duration-150 shadow-lg shadow-primary/50">
                             Beli Sekarang
 
                         </button>
@@ -1120,49 +1120,6 @@
                     });
             });
         }
-
-
-        // logika beli sekarang dan langsung lempar data tanpa kirim ke tabel cart dahulu
-        const buyNowButton = document.getElementById('buyNowButton');
-
-if (buyNowButton) {
-    buyNowButton.addEventListener('click', function(e) {
-        e.preventDefault();
-
-        // Ambil data yang sama seperti add to cart
-        const quantity = parseInt(productQtyInput.value) || 1;
-
-        const selectedStoreRadio = document.querySelector('input[name="selected_store"]:checked');
-        const branchId = selectedStoreRadio ? selectedStoreRadio.value : null;
-
-        const productVariantId = productVariantIdInput ? productVariantIdInput.value : null;
-
-        if (!branchId) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: 'Silakan pilih lokasi toko/cabang terlebih dahulu.',
-            });
-            return;
-        }
-
-        if (!productVariantId) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: 'Silakan pilih varian produk terlebih dahulu.',
-            });
-            return;
-        }
-
-        // LANGSUNG REDIRECT KE CHECKOUT
-        const url = `{{ route('checkout.now') }}?variant_id=${productVariantId}&quantity=${quantity}&branch_id=${branchId}`;
-
-        window.location.href = url;
-    });
-}
-
-
 
        
 

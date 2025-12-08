@@ -9,6 +9,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap"
         rel="stylesheet">
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <!-- Styles / Scripts -->
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -17,16 +21,56 @@
 
 <body class="bg-cream-custom">
 
+
     @include('frontend.components.header')
+
+
+    @if (session('success'))
+    <script>
+        Swal.fire({
+            title: 'Success',
+            text: "{{ session('success')}}",
+            icon: 'success',
+            showConfirmButton: true,
+            confirmButtonText: 'Oke',
+            confirmButtonColor: '#ee0d0dd6',
+
+            timer: 3000
+        });
+    </script>
+    @endif
+
+    @if (session('error'))
+    <script>
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: "{{ session('error')}}",
+            showConfirmButton: true,
+            timer: 3000,
+            confirmButtonColor: '#ee0d0dd6',
+        });
+    </script>
+    @endif
+
+
+    @if ($errors->any())
+    <div class="mt-4 p-3 mb-4 text-sm text-red-700 bg-red-100 rounded-lg">
+        <ul class="list-disc list-inside">
+            @foreach ($errors->all() as $error)
+            <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+    @endif
+
 
     @yield('content')
 
     @include('frontend.components.footer')
- <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
-    <!-- ============================================== -->
-    <!-- JAVASCRIPT UNTUK FUNGSI SLIDER & MENU MOBILE & DROPDOWN BARU -->
-    <!-- ============================================== -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // --- VARIABEL SLIDER ---
@@ -55,11 +99,17 @@
             // 1. FUNGSI SLIDER KATEGORI
             if (categoryList) {
                 catScrollLeft.addEventListener('click', () => {
-                    categoryList.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+                    categoryList.scrollBy({
+                        left: -scrollAmount,
+                        behavior: 'smooth'
+                    });
                 });
 
                 catScrollRight.addEventListener('click', () => {
-                    categoryList.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+                    categoryList.scrollBy({
+                        left: scrollAmount,
+                        behavior: 'smooth'
+                    });
                 });
             }
 
@@ -104,7 +154,7 @@
                 const link = container.querySelector('.category-link');
                 if (!link) return;
 
-                link.addEventListener('mouseenter', function () {
+                link.addEventListener('mouseenter', function() {
                     clearTimeout(hideTimeout);
 
                     const dropdownContent = container.querySelector('.js-dropdown-source');
@@ -158,6 +208,8 @@
             });
         });
     </script>
+
+    @stack('scripts')
 </body>
 
 </html>

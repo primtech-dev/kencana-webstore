@@ -1,12 +1,12 @@
- <footer class="bg-white border-t border-light-grey/50 text-dark-grey pt-10">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+ <footer class=" border-t border-light-grey/50 text-dark-grey pt-10" style="background-color: #FFFFFF;">
+        <div class="mx-auto px-[9%]">
 
             <div
                 class="flex flex-col md:flex-row justify-between items-start md:items-center pb-8 border-b border-light-grey/50">
                 <div class="flex items-center space-x-4 mb-4 md:mb-0">
                     <div class="flex flex-col items-center">
                         <img src="{{asset('asset/Kencana Store.png')}}" alt="" class="w-20">
-                        <span class="text-sm ml-1 text-dark-grey/80">sahabat bangunan anda</span>
+                        <span class="text-sm ml-1 text-dark-grey/80">Sahabat <br> Rumah & Bangunan</span>
                     </div>
                     <!-- <p class="text-sm text-dark-grey/80 hidden sm:block">
                         Solusi Omnichannel Kebutuhan Rumah Tangga, Gaya Hidup, dan Hobi Terlengkap dan Berkualitas
