@@ -289,7 +289,7 @@ class CheckoutController extends Controller
 
 
             return redirect()->route('cart.index')
-                ->with('success', 'Order berhasil dibuat. Harap selesaikan pembayaran.');
+                ->with('success', 'Pesanan berhasil dibuat. Admin akan segera menghubungi Anda.');
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Order Creation Failed: ' . $e->getMessage(), ['exception' => $e]);
