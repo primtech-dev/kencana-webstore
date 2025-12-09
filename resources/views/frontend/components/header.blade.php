@@ -33,7 +33,7 @@
                     </div>
                 </div>
 
-                <a href="{{ route('customer.dashboard') }}" aria-label="Dashboard Akun"
+                <a href="{{ route('member.index') }}" aria-label="Dashboard Akun"
                     class="block text-center border-2 border-primary bg-primary text-white font-bold py-2.5 rounded-xl transition duration-150 hover:bg-primary-dark hover:shadow-lg">
                     Dashboard Akun
                 </a>

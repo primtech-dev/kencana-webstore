@@ -215,7 +215,7 @@
                             <div class="text-gray-800">
                                 <p class="font-bold text-base mb-1">{{ $transaction->branch->name ?? 'N/A' }}</p>
                                 <p class="text-sm text-gray-600 leading-relaxed">
-                                    {{ $transaction->branch->street ?? 'Alamat tidak tersedia' }}
+                                    {{ $transaction->branch->address ?? 'Alamat tidak tersedia' }}
                                 </p>
                                 <p class="text-sm text-gray-600 leading-relaxed">
                                     {{ $transaction->branch->city ?? 'N/A' }}{{ $transaction->branch->city && $transaction->branch->province ? ', ' : '' }}{{ $transaction->branch->province ?? 'N/A' }}
