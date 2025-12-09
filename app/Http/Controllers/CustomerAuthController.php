@@ -21,7 +21,7 @@ class CustomerAuthController extends Controller
       
         $validasi = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:customer,email',
+            'email' => 'required|string|email|max:255|unique:customers,email',
             'phone' => 'nullable|string|max:20',
             'password' => 'required|string',
         ]);     
