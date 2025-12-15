@@ -31,13 +31,13 @@
                 @foreach ($products as $product)
 
                 <a href="{{ route('products.show', $product->id) }}"
-                    class="bg-white border border-light-grey rounded-lg shadow-sm hover:shadow-lg transition duration-200 cursor-pointer block {{ $loop->index >= 5 ? 'hidden lg:block' : '' }}">
+                    class="bg-white border border-light-grey rounded-lg shadow-sm hover:shadow-lg transition duration-200 cursor-pointer block">
 
                     <div class="relative">
                         @php
                         $mainImage = $product->images->where('is_main', true)->first();
 
-              
+
                         if ($mainImage) {
                         $baseUrl = env('APP_URL_BE');
                         $baseUrl = rtrim($baseUrl, '/') . '/';
@@ -104,7 +104,7 @@
 
             @if ($products instanceof \Illuminate\Pagination\LengthAwarePaginator)
             <div class="mt-6">
-                {{ $products->links() }}
+                {{ $products->links('frontend.components.custom-pagestyle') }}
             </div>
             @endif
         </div>

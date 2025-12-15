@@ -1,8 +1,8 @@
-<div id="mobile-menu" 
-     class="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 z-[99] hidden transition-opacity duration-300 ease-in-out" 
-     aria-modal="true" 
-     role="dialog">
-     
+<div id="mobile-menu"
+    class="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 z-[99] hidden transition-opacity duration-300 ease-in-out"
+    aria-modal="true"
+    role="dialog">
+
     <div id="mobile-menu-drawer"
         class="w-full h-full bg-white shadow-2xl p-6 transform -translate-x-full transition-transform duration-300 ease-in-out overflow-y-auto">
 
@@ -18,39 +18,39 @@
                     </path>
                 </svg>
             </button>
-            
+
         </div>
 
         <div class="pt-6 pb-6 border-b border-gray-100">
             @auth('customer')
-                <div class="flex items-center space-x-3 mb-4">
-                    <span class="w-10 h-10 flex items-center justify-center bg-primary text-white text-lg font-bold rounded-full">
-                        {{ substr(auth('customer')->user()->full_name, 0, 1) }}
-                    </span>
-                    <div>
-                        <p class="font-bold text-gray-800 truncate">{{ auth('customer')->user()->full_name }}</p>
-                        <p class="text-sm text-gray-500">{{ auth('customer')->user()->email }}</p>
-                    </div>
+            <div class="flex items-center space-x-3 mb-4">
+                <span class="w-10 h-10 flex items-center justify-center bg-primary text-white text-lg font-bold rounded-full">
+                    {{ substr(auth('customer')->user()->full_name, 0, 1) }}
+                </span>
+                <div>
+                    <p class="font-bold text-gray-800 truncate">{{ auth('customer')->user()->full_name }}</p>
+                    <p class="text-sm text-gray-500">{{ auth('customer')->user()->email }}</p>
                 </div>
+            </div>
 
-                <a href="{{ route('member.index') }}" aria-label="Dashboard Akun"
-                    class="block text-center border-2 border-primary bg-primary text-white font-bold py-2.5 rounded-xl transition duration-150 hover:bg-primary-dark hover:shadow-lg">
-                    Dashboard Akun
-                </a>
-                <form action="{{ route('customer.logout') }}" method="POST" class="mt-2">
-                    @csrf
-                    <button type="submit" aria-label="Keluar dari Akun"
-                        class="w-full text-center bg-gray-200 text-gray-700 font-bold py-2.5 rounded-xl transition duration-150 hover:bg-gray-300 shadow-sm">
-                        Keluar (Logout)
-                    </button>
-                </form>
+            <a href="{{ route('member.index') }}" aria-label="Dashboard Akun"
+                class="block text-center border-2 border-primary bg-primary text-white font-bold py-2.5 rounded-xl transition duration-150 hover:bg-primary-dark hover:shadow-lg">
+                Dashboard Akun
+            </a>
+            <form action="{{ route('customer.logout') }}" method="POST" class="mt-2">
+                @csrf
+                <button type="submit" aria-label="Keluar dari Akun"
+                    class="w-full text-center bg-gray-200 text-gray-700 font-bold py-2.5 rounded-xl transition duration-150 hover:bg-gray-300 shadow-sm">
+                    Keluar (Logout)
+                </button>
+            </form>
             @else
-                <div class="pt-2 space-y-3">
-                    <a href="{{ route('customer.login') }}" aria-label="Masuk ke Akun Anda"
-                        class="block text-center border-2 border-primary text-primary font-bold py-2.5 rounded-xl transition duration-150 hover:bg-primary hover:text-white hover:shadow-lg">Masuk</a>
-                    <a href="{{ route('customer.register') }}" aria-label="Daftar Akun Baru"
-                        class="block text-center bg-gray-200 text-gray-700 font-bold py-2.5 rounded-xl transition duration-150 hover:bg-gray-300 shadow-sm">Daftar</a>
-                </div>
+            <div class="pt-2 space-y-3">
+                <a href="{{ route('customer.login') }}" aria-label="Masuk ke Akun Anda"
+                    class="block text-center border-2 border-primary text-primary font-bold py-2.5 rounded-xl transition duration-150 hover:bg-primary hover:text-white hover:shadow-lg">Masuk</a>
+                <a href="{{ route('customer.register') }}" aria-label="Daftar Akun Baru"
+                    class="block text-center bg-gray-200 text-gray-700 font-bold py-2.5 rounded-xl transition duration-150 hover:bg-gray-300 shadow-sm">Daftar</a>
+            </div>
             @endauth
         </div>
 
@@ -63,7 +63,7 @@
                 <span class="font-bold text-base">Cari Produk</span>
             </button>
 
-            
+
 
             <div id="search-form-container" class="hidden mt-4 transition-all duration-300 ease-in-out">
                 <form action="#" method="GET" class="relative">
@@ -81,38 +81,40 @@
 
 
         </div>
-        
+
         <nav class="mt-6 space-y-1">
+            {{-- Navigasi Utama --}}
             <a href="{{ url('/') }}"
                 class="flex items-center p-3.5 font-semibold text-gray-700 hover:bg-primary-light hover:text-primary rounded-xl transition duration-150">
-                <span class="mr-3 text-xl">🏠</span> Home
+                <span class="mr-3 text-xl"><i class="fas fa-home"></i></span> Home
             </a>
             <a href="{{ url('/') }}"
                 class="flex items-center p-3.5 font-semibold text-gray-700 hover:bg-primary-light hover:text-primary rounded-xl transition duration-150">
-                <span class="mr-3 text-xl">🏷️</span> Kategori Produk
+                <span class="mr-3 text-xl"><i class="fas fa-tags"></i></span> Kategori Produk
             </a>
             <a href="{{ url('/promo') }}"
                 class="flex items-center p-3.5 font-semibold text-gray-700 hover:bg-primary-light hover:text-primary rounded-xl transition duration-150">
-                <span class="mr-3 text-xl">🔥</span> Promo
+                <span class="mr-3 text-xl"><i class="fas fa-fire"></i></span> Promo
             </a>
             <a href="{{ url('/keranjang') }}"
                 class="flex items-center p-3.5 font-semibold text-gray-700 hover:bg-primary-light hover:text-primary rounded-xl transition duration-150">
-                <span class="mr-3 text-xl">🛒</span> Keranjang
+                <span class="mr-3 text-xl"><i class="fas fa-shopping-cart"></i></span> Keranjang
             </a>
         </nav>
 
         <nav class="mt-6 pt-4 border-t border-gray-100 space-y-1">
             <h4 class="font-bold text-gray-600 mb-3 text-sm uppercase tracking-wider">Informasi & Bantuan</h4>
+            {{-- Navigasi Informasi & Bantuan --}}
             <a href="{{ url('/faq') }}"
                 class="flex items-center p-3.5 font-semibold text-gray-700 hover:bg-primary-light hover:text-primary rounded-xl transition duration-150">
-                <span class="mr-3 text-xl">❓</span> FAQ
+                <span class="mr-3 text-xl"><i class="fas fa-question-circle"></i></span> FAQ
             </a>
             <a href="#"
                 class="flex items-center p-3.5 font-semibold text-gray-700 hover:bg-primary-light hover:text-primary rounded-xl transition duration-150">
-                <span class="mr-3 text-xl">💬</span> Pusat Bantuan
+                <span class="mr-3 text-xl"><i class="fas fa-comments"></i></span> Pusat Bantuan
             </a>
             <a href="#" class="flex items-center p-3.5 font-semibold text-gray-700 hover:bg-primary-light hover:text-primary rounded-xl transition duration-150">
-                <span class="mr-3 text-xl">💼</span> Kencana Bisnis
+                <span class="mr-3 text-xl"><i class="fas fa-briefcase"></i></span> Kencana Bisnis
                 <span class="text-xs bg-red-500 text-white font-medium px-2 py-0.5 ml-2 rounded-full transform -translate-y-px">NEW</span>
             </a>
         </nav>
@@ -136,129 +138,129 @@
         </div>
     </div>
 
-   <div class="bg-primary text-white border-b border-gray-100">
-    <div class="container mx-auto px-4 sm:px-[5%] md:px-[9%] py-3 md:py-4 flex items-center justify-between">
+    <div class="bg-primary text-white border-b border-gray-100">
+        <div class="container mx-auto px-4 sm:px-[5%] md:px-[9%] py-3 md:py-4 flex items-center justify-between overflow-x-hidden">
 
-        <div class="flex items-center space-x-2 md:space-x-6 flex-shrink-0">
-            <button id="open-menu-btn" aria-label="Buka Menu" class="md:hidden text-white p-2 rounded-md transition duration-200">
-                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                </svg>
-            </button>
-
-            <a href="{{ url('/') }}" class="flex flex-col items-center leading-none flex-shrink-0 mr-4">
-                <img src="{{ asset('asset/Kencana Store Putih.png') }}" alt="Logo Kencana" class="w-24 h-auto md:w-32">
-                <span class="text-[10px] text-white mt-0.5 hidden sm:block md:hidden mt-2 leading-tight text-center">Sahabat <br> <span>Rumah & Bangunan</span> </span>
-            </a>
-        </div>
-
-        <div class="flex-grow mx-2 md:mx-6 w-full max-w-lg lg:max-w-2xl hidden sm:block">
-            <form action="#" method="GET" class="flex border border-gray-300 rounded-lg overflow-hidden h-10 w-full">
-                <input type="text" name="q" placeholder="Cari bantal, besi, semen..."
-                    class="w-full py-2 px-4 text-sm text-gray-700 focus:outline-none focus:ring-0 bg-white placeholder-gray-400">
-                <button type="submit" aria-label="Cari Produk"
-                    class="bg-primary text-white w-10 md:w-16 flex items-center justify-center transition duration-200 flex-shrink-0">
-                    <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            <div class="flex items-center space-x-2 md:space-x-6 flex-shrink-0">
+                <button id="open-menu-btn" aria-label="Buka Menu" class="md:hidden text-white p-2 rounded-md transition duration-200">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                     </svg>
                 </button>
-            </form>
-        </div>
 
-        <div class="flex items-center space-x-3 md:space-x-4 flex-shrink-0 ml-4">
+                <a href="{{ url('/') }}" class="flex flex-col items-center leading-none flex-shrink-0 mr-4">
+                    <img src="{{ asset('asset/Kencana Store Putih.png') }}" alt="Logo Kencana" class="w-24 h-auto md:w-32">
+                    <span class="text-[10px] text-white mt-0.5 hidden sm:block md:hidden mt-2 leading-tight text-center">Sahabat <br> <span>Rumah & Bangunan</span> </span>
+                </a>
+            </div>
 
-            <button aria-label="Buka Pencarian" class="sm:hidden text-white p-2 rounded-md transition duration-200">
-                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                </svg>
-            </button>
+            <div class="flex-grow mx-2 md:mx-6 w-full max-w-lg lg:max-w-2xl hidden sm:block">
+                <form action="#" method="GET" class="flex border border-gray-300 rounded-lg overflow-hidden h-10 w-full">
+                    <input type="text" name="q" placeholder="Cari bantal, besi, semen..."
+                        class="w-full py-2 px-4 text-sm text-gray-700 focus:outline-none focus:ring-0 bg-white placeholder-gray-400">
+                    <button type="submit" aria-label="Cari Produk"
+                        class="bg-primary text-white w-10 md:w-16 flex items-center justify-center transition duration-200 flex-shrink-0">
+                        <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </button>
+                </form>
+            </div>
 
-            @auth('customer')
-            <button aria-label="Lihat Notifikasi" class="text-white hover:text-white relative p-1 md:p-2 hidden sm:block">
-                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v2a2 2 0 11-4 0v-2m4 0H9"></path>
-                </svg>
-                <span class="absolute top-0 right-0 inline-flex items-center justify-center h-4 w-4 text-[10px] font-bold leading-none text-primary transform translate-x-1/2 -translate-y-1/2 bg-white rounded-full">
-                    {{-- Ganti dengan hitungan notifikasi: {{ auth('customer')->user()->unreadNotifications()->count() }} --}}
-                    3
-                </span>
-            </button>
-            
-            <button aria-label="Lihat Wishlist" class="text-white hover:text-white relative p-1 md:p-2 hidden sm:block">
-                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3-7 3V5z"></path>
-                </svg>
-                {{-- Placeholder Wishlist Dinamis --}}
-                {{-- <span class="absolute top-0 right-0 inline-flex items-center justify-center h-4 w-4 text-[10px] font-bold leading-none text-primary transform translate-x-1/2 -translate-y-1/2 bg-white rounded-full">1</span> --}}
-            </button>
+            <div class="flex items-center space-x-3 md:space-x-4 flex-shrink-0 ">
 
-             <a href="{{ url('/keranjang') }}" aria-label="Lihat Keranjang Belanja" class="text-white relative p-2 rounded-md transition duration-200">
-                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                </svg>
-                @if($cartCount > 0)
-                
-                <span class="absolute top-0 right-0 inline-flex items-center justify-center h-4 w-4 text-[10px] font-bold leading-none text-primary transform translate-x-1/2 -translate-y-1/2 bg-white rounded-full">
-                    {{-- Ganti dengan hitungan keranjang: {{ Cart::count() }} --}}
-                    {{ $cartCount }}
-                </span>
+                <button aria-label="Buka Pencarian" class="hidden sm:hidden text-white p-2 rounded-md transition duration-200">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </button>
 
-                @endif
-            </a>
+                @auth('customer')
+                <button aria-label="Lihat Notifikasi" class="text-white hover:text-white relative p-1 md:p-2 hidden sm:block">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v2a2 2 0 11-4 0v-2m4 0H9"></path>
+                    </svg>
+                    <span class="absolute top-0 right-0 inline-flex items-center justify-center h-4 w-4 text-[10px] font-bold leading-none text-primary transform translate-x-1/2 -translate-y-1/2 bg-white rounded-full">
+                        {{-- Ganti dengan hitungan notifikasi: {{ auth('customer')->user()->unreadNotifications()->count() }} --}}
+                        3
+                    </span>
+                </button>
 
-            
-            @endauth
+                <button aria-label="Lihat Wishlist" class="text-white hover:text-white relative p-1 md:p-2 hidden sm:block">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3-7 3V5z"></path>
+                    </svg>
+                    {{-- Placeholder Wishlist Dinamis --}}
+                    {{-- <span class="absolute top-0 right-0 inline-flex items-center justify-center h-4 w-4 text-[10px] font-bold leading-none text-primary transform translate-x-1/2 -translate-y-1/2 bg-white rounded-full">1</span> --}}
+                </button>
 
-           
+                <a href="{{ url('/keranjang') }}" aria-label="Lihat Keranjang Belanja" class="text-white relative p-2 rounded-md transition duration-200">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                    </svg>
+                    @if($cartCount > 0)
 
-            @auth('customer')
+                    <span class="absolute top-0 right-0 inline-flex items-center justify-center h-4 w-4 text-[10px] font-bold leading-none text-primary transform translate-x-1/2 -translate-y-1/2 bg-white rounded-full">
+                        {{-- Ganti dengan hitungan keranjang: {{ Cart::count() }} --}}
+                        {{ $cartCount }}
+                    </span>
+
+                    @endif
+                </a>
+
+
+                @endauth
+
+
+
+                @auth('customer')
                 <a href="#" aria-label="Status Loyalty"
                     class="bg-gray-200 text-gray-700 font-semibold py-1 px-3 rounded-full text-sm flex items-center space-x-1 hover:bg-gray-300 transition duration-150 hidden lg:flex">
                     <svg class="w-4 h-4 text-gray-700" fill="currentColor" viewBox="0 0 20 20"
                         xmlns="http://www.w3.org/2000/svg">
                         <path d="M10 2a8 8 0 100 16 8 8 0 000-16zm-5 8a5 5 0 1110 0 5 5 0 01-10 0zM8 8a2 2 0 104 0 2 2 0 00-4 0z"></path>
                     </svg>
-                    <span>{{ auth('customer')->user()->loyalty_status ?? 'Member' }}</span> 
+                    <span>{{ auth('customer')->user()->loyalty_status ?? 'Member' }}</span>
                     <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                         xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                     </svg>
                 </a>
-                
+
                 <a href="{{ route('member.index') }}" aria-label="Profile Pengguna"
-                    class="flex items-center space-x-1 text-white font-semibold hover:text-white/80 transition duration-150 cursor-pointer hidden md:flex group">
+                    class="flex items-center space-x-1 text-white font-semibold hover:text-white/80 transition duration-150 cursor-pointer md:flex group">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                         xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                     </svg>
-                    <span class="text-sm">Hi, {{ Str::limit(auth('customer')->user()->full_name, 12, '..') }}</span>
+                    <span class="text-sm">Hi, {{ Str::limit(auth('customer')->user()->full_name, 8, '..') }}</span>
                     <svg class="w-3 h-3 ml-1 group-hover:rotate-180 transition duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                         xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                     </svg>
                 </a>
-            @else
+                @else
                 <a href="{{ route('customer.login') }}" aria-label="Masuk Akun"
-                   class="bg-white text-primary font-semibold py-1.5 px-3 rounded-lg text-sm transition duration-150 hover:bg-gray-100 hidden md:flex">
+                    class="bg-white text-primary font-semibold py-1.5 px-3 rounded-lg text-sm transition duration-150 hover:bg-gray-100 hidden md:flex">
                     Masuk
                 </a>
                 <a href="{{ route('customer.register') }}" aria-label="Daftar Akun"
-                   class="border border-white text-white font-semibold py-1.5 px-3 rounded-lg text-sm transition duration-150 hover:bg-white hover:text-primary hidden md:flex">
+                    class="border border-white text-white font-semibold py-1.5 px-3 rounded-lg text-sm transition duration-150 hover:bg-white hover:text-primary hidden md:flex">
                     Daftar
                 </a>
-            @endauth
+                @endauth
+            </div>
         </div>
     </div>
-</div>
 
     <div id="bottom-bar" class="bg-primary border-t border-b border-light-grey shadow-sm hidden md:block">
         <div class="container mx-auto px-[9%] flex items-center relative">

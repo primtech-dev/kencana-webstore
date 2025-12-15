@@ -1109,8 +1109,8 @@
                         console.error('Error:', error);
                         Swal.fire({
                             icon: 'error',
-                            title: 'Error Koneksi!',
-                            text: 'Terjadi kesalahan koneksi saat menambahkan ke keranjang.',
+                            title: 'Gagal Menambahkan Ke Keranjang!',
+                            text: 'Anda harus login terlebih dahulu.',
                             confirmButtonColor: '#ee0d0dd6',
                         });
                     })

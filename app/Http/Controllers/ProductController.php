@@ -28,7 +28,7 @@ class ProductController extends Controller
             // Eager load relasi yang dibutuhkan
             ->with($this->defaultEagerLoads)
 
-            ->paginate(15);
+            ->paginate(12);
 
         // Mengembalikan View Blade dan meneruskan data produk ke dalamnya
         return view('frontend.index', [

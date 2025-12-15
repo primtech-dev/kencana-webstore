@@ -14,7 +14,7 @@
 
             {{-- Bagian Pencarian Alamat --}}
             <div class="flex space-x-2">
-                <input type="text" id="addressSearchInput" placeholder="masukkan nama jalan, kota, atau tempat..."
+                <input type="text" id="addressSearchInput" placeholder="Cari alamat atau nama tempat..."
                     class="flex-grow border border-gray-300 rounded-lg shadow-sm p-2 focus:ring-primary focus:border-primary">
                 <button id="searchAddressBtn" class="py-2 px-4 rounded-lg bg-primary text-white font-bold hover:bg-primary-dark transition duration-150 flex-shrink-0">
                     <i class="fas fa-search"></i>
