@@ -89,7 +89,7 @@ Route::get('/faq', function () {
 Route::get('/', function () {
     return view('welcome'); // Ganti dengan halaman utama Anda
 });
-Route::get('login', [CustomerAuthController::class, 'showLoginForm'])->name('login');
+Route::get('/customer/login', [CustomerAuthController::class, 'showLoginForm'])->name('login');
 // =================================================================
 // CUSTOMER AUTH ROUTES (Menggunakan Nomor HP dan OTP)
 // =================================================================
