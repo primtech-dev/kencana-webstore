@@ -63,7 +63,7 @@
 
                 <div class="text-center pt-4">
                     <p class="text-sm text-gray-600">
-                        <a href="{{ route('customer.login.show') }}" class="font-bold hover:text-gray-900 flex items-center justify-center">
+                        <a href="{{ route('login') }}" class="font-bold hover:text-gray-900 flex items-center justify-center">
                             <i class="fas fa-arrow-left mr-2"></i> Kembali ke Halaman Masuk
                         </a>
                     </p>

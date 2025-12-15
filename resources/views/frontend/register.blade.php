@@ -81,7 +81,7 @@
                 <div class="text-center pt-4">
                     <p class="text-sm text-gray-600">
                         Sudah punya akun?
-                        <a href="{{ route('customer.login.show') }}" class="font-bold">
+                        <a href="{{ route('login') }}" class="font-bold">
                             Masuk Sekarang
                         </a>
                     </p>
