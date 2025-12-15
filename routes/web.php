@@ -61,16 +61,66 @@ Route::get('/faq', function () {
 
 
 
-Route::get('/register', [CustomerAuthController::class, 'showRegistrationForm'])->name('customer.register.form');
-Route::post('/register', [CustomerAuthController::class, 'register'])->name('customer.register');
+// Route::get('/register', [CustomerAuthController::class, 'showRegistrationForm'])->name('customer.register.form');
+// Route::post('/register', [CustomerAuthController::class, 'register'])->name('customer.register');
 
-Route::get('/login', [CustomerAuthController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [CustomerAuthController::class, 'login'])->name('customer.login');
+// Route::get('/login', [CustomerAuthController::class, 'showLoginForm'])->name('login');
+// Route::post('/login', [CustomerAuthController::class, 'login'])->name('customer.login');
 
-Route::post('/logout', [CustomerAuthController::class, 'logout'])->name('customer.logout');
+// Route::post('/logout', [CustomerAuthController::class, 'logout'])->name('customer.logout');
 
-Route::get('login/google/callback', [GoogleLoginController::class, 'redirectToGoogle'])->name('login.google');
-Route::get('login/auth/google/callback', [GoogleLoginController::class, 'handleGoogleCallback']);
+// Route::get('login/google/callback', [GoogleLoginController::class, 'redirectToGoogle'])->name('login.google');
+// Route::get('login/auth/google/callback', [GoogleLoginController::class, 'handleGoogleCallback']);
+
+// Route::get('/otp', [CustomerAuthController::class, 'otp'])->name('login.otp');
+// Route::post('/verify-otp', [CustomerAuthController::class, 'verifyOtp'])->name('customer.verify.otp');
+// Route::post('/send-otp', [CustomerAuthController::class, 'sendOtp'])->name('customer.resend.otp');
+
+// Route::get('/lupa-password', function () {
+//     return view('frontend.lupa-password');
+// })->name('password.request');
+
+// Route::get('/reset-password', function () {
+//     return view('frontend.reset-password');
+// })->name('password.reset');
+
+
+// Contoh Home Route
+Route::get('/', function () {
+    return view('welcome'); // Ganti dengan halaman utama Anda
+});
+Route::get('login', [CustomerAuthController::class, 'showLoginForm'])->name('login');
+// =================================================================
+// CUSTOMER AUTH ROUTES (Menggunakan Nomor HP dan OTP)
+// =================================================================
+Route::prefix('customer')->group(function () {
+
+    // --- REGISTER FLOW (Alur 1) ---
+    Route::get('register', [CustomerAuthController::class, 'showRegistrationForm'])->name('customer.register.show');
+    Route::post('register', [CustomerAuthController::class, 'register'])->name('customer.register');
+
+    // --- LOGIN FLOW (Alur 2) ---
+    // Route::get('login', [CustomerAuthController::class, 'showLoginForm'])->name('customer.login.show');
+    Route::post('login', [CustomerAuthController::class, 'login'])->name('customer.login');
+
+    // --- LOGOUT ---
+    Route::post('logout', [CustomerAuthController::class, 'logout'])->name('customer.logout');
+
+    // --- OTP VERIFICATION ---
+    Route::get('otp-verification', [CustomerAuthController::class, 'showOtpForm'])->name('customer.otp.show');
+    Route::post('otp-verification', [CustomerAuthController::class, 'verifyOtp'])->name('customer.otp.verify');
+    // Tambahkan route untuk kirim ulang OTP (jika Anda mengimplementasikannya di controller)
+    // Route::post('resend-otp', [CustomerAuthController::class, 'resendOtp'])->name('customer.otp.resend'); 
+
+    // --- FORGOT PASSWORD FLOW (Alur 3) ---
+    Route::get('forgot-password', [CustomerAuthController::class, 'showForgotPasswordForm'])->name('customer.forgot.password.show');
+    Route::post('forgot-password', [CustomerAuthController::class, 'forgotPassword'])->name('customer.forgot.password');
+    
+    // --- RESET PASSWORD (SETELAH OTP VERIFIED) ---
+    Route::get('reset-password', [CustomerAuthController::class, 'showResetPasswordForm'])->name('customer.password.reset.show');
+    Route::post('reset-password', [CustomerAuthController::class, 'resetPassword'])->name('customer.password.reset');
+
+});
 
 
 // Rute untuk menampilkan daftar produk

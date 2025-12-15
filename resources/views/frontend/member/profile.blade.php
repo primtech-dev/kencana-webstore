@@ -9,11 +9,11 @@
         {{-- GRID UTAMA: Navigasi Sidebar dan Konten Utama --}}
         <div class="lg:grid lg:grid-cols-12 lg:gap-8">
 
-            {{-- KOLOM KIRI: Sidebar Navigasi --}}
-            <div class="lg:col-span-3 mb-6 lg:mb-0">
-                {{-- Panggil komponen, dan kirim 'profile' sebagai menu aktif --}}
-                @include('frontend.components.member-sidebar', ['activeMenu' => 'profile'])
-            </div>
+       {{-- KOLOM KIRI: Sidebar Navigasi (Hanya untuk Desktop) --}}
+        {{-- Di Mobile, div ini hanya akan menampilkan Tab Menu karena ada kelas 'block lg:hidden' di dalamnya --}}
+        <div class="lg:col-span-3 mb-6 lg:mb-0">
+            @include('frontend.components.member-sidebar', ['activeMenu' => 'profile'])
+        </div>
 
             {{-- KOLOM KANAN: Konten Utama --}}
             <div class="lg:col-span-9">
@@ -51,8 +51,6 @@
 
                 <div class="bg-white p-6 rounded-lg shadow-md border border-gray-100 mb-6">
                     <h2 class="text-xl font-extrabold text-gray-800 mb-6 border-b pb-3">Detail Profile</h2>
-                    {{-- Pesan Status dan Logic Profile (Dihilangkan untuk brevity, asumsikan sama) --}}
-                    {{-- ... Konten Profile ... --}}
                     @if (session('status'))
                     <div class="mt-4 p-4 mb-4 text-sm text-green-700 bg-green-100 rounded-lg" role="alert">
                         <span class="font-medium">Berhasil!</span> {{ session('status') }}
@@ -269,7 +267,7 @@
                     </div>
 
                     <div class="mt-6 text-center">
-                        <a href="{{ url('member/transactions') }}" class="text-primary font-semibold hover:underline">Lihat Semua Riwayat Transaksi <i class="fas fa-arrow-right ml-1"></i></a>
+                        <a href="{{ route('history.transactions.index') }}" class="text-primary font-semibold hover:underline">Lihat Semua Riwayat Transaksi <i class="fas fa-arrow-right ml-1"></i></a>
                     </div>
                 </div>
 

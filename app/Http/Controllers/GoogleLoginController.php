@@ -77,7 +77,7 @@ class GoogleLoginController extends Controller
             return redirect('/')->with('success', $message); // Ganti '/home' sesuai kebutuhan
 
         } catch (\Exception $e) {
-            \Log::error('Google login failed: ' . $e->getMessage());
+            // \Log::error('Google login failed: ' . $e->getMessage());
             return redirect('/login')->with('error', 'Google login/signup gagal. Silakan coba lagi.');
         }
     }

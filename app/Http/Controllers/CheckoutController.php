@@ -531,7 +531,7 @@ class CheckoutController extends Controller
     $message .= "Terima kasih.";
 
     // Kirim notifikasi
-    $this->sendWhatsAppNotification("085847406716", $message);
+    $this->sendWhatsAppNotification("085708810388", $message);
 }
 
 
