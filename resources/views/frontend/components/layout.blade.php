@@ -17,12 +17,25 @@
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @endif
+
+    <style>
+    /* Sembunyikan Scrollbar */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+</style>
 </head>
 
 <body class="bg-cream-custom">
 
 
     @include('frontend.components.header')
+    {{-- MODAL CABANG --}}
+    @include('frontend.components.branch-modal')
+
+    {{-- FLOATING SUPPORT --}}
+    <div class="fixed bottom-6 right-6 flex flex-col items-end gap-4 z-[99]">
+        @include('frontend.components.floating-support')
+    </div>
 
 
     @if (session('success'))

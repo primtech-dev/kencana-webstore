@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Addresses;
+use App\Models\Branches;
+use App\Models\Category;
 use App\Models\Inventory;
 use App\Models\Product;
 use Illuminate\Http\Request;
@@ -12,65 +14,172 @@ class ProductController extends Controller
 {
     private $defaultEagerLoads = ['images', 'categories', 'variants', 'variants.images'];
 
+    // public function index(Request $request)
+    // {
+    //     $search = $request->get('search');
+
+    //     // 1. Dapatkan ID Cabang dari Session
+    //     $selectedBranchId = session('selected_branch_id');
+
+    //     // 2. Mengambil Data Cabang Toko
+    //     $branches = Branches::where('is_active', true)->get();
+
+    //     // 3. Membangun Query Produk
+    //     $productsQuery = Product::query()
+    //         ->where('is_active', true);
+
+    //     // 4. Filter Berdasarkan Cabang yang Dipilih
+    //     // Jika ada selectedBranchId, maka produk harus memiliki stok di cabang itu.
+    //     if ($selectedBranchId) {
+    //         $productsQuery->whereHas('variants', function ($queryVariant) use ($selectedBranchId) {
+    //             // Filter varian yang memiliki 'inventories'
+    //             $queryVariant->whereHas('inventories', function ($queryInventory) use ($selectedBranchId) {
+    //                 // Filter inventaris yang memiliki 'cabang' yang sesuai
+    //                 $queryInventory->whereHas('cabang', function ($queryCabang) use ($selectedBranchId) {
+    //                     // Filter cabang berdasarkan branch_id
+    //                     $queryCabang->where('branch_id', $selectedBranchId);
+    //                 })
+    //                     // Tambahkan kondisi stok di level 'inventories'
+    //                     ->where('available', '>', 0);
+    //             });
+    //         });
+    //     }
+
+    //     // 5. Filter Pencarian
+    //     $productsQuery->when($search, function ($query, $search) {
+    //         $query->where(function ($subQuery) use ($search) {
+    //             $subQuery->where('name', 'like', '%' . $search . '%')
+    //                 ->orWhere('sku', 'like', '%' . $search . '%');
+    //         });
+    //     });
+    //     // 6. Eager Load dengan Kondisi Cabang
+    //     $products = $productsQuery->with(['images', 'categories', 'variants' => function ($q) use ($selectedBranchId) {
+    //         $q->with(['inventories' => function ($inv) use ($selectedBranchId) {
+    //             // Jika ada cabang dipilih, ambil stok cabang tersebut saja
+    //             if ($selectedBranchId) {
+    //                 $inv->whereHas('cabang', function ($c) use ($selectedBranchId) {
+    //                     $c->where('branch_id', $selectedBranchId);
+    //                 });
+    //             }
+    //         }]);
+    //     }])->paginate(12);
+
+
+    //     $branchesForJs = $branches->map(function ($branch) {
+    //         return [
+    //             'id' => $branch->id,
+    //             'name' => $branch->name,
+    //             'lat' => $branch->latitude,
+    //             'lon' => $branch->longitude,
+    //         ];
+    //     })->all();
+
+    //     // 7. Mengembalikan View Blade
+    //     return view('frontend.index', [
+    //         'products' => $products,
+    //         'search' => $search,
+    //         'branches' => $branches,
+    //         'selectedBranchId' => $selectedBranchId,
+    //         'branchesForJs' => $branchesForJs,
+    //     ]);
+    // }
+
     public function index(Request $request)
-    {
-        $search = $request->get('search');
+{
+    $search = $request->get('search');
+    $categorySlug = $request->get('category'); // Ambil parameter kategori dari URL
 
-        $products = Product::query()
-            ->where('is_active', true)
+    // 1. Dapatkan ID Cabang dari Session
+    $selectedBranchId = session('selected_branch_id');
 
-            // Filter berdasarkan nama atau SKU
-            ->when($search, function ($query, $search) {
-                $query->where('name', 'like', '%' . $search . '%')
-                    ->orWhere('sku', 'like', '%' . $search . '%');
-            })
+    // 2. Mengambil Data Cabang & Kategori untuk Filter di View
+    $branches = Branches::where('is_active', true)->get();
+    $categories = Category::where('is_active', true)->get(); // Mengambil data kategori
 
-            // Eager load relasi yang dibutuhkan
-            ->with($this->defaultEagerLoads)
+    // 3. Membangun Query Produk
+    $productsQuery = Product::query()
+        ->where('is_active', true);
 
-            ->paginate(12);
-
-        // Mengembalikan View Blade dan meneruskan data produk ke dalamnya
-        return view('frontend.index', [
-            'products' => $products,
-            'search' => $search
-        ]);
+    // 4. Filter Berdasarkan Cabang yang Dipilih
+    if ($selectedBranchId) {
+        $productsQuery->whereHas('variants', function ($queryVariant) use ($selectedBranchId) {
+            $queryVariant->whereHas('inventories', function ($queryInventory) use ($selectedBranchId) {
+                $queryInventory->whereHas('cabang', function ($queryCabang) use ($selectedBranchId) {
+                    $queryCabang->where('branch_id', $selectedBranchId);
+                })
+                ->where('available', '>', 0);
+            });
+        });
     }
 
-    /**
-     * Menampilkan detail produk tunggal dalam sebuah View.
-     *
-     * @param  int $id
-     * @return \Illuminate\View\View|\Illuminate\Http\Response
-     */
-    //public function show($id)
-    //{
-    //     // Temukan produk yang aktif dengan semua relasi penting
-    //     $product = Product::with(
-    //         array_merge($this->defaultEagerLoads, [
-    //             'variants' => function ($query) {
-    //                 $query->where('is_active', true)
-    //                       ->where('is_sellable', true);
-    //             }
-    //         ])
-    //     )
-    //     ->where('is_active', true)
-    //     ->find(2);
+    // 5. Filter Pencarian (Nama/SKU)
+    $productsQuery->when($search, function ($query, $search) {
+        $query->where(function ($subQuery) use ($search) {
+            $subQuery->where('name', 'like', '%' . $search . '%')
+                ->orWhere('sku', 'like', '%' . $search . '%');
+        });
+    });
 
-    //     // Penanganan jika produk tidak ditemukan (akan merender View 404 jika ada)
-    //     if (!$product) {
-    //          // Abort 404 akan mencari resources/views/errors/404.blade.php
-    //          abort(404, 'Produk tidak ditemukan atau tidak aktif.');
-    //     }
+    // 6. BARU: Filter Berdasarkan Kategori
+    $productsQuery->when($categorySlug, function ($query, $categorySlug) {
+        $query->whereHas('categories', function ($q) use ($categorySlug) {
+            $q->where('slug', $categorySlug); // Atau gunakan 'id' tergantung kebutuhan
+        });
+    });
 
-    //     dd($product->toArray());
+    // 7. Eager Load dengan Kondisi Cabang
+    $products = $productsQuery->with(['images', 'categories', 'variants' => function ($q) use ($selectedBranchId) {
+        $q->with(['inventories' => function ($inv) use ($selectedBranchId) {
+            if ($selectedBranchId) {
+                $inv->whereHas('cabang', function ($c) use ($selectedBranchId) {
+                    $c->where('branch_id', $selectedBranchId);
+                });
+            }
+        }]);
+    }])->paginate(12);
 
-    //     // Mengembalikan View Blade dan meneruskan data produk tunggal
-    //     return view('products.show', [
-    //         'product' => $product
-    //     ]);
-    // }
+    $branchesForJs = $branches->map(function ($branch) {
+        return [
+            'id' => $branch->id,
+            'name' => $branch->name,
+            'lat' => $branch->latitude,
+            'lon' => $branch->longitude,
+        ];
+    })->all();
 
+    // 8. Mengembalikan View Blade dengan tambahan variable 'categories'
+    return view('frontend.index', [
+        'products' => $products,
+        'search' => $search,
+        'categories' => $categories, // Dikirim ke blade
+        'selectedCategory' => $categorySlug, // Untuk menandai kategori yang aktif
+        'branches' => $branches,
+        'selectedBranchId' => $selectedBranchId,
+        'branchesForJs' => $branchesForJs,
+    ]);
+}
+
+
+    private function calculateHaversineDistance($lat1, $lon1, $lat2, $lon2)
+    {
+        // Radius bumi dalam kilometer
+        $earthRadius = 6371;
+
+        // Konversi derajat ke radian
+        $latFrom = deg2rad($lat1);
+        $lonFrom = deg2rad($lon1);
+        $latTo = deg2rad($lat2);
+        $lonTo = deg2rad($lon2);
+
+        $latDelta = $latTo - $latFrom;
+        $lonDelta = $lonTo - $lonFrom;
+
+        // Rumus Haversine
+        $angle = 2 * asin(sqrt(pow(sin($latDelta / 2), 2) +
+            cos($latFrom) * cos($latTo) * pow(sin($lonDelta / 2), 2)));
+
+        return $angle * $earthRadius;
+    }
 
     // public function show($id)
     // {
@@ -95,114 +204,7 @@ class ProductController extends Controller
     //     $basePrice = round($priceCents);
     //     $subtotal_price = $basePrice * 1;
 
-    //     $productImagesCollection = collect([]);
-    //     if ($variant) {
-    //         $productImagesCollection = $productImagesCollection->merge($variant->images);
-    //     }
-    //     $productImagesCollection = $productImagesCollection->merge($product->images)->unique('url')->sortByDesc('is_main');
-
-    //     $mainImageModel = $productImagesCollection->where('is_main', true)->first() ?? $productImagesCollection->first();
-
-    //     $image_be = env('APP_URL_BE');
-
-    //     $product_main_image = $mainImageModel
-    //         ? $image_be . ltrim($mainImageModel->url, '/')
-    //         : 'https://placehold.co/600x600/ccc/fff?text=No+Image';
-
-    //     $product_images = $productImagesCollection->map(function ($image) {
-    //         return [
-    //             'url' => env('APP_URL_BE') . ltrim($image->url, '/'),
-    //             'label' => 'Gambar Produk',
-    //         ];
-    //     })->toArray();
-
-    //     // dd($product_images);
-
-    //     $product->average_rating = 0.0;
-    //     $product->rating_distribution = [5 => 0, 4 => 0, 3 => 0, 2 => 0, 1 => 0];
-
-    //     $category_id = $product->categories->first()->id ?? null;
-
-    //     $related_products = Product::with('images', 'categories')
-    //         ->whereHas('categories', function ($query) use ($category_id) {
-    //             $query->where('categories.id', $category_id);
-    //         })
-    //         ->where('id', '!=', $product->id)
-    //         ->where('is_active', true)
-    //         ->take(4)
-    //         ->get();
-
-    //     // dd($related_products);
-
-    //     $products = $related_products->map(function ($p) {
-    //         $price_int = round(($p->variants->first()->price ?? $p->price ?? 0));
-    //         $old_price_int = round($price_int / 0.8, -3);
-    //         $main_img = $p->images->where('is_main', true)->first() ?? $p->images->first();
-
-    //         return [
-    //             'id' => $p->id,
-    //             'name' => $p->name,
-    //             'price' => $price_int,
-    //             'category' => $p->categories->first()->name ?? 'Umum',
-    //             'rating' => 0.0,
-    //             'ulasan' => 0,
-    //             'stok' => 'Tersedia',
-    //             'url_img' => $main_img ? env('APP_URL_BE') . ltrim($main_img->url, '/') : 'https://placehold.co/400x400/ccc/fff?text=No+Image',
-    //             'price_formatted' => number_format($price_int, 0, ',', '.'),
-    //             'old_price_formatted' => number_format($old_price_int, 0, ',', '.'),
-    //         ];
-    //     })->toArray();
-
-    //     // dd( Auth::guard('customer')->user());
-    //     // customer location
-    //     if (!Auth::guard('customer')->user()) {
-    //         $customer_location = [];
-
-    //     } else {
-    //         $customer_location = Addresses::where('customer_id', Auth::guard('customer')->user()->id)->get();
-
-    //     }
-
-    //      $branches_available = Inventory::whereHas('variant', function ($query) use ($id) {
-    //             $query->where('product_id', $id)->where('available' , '>', 5);
-    //         });
-
-
-
-
-
-    //     return view('frontend.detail', [
-    //         'product' => $product,
-    //         'product_main_image' => $product_main_image,
-    //         'product_images' => $product_images,
-    //         'subtotal_price' => $subtotal_price,
-    //         'products' => $products,
-    //     ]);
-    // }
-
-
-    // public function show($id){
-    //     $product = Product::with([
-    //         'images' => function ($query) {
-    //             $query->orderBy('is_main', 'desc')->orderBy('position', 'asc');
-    //         },
-    //         'categories',
-    //         'variants' => function ($query) {
-    //             $query->with('images')->where('is_active', true)->where('is_sellable', true);
-    //         }
-    //     ])
-    //         ->where('is_active', true)
-    //         ->find($id);
-
-    //     if (!$product) {
-    //         abort(404, 'Produk tidak ditemukan atau tidak aktif.');
-    //     }
-
-    //     $variant = $product->variants->first();
-    //     $priceCents = $variant->price ?? $product->price ?? 0;
-    //     $basePrice = round($priceCents);
-    //     $subtotal_price = $basePrice * 1;
-
+    //     // --- Logika Gambar (Tidak Berubah Signifikan) ---
     //     $productImagesCollection = collect([]);
     //     if ($variant) {
     //         $productImagesCollection = $productImagesCollection->merge($variant->images);
@@ -227,334 +229,8 @@ class ProductController extends Controller
     //     $product->average_rating = 0.0;
     //     $product->rating_distribution = [5 => 0, 4 => 0, 3 => 0, 2 => 0, 1 => 0];
 
+    //     // --- Logika Related Products (Tidak Berubah) ---
     //     $category_id = $product->categories->first()->id ?? null;
-
-    //     $related_products = Product::with('images', 'categories')
-    //         ->whereHas('categories', function ($query) use ($category_id) {
-    //             $query->where('categories.id', $category_id);
-    //         })
-    //         ->where('id', '!=', $product->id)
-    //         ->where('is_active', true)
-    //         ->take(4)
-    //         ->get();
-
-    //     $products = $related_products->map(function ($p) {
-    //         $price_int = round(($p->variants->first()->price ?? $p->price ?? 0));
-    //         $old_price_int = round($price_int / 0.8, -3);
-    //         $main_img = $p->images->where('is_main', true)->first() ?? $p->images->first();
-
-    //         return [
-    //             'id' => $p->id,
-    //             'name' => $p->name,
-    //             'price' => $price_int,
-    //             'category' => $p->categories->first()->name ?? 'Umum',
-    //             'rating' => 0.0,
-    //             'ulasan' => 0,
-    //             'stok' => 'Tersedia',
-    //             'url_img' => $main_img ? env('APP_URL_BE') . ltrim($main_img->url, '/') : 'https://placehold.co/400x400/ccc/fff?text=No+Image',
-    //             'price_formatted' => number_format($price_int, 0, ',', '.'),
-    //             'old_price_formatted' => number_format($old_price_int, 0, ',', '.'),
-    //         ];
-    //     })->toArray();
-
-    //     if (Auth::guard('customer')->user()) {
-    //         $customer_location = Addresses::where('customer_id', Auth::guard('customer')->user()->id)->get();
-    //     } else {
-    //         $customer_location = collect([]);
-    //     }
-
-    //     $inventoryData = Inventory::with('cabang')
-    //         ->whereHas('variant', function ($query) use ($id) {
-    //             $query->where('product_id', $id);
-    //         })
-    //         ->where('available', '>', 0)
-    //         ->get()
-    //         ->map(function ($inventory) {
-    //             return [
-    //                 'branch_id' => $inventory->branch_id,
-    //                 'branch_name' => $inventory->cabang->name ?? 'Nama Cabang Tidak Ditemukan',
-    //                 'branch_address' => $inventory->cabang->address ?? 'Alamat Tidak Ditemukan',
-    //                 'available_stock' => $inventory->available,
-    //             ];
-    //         })
-    //         ->groupBy('branch_id')
-    //         ->map(function ($groupedItems) {
-    //             $firstItem = $groupedItems->first();
-
-    //             $totalAvailable = $groupedItems->sum('available_stock');
-
-    //             return [
-    //                 'branch_id' => $firstItem['branch_id'],
-    //                 'branch_name' => $firstItem['branch_name'],
-    //                 'branch_address' => $firstItem['branch_address'],
-    //                 'total_available_stock' => $totalAvailable,
-    //                 'status_label' => $totalAvailable > 5 ? 'Stok Banyak' : ($totalAvailable > 0 ? 'Stok Terbatas' : 'Stok Habis'),
-    //             ];
-    //         })
-    //         ->values()
-    //         ->toArray();
-
-    //         $default_address = Auth::user()->addresses()->where('is_default', true)->first();
-
-    //     return view('frontend.detail', [
-    //         'product' => $product,
-    //         'product_main_image' => $product_main_image,
-    //         'product_images' => $product_images,
-    //         'subtotal_price' => $subtotal_price,
-    //         'products' => $products,
-    //         'inventory_data' => $inventoryData,
-    //     ]);
-    // }
-
-
-    //     private function calculateDistance($lat1, $lon1, $lat2, $lon2) {
-    //         if (is_null($lat1) || is_null($lon1) || is_null($lat2) || is_null($lon2)) {
-    //             return 99999.0; // Nilai default yang sangat tinggi jika koordinat tidak ada
-    //         }
-
-    //         $R = 6371; // Radius bumi dalam kilometer
-    //         $dLat = deg2rad($lat2 - $lat1);
-    //         $dLon = deg2rad($lon2 - $lon1);
-
-    //         $a = sin($dLat / 2) * sin($dLat / 2) +
-    //              cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($dLon / 2) * sin($dLon / 2);
-
-    //         $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
-    //         $distance = $R * $c;
-
-    //         return round($distance, 2); // Jarak dalam km, 2 desimal
-    //     }
-    // public function show($id){
-    //         // 1. Ambil Data Produk
-    //         $product = Product::with([
-    //             'images' => function ($query) {
-    //                 $query->orderBy('is_main', 'desc')->orderBy('position', 'asc');
-    //             },
-    //             'categories',
-    //             'variants' => function ($query) {
-    //                 $query->with('images')->where('is_active', true)->where('is_sellable', true);
-    //             }
-    //         ])
-    //             ->where('is_active', true)
-    //             ->find($id);
-
-    //         if (!$product) {
-    //             abort(404, 'Produk tidak ditemukan atau tidak aktif.');
-    //         }
-
-    //         // --- Persiapan Harga & Gambar ---
-    //         $variant = $product->variants->first();
-    //         $priceCents = $variant->price ?? $product->price ?? 0;
-    //         $basePrice = round($priceCents);
-    //         $subtotal_price = $basePrice * 1;
-
-    //         // Logika penggabungan gambar produk/varian
-    //         $productImagesCollection = collect([]);
-    //         if ($variant) {
-    //             $productImagesCollection = $productImagesCollection->merge($variant->images);
-    //         }
-    //         $productImagesCollection = $productImagesCollection->merge($product->images)->unique('url')->sortByDesc('is_main');
-
-    //         $mainImageModel = $productImagesCollection->where('is_main', true)->first() ?? $productImagesCollection->first();
-
-    //         $image_be = env('APP_URL_BE');
-
-    //         $product_main_image = $mainImageModel
-    //             ? $image_be . ltrim($mainImageModel->url, '/')
-    //             : 'https://placehold.co/600x600/ccc/fff?text=No+Image';
-
-    //         $product_images = $productImagesCollection->map(function ($image) use ($image_be) {
-    //             return [
-    //                 'url' => $image_be . ltrim($image->url, '/'),
-    //                 'label' => 'Gambar Produk',
-    //             ];
-    //         })->toArray();
-
-    //         // --- Data Ulasan (Simulasi) ---
-    //         $product->average_rating = 0.0;
-    //         $product->rating_distribution = [5 => 0, 4 => 0, 3 => 0, 2 => 0, 1 => 0];
-
-    //         // --- Produk Terkait ---
-    //         $category_id = $product->categories->first()->id ?? null;
-
-    //         $related_products = Product::with('images', 'categories', 'variants')
-    //             ->whereHas('categories', function ($query) use ($category_id) {
-    //                 $query->where('categories.id', $category_id);
-    //             })
-    //             ->where('id', '!=', $product->id)
-    //             ->where('is_active', true)
-    //             ->take(4)
-    //             ->get();
-
-    //         $products = $related_products->map(function ($p) {
-    //             $price_int = round(($p->variants->first()->price ?? $p->price ?? 0));
-    //             $old_price_int = round($price_int / 0.8, -3);
-    //             $main_img = $p->images->where('is_main', true)->first() ?? $p->images->first();
-
-    //             return [
-    //                 'id' => $p->id,
-    //                 'name' => $p->name,
-    //                 'price' => $price_int,
-    //                 'category' => $p->categories->first()->name ?? 'Umum',
-    //                 'rating' => 0.0,
-    //                 'ulasan' => 0,
-    //                 'stok' => 'Tersedia',
-    //                 'url_img' => $main_img ? env('APP_URL_BE') . ltrim($main_img->url, '/') : 'https://placehold.co/400x400/ccc/fff?text=No+Image',
-    //                 'price_formatted' => number_format($price_int, 0, ',', '.'),
-    //                 'old_price_formatted' => number_format($old_price_int, 0, ',', '.'),
-    //             ];
-    //         })->toArray();
-
-    //         // --- 2. Ambil Lokasi Pelanggan Default (untuk perhitungan jarak) ---
-    //         $default_address = null;
-    //         if (Auth::guard('customer')->check()) {
-    //             $customer_id = Auth::guard('customer')->user()->id;
-    //             // Ambil alamat default atau yang pertama
-    //             $default_address = Addresses::where('customer_id', $customer_id)
-    //                                         ->where('is_default', true)
-    //                                         ->orWhere('customer_id', $customer_id)
-    //                                         ->orderBy('id', 'desc')
-    //                                         ->first();
-    //         } 
-
-    //         // Tentukan koordinat pelanggan (digunakan untuk menghitung jarak)
-    //         $customer_lat = $default_address ? (float) $default_address->latitude : null;
-    //         $customer_lon = $default_address ? (float) $default_address->longitude : null;
-
-    //         // --- 3. Ambil Data Inventori & Cabang ---
-    //         $inventoryData = Inventory::with('cabang')
-    //             ->whereHas('variant', function ($query) use ($id) {
-    //                 $query->where('product_id', $id);
-    //             })
-    //             ->where('available', '>', 0)
-    //             ->get()
-    //             ->map(function ($inventory) {
-    //                 // Pastikan kolom koordinat ada di model Cabang
-    //                 return [
-    //                     'branch_id' => $inventory->branch_id,
-    //                     'branch_name' => $inventory->cabang->name ?? 'Nama Cabang Tidak Ditemukan',
-    //                     'branch_address' => $inventory->cabang->address ?? 'Alamat Tidak Ditemukan',
-    //                     'latitude' => (float) $inventory->cabang->latitude, // BARU
-    //                     'longitude' => (float) $inventory->cabang->longitude, // BARU
-    //                     'available_stock' => $inventory->available,
-    //                 ];
-    //             })
-    //             ->groupBy('branch_id')
-    //             ->map(function ($groupedItems) use ($customer_lat, $customer_lon, $default_address) {
-    //                 $firstItem = $groupedItems->first();
-    //                 $totalAvailable = $groupedItems->sum('available_stock');
-
-    //                 // Tentukan label status dan kelas warna
-    //                 if ($totalAvailable > 5) {
-    //                     $statusLabel = 'Stok Banyak';
-    //                     $statusColor = 'text-green-600'; // Warna Hijau
-    //                 } elseif ($totalAvailable > 0) {
-    //                     $statusLabel = 'Stok Terbatas';
-    //                     $statusColor = 'text-orange-600'; // Warna Oranye
-    //                 } else {
-    //                     $statusLabel = 'Stok Habis';
-    //                     $statusColor = 'text-red-600'; // Warna Merah
-    //                 }
-
-    //                 // Perhitungan Jarak (Hanya dilakukan jika pelanggan sudah login dan memiliki koordinat)
-    //                 $distance = $this->calculateDistance(
-    //                     $customer_lat, 
-    //                     $customer_lon, 
-    //                     $firstItem['latitude'], 
-    //                     $firstItem['longitude']
-    //                 );
-
-    //                 $distanceFormatted = ($distance < 99999.0) ? $distance . ' km' : 'Jarak N/A';
-
-    //                 return [
-    //                     'branch_id' => $firstItem['branch_id'],
-    //                     'branch_name' => $firstItem['branch_name'],
-    //                     'branch_address' => $firstItem['branch_address'],
-    //                     'latitude' => $firstItem['latitude'], 
-    //                     'longitude' => $firstItem['longitude'], 
-    //                     'total_available_stock' => $totalAvailable,
-    //                     'status_label' => $statusLabel, // Status singkat (misal: Stok Banyak)
-    //                     'status_color' => $statusColor, // Kelas warna Tailwind
-    //                     'distance_value' => $distance, // Nilai numerik jarak (untuk sorting di JS)
-    //                     'distance_formatted' => $distanceFormatted, // Format string jarak (misal: 1.25 km)
-    //                 ];
-    //             })
-    //             ->values()
-    //             ->toArray();
-
-    //         // 4. Sortir Cabang Berdasarkan Jarak (di sisi server sebelum dikirim ke view)
-    //         usort($inventoryData, function($a, $b) {
-    //             // Sortir berdasarkan distance_value
-    //             return $a['distance_value'] <=> $b['distance_value'];
-    //         });
-
-    //         // 5. Kembalikan View
-    //         return view('frontend.detail', [
-    //             'product' => $product,
-    //             'product_main_image' => $product_main_image,
-    //             'product_images' => $product_images,
-    //             'subtotal_price' => $subtotal_price,
-    //             'products' => $products, // Produk terkait
-    //             'inventory_data' => $inventoryData, // Data ketersediaan dan jarak cabang yang sudah diurutkan
-    //             'customer_addresses' => $default_address ? Addresses::where('customer_id', $customer_id)->get() : collect([]), // Semua alamat pelanggan (untuk modal)
-    //             'default_address' => $default_address, // Alamat default pelanggan (untuk inisialisasi JS)
-    //         ]);
-
-    //     }
-
-    // }
-
-
-    // public function show($id)
-    // {
-    //     $product = Product::with([
-    //         'images' => function ($query) {
-    //             $query->orderBy('is_main', 'desc')->orderBy('position', 'asc');
-    //         },
-    //         'categories',
-    //         'variants' => function ($query) {
-    //             $query->with('images')->where('is_active', true)->where('is_sellable', true);
-    //         }
-    //     ])
-    //         ->where('is_active', true)
-    //         ->find($id);
-
-    //     if (!$product) {
-    //         abort(404, 'Produk tidak ditemukan atau tidak aktif.');
-    //     }
-
-    //     $variant = $product->variants->first();
-    //     $priceCents = $variant->price ?? $product->price ?? 0;
-    //     $basePrice = round($priceCents);
-    //     $subtotal_price = $basePrice * 1;
-
-    //     $productImagesCollection = collect([]);
-    //     if ($variant) {
-    //         $productImagesCollection = $productImagesCollection->merge($variant->images);
-    //     }
-    //     $productImagesCollection = $productImagesCollection->merge($product->images)->unique('url')->sortByDesc('is_main');
-
-    //     $mainImageModel = $productImagesCollection->where('is_main', true)->first() ?? $productImagesCollection->first();
-
-    //     $image_be = env('APP_URL_BE');
-
-    //     $product_main_image = $mainImageModel
-    //         ? $image_be . ltrim($mainImageModel->url, '/')
-    //         : 'https://placehold.co/600x600/ccc/fff?text=No+Image';
-
-    //     $product_images = $productImagesCollection->map(function ($image) {
-    //         return [
-    //             'url' => env('APP_URL_BE') . ltrim($image->url, '/'),
-    //             'label' => 'Gambar Produk',
-    //         ];
-    //     })->toArray();
-
-    //     $product->average_rating = 0.0;
-    //     $product->rating_distribution = [5 => 0, 4 => 0, 3 => 0, 2 => 0, 1 => 0];
-
-    //     $category_id = $product->categories->first()->id ?? null;
-
-    //     // ... (Logika Related Products) ...
     //     $related_products = Product::with('images', 'categories')
     //         ->whereHas('categories', function ($query) use ($category_id) {
     //             $query->where('categories.id', $category_id);
@@ -584,37 +260,59 @@ class ProductController extends Controller
     //     })->toArray();
 
     //     // 1. Ambil Data Alamat Pelanggan
-    //     $customer_locations =  [];
+    //     $customer_locations = [];
     //     $default_address = null;
+    //     $customerLat = 0;
+    //     $customerLon = 0;
 
     //     if (Auth::guard('customer')->check()) {
     //         $customer = Auth::guard('customer')->user();
     //         // ASUMSI: Model Addresses di-relasikan dengan Customer
     //         $customer_locations = $customer->addresses()->get();
 
-    //         // Pastikan Anda mendapatkan alamat default yang akan digunakan untuk inisialisasi JS
+    //         // Ambil alamat default untuk koordinat
     //         $default_address = $customer_locations->where('is_default', true)->first();
-    //     }
-    //     // Jika tidak login, default_address tetap null
 
-    //     // 2. Ambil Data Inventory DENGAN data lokasi Cabang
+    //         if ($default_address) {
+    //             // PASTIKAN kolom 'latitude' dan 'longitude' ADA di Model Address
+    //             $customerLat = (float) $default_address->latitude ?? 0;
+    //             $customerLon = (float) $default_address->longitude ?? 0;
+    //         }
+    //     }
+
+    //     // 2. Ambil Data Inventory, Cabang, dan Hitung Jarak
     //     $inventoryData = Inventory::with(['variant', 'cabang'])
     //         ->whereHas('variant', function ($query) use ($id) {
     //             $query->where('product_id', $id);
     //         })
     //         ->where('available', '>', 0)
     //         ->get()
-    //         ->map(function ($inventory) {
+    //         ->map(function ($inventory) use ($customerLat, $customerLon) {
     //             $cabang = $inventory->cabang;
     //             $status_label = $inventory->available > 5 ? 'Stok Banyak' : ($inventory->available > 0 ? 'Stok Terbatas' : 'Stok Habis');
     //             $status_color = $inventory->available > 5 ? 'text-green-600' : ($inventory->available > 0 ? 'text-orange-500' : 'text-red-500');
 
+    //             $branchLat = (float) $cabang->latitude ?? 0;
+    //             $branchLon = (float) $cabang->longitude ?? 0;
+
+    //             // Hitung Jarak
+    //             $distanceKm = 0;
+    //             $distanceDisplay = 'N/A';
+
+    //             if ($customerLat != 0 && $customerLon != 0 && $branchLat != 0 && $branchLon != 0) {
+    //                 $distanceKm = $this->calculateHaversineDistance($customerLat, $customerLon, $branchLat, $branchLon);
+    //                 $distanceDisplay = number_format($distanceKm, 2, ',', '.') . ' km';
+    //             }
+
     //             return [
+    //                 'inventory_id' => $inventory->variant->sku,
     //                 'branch_id' => $inventory->branch_id,
     //                 'branch_name' => $cabang->name ?? 'Nama Cabang N/A',
     //                 'branch_address' => $cabang->address ?? 'Alamat N/A',
-    //                 'latitude' => $cabang->latitude ?? 0, // PASTIKAN ADA kolom 'latitude' di model Cabang
-    //                 'longitude' => $cabang->longitude ?? 0, // PASTIKAN ADA kolom 'longitude' di model Cabang
+    //                 'distance_value' => $distanceKm, // Nilai numerik untuk sorting
+    //                 'distance_display' => $distanceDisplay, // Nilai string untuk ditampilkan
+    //                 'latitude' => $branchLat,
+    //                 'longitude' => $branchLon,
     //                 'total_available_stock' => $inventory->available,
     //                 'status_label' => $status_label,
     //                 'status_color_class' => $status_color,
@@ -627,24 +325,26 @@ class ProductController extends Controller
     //             $totalAvailable = $groupedItems->sum('total_available_stock');
 
     //             // Kita harus update statusnya lagi jika total stok lebih dari 5
-    //             $status_label = $totalAvailable > 5 ? 'Stok Banyak' : ($totalAvailable > 0 ? 'Stok Terbatas' : 'Stok Habis');
+    //             $status_label = $totalAvailable > 5 ? 'Stok Tersedia' : ($totalAvailable > 0 ? 'Stok Terbatas' : 'Stok Habis');
     //             $status_color = $totalAvailable > 5 ? 'text-green-600' : ($totalAvailable > 0 ? 'text-orange-500' : 'text-red-500');
 
     //             return [
     //                 'branch_id' => $firstItem['branch_id'],
     //                 'branch_name' => $firstItem['branch_name'],
     //                 'branch_address' => $firstItem['branch_address'],
+    //                 'distance_value' => $firstItem['distance_value'], // Pertahankan nilai jarak numerik
+    //                 'distance_display' => $firstItem['distance_display'], // Pertahankan nilai jarak tampilan
     //                 'latitude' => $firstItem['latitude'],
     //                 'longitude' => $firstItem['longitude'],
     //                 'total_available_stock' => $totalAvailable,
     //                 'status_label' => $status_label,
     //                 'status_color_class' => $status_color,
+    //                 'items' => $groupedItems->toArray(),
     //             ];
     //         })
+    //         ->sortBy('distance_value') // SORTIR DI CONTROLLER BERDASARKAN JARAK
     //         ->values()
     //         ->toArray();
-
-    //     // dd($customer_locations);
 
 
     //     // 3. Kirim data yang dibutuhkan ke View
@@ -654,34 +354,14 @@ class ProductController extends Controller
     //         'product_images' => $product_images,
     //         'subtotal_price' => $subtotal_price,
     //         'products' => $products,
-    //         'inventory_data' => $inventoryData, // Data Cabang dengan Lat/Lon
-    //         'default_address' => $default_address, // Alamat Default Pelanggan (untuk inisialisasi JS)
-    //         'customer_addresses' => $customer_locations, // SEMUA Alamat Pelanggan (untuk modal)
+    //         'inventory_data' => $inventoryData,
+    //         'default_address' => $default_address,
+    //         'customer_addresses' => $customer_locations,
     //     ]);
     // }
 
 
-    private function calculateHaversineDistance($lat1, $lon1, $lat2, $lon2) {
-        // Radius bumi dalam kilometer
-        $earthRadius = 6371; 
-
-        // Konversi derajat ke radian
-        $latFrom = deg2rad($lat1);
-        $lonFrom = deg2rad($lon1);
-        $latTo = deg2rad($lat2);
-        $lonTo = deg2rad($lon2);
-
-        $latDelta = $latTo - $latFrom;
-        $lonDelta = $lonTo - $lonFrom;
-
-        // Rumus Haversine
-        $angle = 2 * asin(sqrt(pow(sin($latDelta / 2), 2) + 
-            cos($latFrom) * cos($latTo) * pow(sin($lonDelta / 2), 2)));
-            
-        return $angle * $earthRadius;
-    }
-
-    public function show($id)
+     public function show($id)
     {
         $product = Product::with([
             'images' => function ($query) {
@@ -725,10 +405,10 @@ class ProductController extends Controller
                 'label' => 'Gambar Produk',
             ];
         })->toArray();
-        
+
         $product->average_rating = 0.0;
         $product->rating_distribution = [5 => 0, 4 => 0, 3 => 0, 2 => 0, 1 => 0];
-        
+
         // --- Logika Related Products (Tidak Berubah) ---
         $category_id = $product->categories->first()->id ?? null;
         $related_products = Product::with('images', 'categories')
@@ -772,79 +452,84 @@ class ProductController extends Controller
 
             // Ambil alamat default untuk koordinat
             $default_address = $customer_locations->where('is_default', true)->first();
-            
+
             if ($default_address) {
                 // PASTIKAN kolom 'latitude' dan 'longitude' ADA di Model Address
-                $customerLat = (float) $default_address->latitude ?? 0; 
+                $customerLat = (float) $default_address->latitude ?? 0;
                 $customerLon = (float) $default_address->longitude ?? 0;
             }
         }
-        
+
         // 2. Ambil Data Inventory, Cabang, dan Hitung Jarak
-        $inventoryData = Inventory::with(['variant', 'cabang'])
-            ->whereHas('variant', function ($query) use ($id) {
-                $query->where('product_id', $id);
-            })
-            ->where('available', '>', 0)
-            ->get()
-            ->map(function ($inventory) use ($customerLat, $customerLon) {
-                $cabang = $inventory->cabang;
-                $status_label = $inventory->available > 5 ? 'Stok Banyak' : ($inventory->available > 0 ? 'Stok Terbatas' : 'Stok Habis');
-                $status_color = $inventory->available > 5 ? 'text-green-600' : ($inventory->available > 0 ? 'text-orange-500' : 'text-red-500');
-                
-                $branchLat = (float) $cabang->latitude ?? 0;
-                $branchLon = (float) $cabang->longitude ?? 0;
-                
-                // Hitung Jarak
-                $distanceKm = 0;
-                $distanceDisplay = 'N/A';
-                
-                if ($customerLat != 0 && $customerLon != 0 && $branchLat != 0 && $branchLon != 0) {
-                    $distanceKm = $this->calculateHaversineDistance($customerLat, $customerLon, $branchLat, $branchLon);
-                    $distanceDisplay = number_format($distanceKm, 2, ',', '.') . ' km';
-                }
-                
+       // 2. Ambil Data Inventory, Cabang, dan Hitung Jarak
+$inventoryData = Inventory::with(['variant', 'cabang'])
+    ->whereHas('variant', function ($query) use ($id) {
+        $query->where('product_id', $id);
+    })
+    ->where('available', '>', 0)
+    ->get()
+    ->map(function ($inventory) use ($customerLat, $customerLon) {
+        $cabang = $inventory->cabang;
+        $variant = $inventory->variant; // Ambil object variant
+
+        $branchLat = (float) ($cabang->latitude ?? 0);
+        $branchLon = (float) ($cabang->longitude ?? 0);
+
+        // Hitung Jarak
+        $distanceKm = 0;
+        $distanceDisplay = 'N/A';
+        if ($customerLat != 0 && $customerLon != 0 && $branchLat != 0 && $branchLon != 0) {
+            $distanceKm = $this->calculateHaversineDistance($customerLat, $customerLon, $branchLat, $branchLon);
+            $distanceDisplay = number_format($distanceKm, 2, ',', '.') . ' km';
+        }
+
+        return [
+            'variant_id' => $variant->id, // TAMBAHKAN INI
+            'variant_name' => $variant->name, // Opsional: misal "Warna Merah, Ukuran XL"
+            'sku' => $variant->sku,
+            'branch_id' => $inventory->branch_id,
+            'branch_name' => $cabang->name ?? 'Nama Cabang N/A',
+            'branch_address' => $cabang->address ?? 'Alamat N/A',
+            'distance_value' => $distanceKm,
+            'distance_display' => $distanceDisplay,
+            'latitude' => $branchLat,
+            'longitude' => $branchLon,
+            'available_stock' => $inventory->available,
+        ];
+    })
+    ->groupBy('branch_id')
+    ->map(function ($groupedItems) {
+        $firstItem = $groupedItems->first();
+        $totalAvailable = $groupedItems->sum('available_stock');
+
+        $status_label = $totalAvailable > 5 ? 'Stok Tersedia' : ($totalAvailable > 0 ? 'Stok Terbatas' : 'Stok Habis');
+        $status_color = $totalAvailable > 5 ? 'text-green-600' : ($totalAvailable > 0 ? 'text-orange-500' : 'text-red-500');
+
+        return [
+            'branch_id' => $firstItem['branch_id'],
+            'branch_name' => $firstItem['branch_name'],
+            'branch_address' => $firstItem['branch_address'],
+            'distance_value' => $firstItem['distance_value'],
+            'distance_display' => $firstItem['distance_display'],
+            'latitude' => $firstItem['latitude'],
+            'longitude' => $firstItem['longitude'],
+            'total_available_stock' => $totalAvailable,
+            'status_label' => $status_label,
+            'status_color_class' => $status_color,
+            // 'items' sekarang berisi daftar varian yang tersedia di cabang tersebut
+            'items' => $groupedItems->map(function($item) {
                 return [
-                    'branch_id' => $inventory->branch_id,
-                    'branch_name' => $cabang->name ?? 'Nama Cabang N/A',
-                    'branch_address' => $cabang->address ?? 'Alamat N/A',
-                    'distance_value' => $distanceKm, // Nilai numerik untuk sorting
-                    'distance_display' => $distanceDisplay, // Nilai string untuk ditampilkan
-                    'latitude' => $branchLat, 
-                    'longitude' => $branchLon, 
-                    'total_available_stock' => $inventory->available,
-                    'status_label' => $status_label,
-                    'status_color_class' => $status_color,
+                    'variant_id' => $item['variant_id'],
+                    'sku' => $item['sku'],
+                    'variant_name' => $item['variant_name'],
+                    'stock' => $item['available_stock']
                 ];
-            })
-            ->groupBy('branch_id')
-            ->map(function ($groupedItems) {
-                // Kita ambil data cabang dari item pertama (karena semua harusnya sama)
-                $firstItem = $groupedItems->first();
-                $totalAvailable = $groupedItems->sum('total_available_stock');
-
-                // Kita harus update statusnya lagi jika total stok lebih dari 5
-                $status_label = $totalAvailable > 5 ? 'Stok Tersedia' : ($totalAvailable > 0 ? 'Stok Terbatas' : 'Stok Habis');
-                $status_color = $totalAvailable > 5 ? 'text-green-600' : ($totalAvailable > 0 ? 'text-orange-500' : 'text-red-500');
-
-                return [
-                    'branch_id' => $firstItem['branch_id'],
-                    'branch_name' => $firstItem['branch_name'],
-                    'branch_address' => $firstItem['branch_address'],
-                    'distance_value' => $firstItem['distance_value'], // Pertahankan nilai jarak numerik
-                    'distance_display' => $firstItem['distance_display'], // Pertahankan nilai jarak tampilan
-                    'latitude' => $firstItem['latitude'],
-                    'longitude' => $firstItem['longitude'],
-                    'total_available_stock' => $totalAvailable,
-                    'status_label' => $status_label,
-                    'status_color_class' => $status_color,
-                ];
-            })
-            ->sortBy('distance_value') // SORTIR DI CONTROLLER BERDASARKAN JARAK
-            ->values()
-            ->toArray();
-
-
+            })->toArray(),
+        ];
+    })
+    ->sortBy('distance_value')
+    ->values()
+    ->toArray();
         // 3. Kirim data yang dibutuhkan ke View
         return view('frontend.detail', [
             'product' => $product,
@@ -852,9 +537,56 @@ class ProductController extends Controller
             'product_images' => $product_images,
             'subtotal_price' => $subtotal_price,
             'products' => $products,
-            'inventory_data' => $inventoryData, 
-            'default_address' => $default_address, 
-            'customer_addresses' => $customer_locations, 
+            'inventory_data' => $inventoryData,
+            'default_address' => $default_address,
+            'customer_addresses' => $customer_locations,
         ]);
     }
+
+    public function setBranch(Request $request)
+    {
+        // Validasi input
+        $request->validate([
+            'branch_id' => 'required|exists:branches,id', // Pastikan ID cabang ada
+        ]);
+
+        // Simpan ID Cabang ke Session
+        session(['selected_branch_id' => $request->branch_id]);
+
+        return redirect()->route('products.index')
+            ->with('branch_set', 'Cabang toko Anda berhasil dipilih!');
+    }
+
+    // public function getNearbyBranches(Request $request)
+    // {
+    //     // 1. Validasi input koordinat user
+    //     $request->validate([
+    //         'user_lat' => 'required|numeric|between:-90,90',
+    //         'user_lon' => 'required|numeric|between:-180,180',
+    //     ]);
+
+    //     $userLat = $request->user_lat;
+    //     $userLon = $request->user_lon;
+
+    //     // Jari-jari Bumi (dalam kilometer)
+    //     $earthRadius = 6371;
+
+    //     // 2. Query Cabang dengan Perhitungan Jarak (Rumus Haversine)
+    //     $branches = Branches::select('*', DB::raw("
+    //         ({$earthRadius} * acos(
+    //             cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude))
+    //         )) AS distance
+    //     "))
+    //         // Ganti 'latitude' dan 'longitude' dengan nama kolom yang benar di tabel branches Anda
+    //         ->setBindings([$userLat, $userLon, $userLat])
+    //         ->orderBy('distance', 'asc') // Urutkan dari yang terdekat
+    //         ->get();
+
+    //     // 3. Mengembalikan data dalam format JSON
+    //     return response()->json([
+    //         'status' => 'success',
+    //         'user_location' => ['lat' => $userLat, 'lon' => $userLon],
+    //         'branches' => $branches
+    //     ]);
+    // }
 }
