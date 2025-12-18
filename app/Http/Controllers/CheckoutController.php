@@ -107,7 +107,7 @@ class CheckoutController extends Controller
     // Konstanta Status
     const ORDER_STATUS_PENDING = 'pending';
     const PAYMENT_STATUS_PENDING = 'pending';
-    const DEFAULT_SHIPPING_COST = 15000; // Contoh biaya ongkir default
+    const DEFAULT_SHIPPING_COST = 0; // Contoh biaya ongkir default
 
     public function store(Request $request)
     {
