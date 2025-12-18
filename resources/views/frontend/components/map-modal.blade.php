@@ -1,4 +1,4 @@
-<div id="mapModal" class="fixed inset-0 bg-light-grey bg-opacity-50 hidden items-center justify-center " style="z-index: 999;">
+<div id="mapModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center " style="z-index: 999;">
     <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto m-4">
 
         {{-- Header Modal --}}

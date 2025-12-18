@@ -35,4 +35,9 @@ class ProductVariant extends Model
     {
         return $this->belongsTo(Unit::class, 'unit_id');
     }
+
+    public function inventories()
+    {
+        return $this->hasMany(Inventory::class, 'variant_id');
+    }
 }

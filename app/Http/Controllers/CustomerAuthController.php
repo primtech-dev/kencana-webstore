@@ -331,6 +331,6 @@ class CustomerAuthController extends Controller
         Auth::guard('customer')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect('/')->with('success', 'Sampai jumpa lagi ya!');
+        return redirect('/customer/login')->with('success', 'Sampai jumpa lagi ya!');
     }
 }

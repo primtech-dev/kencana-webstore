@@ -132,6 +132,12 @@ Route::get('/products/{id}', [ProductController::class, 'show'])->name('products
 // customer dashboard
 // routes/web.php
 
+// Route untuk API yang menghitung jarak dan mengurutkan cabang
+Route::post('/branches/nearby', [ProductController::class, 'getNearbyBranches'])->name('branches.nearby'); 
+
+// Route untuk menyimpan pilihan cabang dari modal
+Route::post('/set-selected-branch', [ProductController::class, 'setBranch'])->name('set.branch');
+
 Route::middleware(['auth:customer'])->group(function () {
     Route::get('/dashboard', function () {
         // Akses pengguna yang sedang login
