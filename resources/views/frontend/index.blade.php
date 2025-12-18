@@ -76,7 +76,7 @@
                     }}">
                     
                     <div class="w-12 h-12 md:w-14 md:h-14 bg-white rounded-md overflow-hidden flex-shrink-0 flex items-center justify-center p-1 shadow-sm border border-gray-50">
-                        <img src="{{ env('APP_URL_BE'). '/' . $category->thumbnail }}"
+                        <img src="{{ $category->thumbnail ? env('APP_URL_BE') . '/' . $category->thumbnail : 'https://placehold.co/100x100/000/ffffff?text=No+Image' }}"
                             alt="{{ $category->name }}"
                             class="max-w-full max-h-full object-contain transition-transform duration-300 group-hover/card:scale-110">
                     </div>
@@ -183,7 +183,7 @@
                             <span class="ml-2 text-dark-grey">| {{ rand(1, 300) }} (ulasan)</span>
                         </div>
                         <p class="stock text-xs font-bold text-red-500 mt-2">
-                            Stok: {{ $mainVariant ? $mainVariant->inventories->first()->available : 0 }}
+                           Stok: {{ optional(optional($mainVariant)->inventories)->first()->available ?? 0 }}
                         </p>
                     </div>
                 </a>

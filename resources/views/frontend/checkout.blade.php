@@ -343,7 +343,7 @@
         const checkoutForm = document.getElementById('checkout-form');
         const shippingDetailsInput = document.getElementById('shipping-details-input');
 
-        const DEFAULT_DELIVERY_COST = 15000;
+        const DEFAULT_DELIVERY_COST = 0;
 
         let currentSelectedAddress = null; // Menyimpan DOM element dari alamat yang dipilih di modal
 
