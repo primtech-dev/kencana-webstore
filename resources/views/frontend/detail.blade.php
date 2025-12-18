@@ -543,7 +543,7 @@
             if (finalQty < 1) finalQty = 1;
 
             // Opsional: Batasi input agar tidak melebihi 100 atau stok jika perlu
-            if (finalQty > 100) finalQty = 100;
+            if (finalQty > 99999) finalQty = 99999;
 
             productQtyInput.value = finalQty;
 
