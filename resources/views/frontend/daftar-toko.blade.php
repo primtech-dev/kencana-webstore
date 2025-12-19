@@ -43,7 +43,7 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         <div class="lg:col-span-2 order-1 lg:order-2 relative">
             <div id="storeMap" class="shadow-lg border border-gray-100"></div>
