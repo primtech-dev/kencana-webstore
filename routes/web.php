@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BranchController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use Illuminate\Support\Facades\Route;
@@ -133,10 +134,12 @@ Route::get('/products/{id}', [ProductController::class, 'show'])->name('products
 // routes/web.php
 
 // Route untuk API yang menghitung jarak dan mengurutkan cabang
-Route::post('/branches/nearby', [ProductController::class, 'getNearbyBranches'])->name('branches.nearby'); 
+// Route::post('/branches/nearby', [ProductController::class, 'getNearbyBranches'])->name('branches.nearby'); 
 
 // Route untuk menyimpan pilihan cabang dari modal
 Route::post('/set-selected-branch', [ProductController::class, 'setBranch'])->name('set.branch');
+
+Route::get('/daftar-toko', [BranchController::class, 'index'])->name('branches.index');
 
 Route::middleware(['auth:customer'])->group(function () {
     Route::get('/dashboard', function () {
