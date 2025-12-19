@@ -242,7 +242,7 @@
                 <div class="h-4 w-[1px] bg-gray-300 hidden md:block"></div>
                 <a href="#" class="hover:text-primary hidden md:block">Official Partner</a>
                 <a href="#" class="hover:text-primary hidden md:block">Promo</a>
-                <a href="#" class="hover:text-primary hidden md:block">FAQ</a>
+                <a href="{{url('/faq')}}" class="hover:text-primary hidden md:block">FAQ</a>
                 <a href="{{route('branches.index')}}" class="hover:text-primary hidden md:block">Lokasi Toko</a>
                 <a href="#" class="hover:text-primary hidden md:block">Download APP</a>
             </nav>
