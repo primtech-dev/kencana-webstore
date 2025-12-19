@@ -121,7 +121,7 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
 {{-- SCRIPT UTAMA UNTUK PETA DAN MODAL --}}
-<script>
+<!-- <script>
     document.addEventListener('DOMContentLoaded', function() {
         // === 1. PENGAMBILAN ELEMEN DOM ===
         const mapModal = document.getElementById('mapModal');
@@ -377,4 +377,185 @@
             });
         });
     });
+</script> -->
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+    // 1. DOM Elements
+    const mapModal = document.getElementById('mapModal');
+    const openBtn = document.getElementById('openMapModal'); // Sesuaikan ID tombol trigger Anda
+    const closeBtn = document.getElementById('closeMapModal');
+    const getCurrentLocationBtn = document.getElementById('getCurrentLocationBtn');
+    
+    // Form Inputs
+    const addressForm = document.getElementById('addressForm');
+    const formMethod = document.getElementById('formMethod');
+    const submitButton = document.getElementById('submitButton');
+    const modalTitle = document.getElementById('modalTitle');
+    const searchInput = document.getElementById('addressSearchInput');
+    const searchBtn = document.getElementById('searchAddressBtn');
+    const searchMsg = document.getElementById('searchMessage');
+
+    // Field Inputs
+    const fieldLat = document.getElementById('inputLatitude');
+    const fieldLng = document.getElementById('inputLongitude');
+    const fieldStreet = document.getElementById('street');
+    const fieldCity = document.getElementById('city');
+    const fieldProvince = document.getElementById('province');
+    const fieldZip = document.getElementById('postal_code');
+
+    // 2. Map Variables
+    let map = null;
+    let marker = null;
+    let isMapInit = false;
+    const defaultLat = -6.2088; 
+    const defaultLng = 106.8456;
+
+    // --- FUNGSI UTAMA ---
+
+    function initMap(lat, lng) {
+        if (!isMapInit) {
+            map = L.map('leafletMap').setView([lat, lng], 16);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap'
+            }).addTo(map);
+
+            marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+
+            marker.on('dragend', function() {
+                const pos = marker.getLatLng();
+                updateCoords(pos.lat, pos.lng, true);
+            });
+            isMapInit = true;
+        } else {
+            marker.setLatLng([lat, lng]);
+            map.setView([lat, lng], 16);
+        }
+    }
+
+    function updateCoords(lat, lng, fetchReverse = false) {
+        const fixedLat = parseFloat(lat).toFixed(6);
+        const fixedLng = parseFloat(lng).toFixed(6);
+        
+        document.getElementById('latlngOutput').innerHTML = `Lat: ${fixedLat}, Lng: ${fixedLng}`;
+        fieldLat.value = fixedLat;
+        fieldLng.value = fixedLng;
+
+        if (fetchReverse) reverseGeocode(lat, lng);
+    }
+
+    function reverseGeocode(lat, lng) {
+        fieldStreet.value = "Sedang mengambil alamat...";
+        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.address) {
+                    const addr = data.address;
+                    fieldStreet.value = data.display_name;
+                    fieldCity.value = addr.city || addr.town || addr.village || '';
+                    fieldProvince.value = addr.state || '';
+                    fieldZip.value = addr.postcode || '';
+                }
+            })
+            .catch(() => fieldStreet.value = "Gagal mengambil alamat otomatis.");
+    }
+
+    // --- EVENT LISTENERS ---
+
+    // Tombol Buka Modal (Tambah Baru)
+    if(openBtn) {
+        openBtn.addEventListener('click', () => {
+            addressForm.reset();
+            formMethod.value = 'POST';
+            modalTitle.innerText = "Tentukan Lokasi di Peta";
+            mapModal.classList.replace('hidden', 'flex');
+            
+            setTimeout(() => {
+                initMap(defaultLat, defaultLng);
+                map.invalidateSize();
+                updateCoords(defaultLat, defaultLng, true);
+            }, 200);
+        });
+    }
+
+    // Tombol Close
+    closeBtn.addEventListener('click', () => mapModal.classList.replace('flex', 'hidden'));
+
+    // Klik Diluar Modal untuk tutup
+    mapModal.addEventListener('click', (e) => { if(e.target === mapModal) closeBtn.click(); });
+
+    // Fitur Cari Alamat (Forward Geocode)
+    searchBtn.addEventListener('click', () => {
+        const query = searchInput.value;
+        if(!query) return;
+        
+        searchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1&addressdetails=1`)
+            .then(res => res.json())
+            .then(data => {
+                if(data.length > 0) {
+                    const lat = data[0].lat;
+                    const lon = data[0].lon;
+                    initMap(lat, lon);
+                    updateCoords(lat, lon, false); // false karena data nominatim search sudah lengkap
+                    
+                    const addr = data[0].address;
+                    fieldStreet.value = data[0].display_name;
+                    fieldCity.value = addr.city || addr.town || addr.village || '';
+                    fieldProvince.value = addr.state || '';
+                    fieldZip.value = addr.postcode || '';
+                    searchMsg.classList.add('hidden');
+                } else {
+                    searchMsg.classList.remove('hidden');
+                }
+            })
+            .finally(() => searchBtn.innerHTML = '<i class="fas fa-search"></i> <span class="hidden sm:inline ml-2">Cari</span>');
+    });
+
+    // Fitur Lokasi Saat Ini (Geolocation)
+    getCurrentLocationBtn.addEventListener('click', () => {
+        if (!navigator.geolocation) return alert("Geolocation tidak didukung browser ini.");
+
+        getCurrentLocationBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Mencari...';
+        navigator.geolocation.getCurrentPosition((pos) => {
+            const lat = pos.coords.latitude;
+            const lng = pos.coords.longitude;
+            initMap(lat, lng);
+            updateCoords(lat, lng, true);
+            getCurrentLocationBtn.innerHTML = '<i class="fas fa-location-arrow mr-2"></i> Gunakan Lokasi Saat Ini';
+        }, () => {
+            alert("Gagal mengakses lokasi. Pastikan GPS aktif.");
+            getCurrentLocationBtn.innerHTML = '<i class="fas fa-location-arrow mr-2"></i> Gunakan Lokasi Saat Ini';
+        });
+    });
+
+    // Fitur Edit (Dipasang pada tombol edit di luar modal)
+    document.querySelectorAll('.edit-address-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const d = this.dataset;
+            addressForm.action = `/member/daftar-alamat/${d.id}`;
+            formMethod.value = 'PUT';
+            modalTitle.innerText = "Ubah Detail Alamat";
+            
+            // Fill Fields
+            document.getElementById('label').value = d.label;
+            document.getElementById('phone').value = d.phone;
+            fieldStreet.value = d.street;
+            fieldCity.value = d.city;
+            fieldProvince.value = d.province;
+            fieldZip.value = d.zip;
+            document.getElementById('is_default').checked = d.default == '1';
+
+            mapModal.classList.replace('hidden', 'flex');
+            setTimeout(() => {
+                const lat = parseFloat(d.lat);
+                const lng = parseFloat(d.lng);
+                initMap(lat, lng);
+                map.invalidateSize();
+                updateCoords(lat, lng, false);
+            }, 200);
+        });
+    });
+});
 </script>

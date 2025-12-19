@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Addresses;
 use App\Models\Branches;
 use App\Models\Category;
+use App\Models\HomeBanner;
 use App\Models\Inventory;
 use App\Models\Product;
 use Illuminate\Http\Request;
@@ -13,77 +14,6 @@ use Illuminate\Support\Facades\Auth;
 class ProductController extends Controller
 {
     private $defaultEagerLoads = ['images', 'categories', 'variants', 'variants.images'];
-
-    // public function index(Request $request)
-    // {
-    //     $search = $request->get('search');
-
-    //     // 1. Dapatkan ID Cabang dari Session
-    //     $selectedBranchId = session('selected_branch_id');
-
-    //     // 2. Mengambil Data Cabang Toko
-    //     $branches = Branches::where('is_active', true)->get();
-
-    //     // 3. Membangun Query Produk
-    //     $productsQuery = Product::query()
-    //         ->where('is_active', true);
-
-    //     // 4. Filter Berdasarkan Cabang yang Dipilih
-    //     // Jika ada selectedBranchId, maka produk harus memiliki stok di cabang itu.
-    //     if ($selectedBranchId) {
-    //         $productsQuery->whereHas('variants', function ($queryVariant) use ($selectedBranchId) {
-    //             // Filter varian yang memiliki 'inventories'
-    //             $queryVariant->whereHas('inventories', function ($queryInventory) use ($selectedBranchId) {
-    //                 // Filter inventaris yang memiliki 'cabang' yang sesuai
-    //                 $queryInventory->whereHas('cabang', function ($queryCabang) use ($selectedBranchId) {
-    //                     // Filter cabang berdasarkan branch_id
-    //                     $queryCabang->where('branch_id', $selectedBranchId);
-    //                 })
-    //                     // Tambahkan kondisi stok di level 'inventories'
-    //                     ->where('available', '>', 0);
-    //             });
-    //         });
-    //     }
-
-    //     // 5. Filter Pencarian
-    //     $productsQuery->when($search, function ($query, $search) {
-    //         $query->where(function ($subQuery) use ($search) {
-    //             $subQuery->where('name', 'like', '%' . $search . '%')
-    //                 ->orWhere('sku', 'like', '%' . $search . '%');
-    //         });
-    //     });
-    //     // 6. Eager Load dengan Kondisi Cabang
-    //     $products = $productsQuery->with(['images', 'categories', 'variants' => function ($q) use ($selectedBranchId) {
-    //         $q->with(['inventories' => function ($inv) use ($selectedBranchId) {
-    //             // Jika ada cabang dipilih, ambil stok cabang tersebut saja
-    //             if ($selectedBranchId) {
-    //                 $inv->whereHas('cabang', function ($c) use ($selectedBranchId) {
-    //                     $c->where('branch_id', $selectedBranchId);
-    //                 });
-    //             }
-    //         }]);
-    //     }])->paginate(12);
-
-
-    //     $branchesForJs = $branches->map(function ($branch) {
-    //         return [
-    //             'id' => $branch->id,
-    //             'name' => $branch->name,
-    //             'lat' => $branch->latitude,
-    //             'lon' => $branch->longitude,
-    //         ];
-    //     })->all();
-
-    //     // 7. Mengembalikan View Blade
-    //     return view('frontend.index', [
-    //         'products' => $products,
-    //         'search' => $search,
-    //         'branches' => $branches,
-    //         'selectedBranchId' => $selectedBranchId,
-    //         'branchesForJs' => $branchesForJs,
-    //     ]);
-    // }
-
     public function index(Request $request)
 {
     $search = $request->get('search');
@@ -147,6 +77,8 @@ class ProductController extends Controller
         ];
     })->all();
 
+    $home_banner = HomeBanner::where('is_active', true)->where('start_at', '<=', now())->where('end_at', '>=', now())->first() ?? null;
+
     // 8. Mengembalikan View Blade dengan tambahan variable 'categories'
     return view('frontend.index', [
         'products' => $products,
@@ -156,6 +88,7 @@ class ProductController extends Controller
         'branches' => $branches,
         'selectedBranchId' => $selectedBranchId,
         'branchesForJs' => $branchesForJs,
+        'home_banner' => $home_banner,
     ]);
 }
 
