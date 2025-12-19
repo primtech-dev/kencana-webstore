@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order; // Menggunakan Order sesuai kode Anda
+use App\Models\Review_Images;
+use App\Models\Reviews;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class HistoryTransactionController extends Controller
 {
@@ -87,5 +90,78 @@ class HistoryTransactionController extends Controller
         return view('frontend.member.detail-transaksi', [
             'transaction' => $transaction,
         ]);
+    }
+
+    public function complete(Request $request, $order_no)
+    {
+        $customerId = Auth::guard('customer')->user()->id;
+
+        // Cari transaksi berdasarkan order_no dan pastikan milik customer yang sedang login
+        $transaction = Order::where('order_no', $order_no)
+                            ->where('customer_id', $customerId)
+                            ->firstOrFail();
+
+        // Perbarui status transaksi menjadi 'complete' jika saat ini berstatus 'shipped'
+        if ($transaction->status === 'shipped') {
+            $transaction->status = 'complete';
+            $transaction->updated_at = now();
+            $transaction->save();
+
+            return redirect()->route('history.transactions.show', ['order_no' => $order_no])
+                             ->with('success', 'Transaksi telah ditandai sebagai selesai.');
+        }
+
+        return redirect()->route('history.transactions.show', ['order_no' => $order_no])
+                         ->with('error', 'Transaksi tidak dapat ditandai sebagai selesai.');
+    }
+
+    public function storeReview(Request $request , $orderId)
+    {
+       $request->validate([
+        'reviews' => 'required|array',
+        'reviews.*.rating' => 'required|integer|min:1|max:5',
+        'reviews.*.body' => 'required|string',
+        'reviews.*.images.*' => 'image|mimes:jpeg,png,jpg|max:2048', // Validasi file gambar
+    ]);
+
+   try {
+    DB::transaction(function () use ($request, $orderId) {
+        foreach ($request->reviews as $index => $data) {
+            // 1. Simpan Data Review
+            $review = Reviews::create([
+                'public_id' => (string) Str::uuid(),
+                'customer_id' => auth('customer')->id(),
+                'order_id' => $orderId,
+                'order_item_id' => $data['order_item_id'],
+                'product_id' => $data['product_id'],
+                'variant_id' => $data['variant_id'] ?? null,
+                'rating' => $data['rating'],
+                'body' => $data['body'],
+                'is_verified_purchase' => true,
+                'status' => 'published', 
+            ]);
+
+            // 2. Cek dan Simpan Gambar jika ada
+            if ($request->hasFile("reviews.$index.images")) {
+                foreach ($request->file('reviews')[$index]['images'] as $pos => $image) {
+                    
+                    // MODIFIKASI DI SINI:
+                    // Folder akan menjadi: storage/app/public/reviews/{review_id}/nama_file.jpg
+                    $path = $image->store("reviews/{$review->id}", 'public');
+
+                    Review_Images::create([
+                        'review_id' => $review->id,
+                        'image_path' => $path,
+                        'position' => $pos
+                    ]);
+                }
+            }
+        }
+    });
+
+    return redirect()->back()->with('success', 'Ulasan dan foto berhasil terkirim!');
+} catch (\Exception $e) {
+    return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+}
     }
 }

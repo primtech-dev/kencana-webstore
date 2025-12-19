@@ -423,26 +423,77 @@
         {{-- Customer Reviews --}}
         <div class="mt-8">
             <h2 class="text-xl font-bold mb-4">Ulasan Pelanggan</h2>
+
+            @php
+            // JIKA tidak mengubah controller, gunakan ini untuk menghitung total & rata-rata:
+            $totalReviews = $reviews->total(); // Mengambil total record dari pagination
+
+            // Ambil rata-rata (Jika di controller belum dihitung)
+            // Kita gunakan $averageRating dari controller jika ada, jika tidak, default 0
+            $displayRating = $averageRating ?? 0;
+            @endphp
+
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="flex items-center space-x-4 p-4 border border-light-grey rounded-lg bg-light-bg/50">
-                    {{-- Default rating 0/5 --}}
-                    <div class="text-6xl font-extrabold text-primary">{{ $product->average_rating ?? 0 }}/5</div>
+                {{-- Ringkasan Rating --}}
+                <div class="flex items-center space-x-4 p-4 border border-light-grey rounded-lg bg-light-bg/50 h-fit">
+                    {{-- Menampilkan rating yang sudah dihitung (Bukan lagi 0.0) --}}
+                    <div class="text-6xl font-extrabold text-primary">{{ number_format($displayRating, 1) }}/5</div>
                     <div>
-                        <div class="flex items-center text-yellow-500 mb-1" aria-label="Rating Bintang">
-                            <span class="text-3xl" aria-hidden="true">
-                                {{ str_repeat('★', floor($product->average_rating ?? 0)) . str_repeat('☆', 5 - floor($product->average_rating ?? 0)) }}
+                        <div class="flex items-center text-yellow-500 mb-1">
+                            <span class="text-3xl">
+                                {{-- Menampilkan bintang sesuai angka rata-rata --}}
+                                @php $fullStars = floor($displayRating); @endphp
+                                {{ str_repeat('★', $fullStars) . str_repeat('☆', 5 - $fullStars) }}
                             </span>
                         </div>
-                        <p class="text-sm text-dark-grey/80">Dari 0 ulasan</p>
+                        <p class="text-sm text-dark-grey/80">Dari {{ $totalReviews }} ulasan</p>
                     </div>
                 </div>
 
-                <div class="col-span-1 md:col-span-2 p-4 border border-light-grey rounded-lg bg-light-bg/50 text-sm">
-                    <p class="text-dark-grey/80">Belum ada ulasan untuk produk ini.</p>
+                {{-- Daftar Ulasan --}}
+                <div class="col-span-1 md:col-span-2 space-y-4">
+                    @forelse($reviews as $item)
+                    <div class="p-4 border border-light-grey rounded-lg bg-white shadow-sm">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                {{-- Akses sebagai Object karena menggunakan Eloquent get()/paginate() --}}
+                                <p class="font-bold text-dark">{{ $item->customer->full_name ?? 'Pelanggan' }}</p>
+                                <div class="flex text-yellow-500 text-sm">
+                                    {{ str_repeat('★', $item->rating) . str_repeat('☆', 5 - $item->rating) }}
+                                </div>
+                            </div>
+                            <span class="text-xs text-dark-grey/60">
+                                {{ $item->created_at->format('d M Y') }}
+                            </span>
+                        </div>
+
+                        <p class="text-dark-grey mt-2 text-sm italic">"{{ $item->body }}"</p>
+
+                        {{-- Gambar --}}
+                        @if($item->images->isNotEmpty())
+                        <div class="flex gap-2 mt-3">
+                            @foreach($item->images as $img)
+                            <img src="{{ asset('storage/' . $img->image_path) }}"
+                            onclick="openLightbox('{{ asset('storage/' . $img->image_path) }}')"
+                                class="w-20 h-20 object-cover rounded-md border border-light-grey">
+                            @endforeach
+                        </div>
+                        @endif
+                    </div>
+                    @empty
+                    <div class="p-4 border border-light-grey rounded-lg bg-light-bg/50 text-sm text-center">
+                        Belum ada ulasan untuk produk ini.
+                    </div>
+                    @endforelse
+
+                    @if ($reviews instanceof \Illuminate\Pagination\LengthAwarePaginator)
+                    <div class="mt-6">
+                        {{ $reviews->links('frontend.components.custom-pagestyle') }}
+                    </div>
+                    @endif
                 </div>
             </div>
         </div>
-
 
     </main>
 </section>
