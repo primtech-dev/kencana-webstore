@@ -185,5 +185,8 @@ Route::middleware(['auth:customer'])->group(function () {
     Route::group(['prefix' => 'history-transactions'], function () {
         Route::get('/', [HistoryTransactionController::class, 'index'])->name('history.transactions.index');
         Route::get('/{order_no}', [HistoryTransactionController::class, 'show'])->name('history.transactions.show');
+        Route::post('/{order_no}/complete', [HistoryTransactionController::class, 'complete'])->name('history.transactions.complete');
     });
+
+    Route::post('/review-store/{orderId}', [HistoryTransactionController::class, 'storeReview'])->name('history.transactions.review');
 });
