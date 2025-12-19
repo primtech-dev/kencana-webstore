@@ -4,23 +4,41 @@
     @php
     $currentCatSlug = request('category');
     $catName = "Rekomendasi Spesial";
-    $bannerImg = "https://cdn.ruparupa.io/filters:quality(80)/media/promotion/ruparupa/payday-oct-25/ms/header-d.png";
     $categoryDesc = "Temukan koleksi produk terbaik kami dengan harga distributor dan kualitas terjamin.";
+    
+    // Default fallback jika tidak ada banner sama sekali
+    $fallbackImg = "https://cdn.ruparupa.io/filters:quality(80)/media/promotion/ruparupa/payday-oct-25/ms/header-d.png";
+    
+    // Inisialisasi variabel banner
+    $desktopBanner = $fallbackImg;
+    $mobileBanner = $fallbackImg;
 
+    // 1. Prioritas: Banner Kategori (Jika ada kategori yang dipilih)
     if($currentCatSlug) {
-    $categoryData = $products->first() ? $products->first()->categories->where('slug', $currentCatSlug)->first() : null;
+        $categoryData = $categories->where('slug', $currentCatSlug)->first();
 
-    if($categoryData) {
-    $catName = $categoryData->name;
-    if($categoryData->banner_path) {
-    $bannerImg = env('APP_URL_BE'). '/' . $categoryData->banner_path;
+        if($categoryData && $categoryData->banner_path) {
+            $catName = $categoryData->name;
+            $categoryDesc = "Menampilkan koleksi lengkap untuk kebutuhan " . $catName . " Anda.";
+            
+            $desktopBanner = env('APP_URL_BE'). '/' . $categoryData->banner_path;
+            // Gunakan thumbnail atau banner_path jika tidak ada mobile_path khusus di kategori
+            $mobileBanner = isset($categoryData->thumbnail) 
+                            ? env('APP_URL_BE'). '/' . $categoryData->thumbnail 
+                            : $desktopBanner;
+        } 
+        // 2. Jika Kategori dipilih tapi tidak punya banner, gunakan Home Banner dari Controller
+        elseif($home_banner) {
+            $desktopBanner = env('APP_URL_BE'). '/' . $home_banner->image_path;
+            $mobileBanner = env('APP_URL_BE'). '/' . ($home_banner->image_mobile_path ?? $home_banner->image_path);
+        }
+    } 
+    // 3. Jika di Home (Tanpa Kategori), gunakan Home Banner dari Controller
+    elseif($home_banner) {
+        $desktopBanner = env('APP_URL_BE'). '/' . $home_banner->image_path;
+        $mobileBanner = env('APP_URL_BE'). '/' . ($home_banner->image_mobile_path ?? $home_banner->image_path);
     }
-    $categoryDesc = "Menampilkan koleksi lengkap untuk kebutuhan " . $catName . " Anda.";
-    } else {
-    $catName = ucwords(str_replace('-', ' ', $currentCatSlug));
-    }
-    }
-    @endphp
+@endphp
 
     @if($currentCatSlug)
     <nav class="flex px-4 mb-3 md:mb-4 text-gray-500 text-[10px] md:text-xs capitalize font-bold">
@@ -39,67 +57,78 @@
     @endif
 
     <section class="banner px-4 mb-4 md:mb-8">
-        <div class="relative rounded-xl md:rounded-2xl overflow-hidden shadow-md border border-gray-100 bg-gray-100">
-            <img src="{{ $bannerImg }}"
-                alt="Banner {{ $catName }}"
-                class="w-full h-auto block transition-transform duration-700 hover:scale-105"
-                onerror="this.onerror=null;this.src='https://cdn.ruparupa.io/filters:quality(80)/media/promotion/ruparupa/payday-oct-25/ms/header-d.png';">
-        </div>
-    </section>
-
-
-<section class="mb-6 md:mb-10 px-4 relative group">
-    <div class="mb-3">
-        <span class="text-[8px] font-extrabold text-primary uppercase tracking-widest block">Koleksi Kategori</span>
-        <h1 class="text-lg md:text-xl font-black text-dark-grey uppercase">Kategori</h1>
-    </div>
-
-    <div class="relative">
-        <button onclick="scrollKategori('left')" 
-            class="absolute -left-2 top-1/2 -translate-y-1/2 bg-white shadow-md rounded-full p-1.5 z-1 hidden md:flex items-center justify-center border border-gray-100 hover:bg-primary hover:text-white transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" />
-            </svg>
-        </button>
-
-        <div id="category-container" class="flex overflow-x-auto pb-2 gap-2 md:gap-3 snap-x snap-mandatory no-scrollbar scroll-smooth">
-            @foreach ($categories as $category)
-            @php $isActive = $category->slug == $currentCatSlug; @endphp
-            
-            <a href="{{ route('products.index', ['category' => $category->slug]) }}"
-                class="flex-none w-[160px] md:w-[210px] snap-start group/card">
+    <div class="relative rounded-xl md:rounded-2xl overflow-hidden shadow-md border border-gray-100 bg-gray-100">
+        <a href="{{ $currentCatSlug ? '#' : ($home_banner->link_url ?? '#') }}">
+            <picture>
+                {{-- Source untuk Mobile --}}
+                <source media="(max-width: 767px)" srcset="{{ $mobileBanner }}">
                 
-                <div class="flex items-center rounded-lg p-2 border transition-all duration-200 h-16 md:h-20
+                {{-- Source untuk Desktop --}}
+                <source media="(min-width: 768px)" srcset="{{ $desktopBanner }}">
+                
+                {{-- Img Fallback --}}
+                <img src="{{ $desktopBanner }}"
+                    alt="Banner {{ $catName }}"
+                    class="w-full h-auto block transition-transform duration-700 hover:scale-105"
+                    onerror="this.onerror=null;this.src='{{ $fallbackImg }}';">
+            </picture>
+        </a>
+    </div>
+</section>
+
+
+    <section class="mb-6 md:mb-10 px-4 relative group">
+        <div class="mb-3">
+            <span class="text-[8px] font-extrabold text-primary uppercase tracking-widest block">Koleksi Kategori</span>
+            <h1 class="text-lg md:text-xl font-black text-dark-grey uppercase">Kategori</h1>
+        </div>
+
+        <div class="relative">
+            <button onclick="scrollKategori('left')"
+                class="absolute -left-2 top-1/2 -translate-y-1/2 bg-white shadow-md rounded-full p-1.5 z-1 hidden md:flex items-center justify-center border border-gray-100 hover:bg-primary hover:text-white transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" />
+                </svg>
+            </button>
+
+            <div id="category-container" class="flex overflow-x-auto pb-2 gap-2 md:gap-3 snap-x snap-mandatory no-scrollbar scroll-smooth">
+                @foreach ($categories as $category)
+                @php $isActive = $category->slug == $currentCatSlug; @endphp
+
+                <a href="{{ route('products.index', ['category' => $category->slug]) }}"
+                    class="flex-none w-[160px] md:w-[210px] snap-start group/card">
+
+                    <div class="flex items-center rounded-lg p-2 border transition-all duration-200 h-16 md:h-20
                     {{ $isActive 
                         ? 'bg-gray-700 border-gray-700 shadow-md' 
                         : 'bg-gray-50 border-gray-100 hover:border-primary hover:bg-white hover:shadow-sm' 
                     }}">
-                    
-                    <div class="w-12 h-12 md:w-14 md:h-14 bg-white rounded-md overflow-hidden flex-shrink-0 flex items-center justify-center p-1 shadow-sm border border-gray-50">
-                        <img src="{{ $category->thumbnail ? env('APP_URL_BE') . '/' . $category->thumbnail : 'https://placehold.co/100x100/000/ffffff?text=No+Image' }}"
-                            alt="{{ $category->name }}"
-                            class="max-w-full max-h-full object-contain transition-transform duration-300 group-hover/card:scale-110">
-                    </div>
 
-                    <div class="ml-3 flex-grow overflow-hidden">
-                        <p class="text-[11px] md:text-xs font-bold leading-tight line-clamp-2 uppercase
+                        <div class="w-12 h-12 md:w-14 md:h-14 bg-white rounded-md overflow-hidden flex-shrink-0 flex items-center justify-center p-1 shadow-sm border border-gray-50">
+                            <img src="{{ $category->thumbnail ? env('APP_URL_BE') . '/' . $category->thumbnail : 'https://placehold.co/100x100/000/ffffff?text=No+Image' }}"
+                                alt="{{ $category->name }}"
+                                class="max-w-full max-h-full object-contain transition-transform duration-300 group-hover/card:scale-110">
+                        </div>
+
+                        <div class="ml-3 flex-grow overflow-hidden">
+                            <p class="text-[11px] md:text-xs font-bold leading-tight line-clamp-2 uppercase
                             {{ $isActive ? 'text-white' : 'text-gray-700' }}">
-                            {{ $category->name }}
-                        </p>
+                                {{ $category->name }}
+                            </p>
+                        </div>
                     </div>
-                </div>
-            </a>
-            @endforeach
-        </div>
+                </a>
+                @endforeach
+            </div>
 
-        <button onclick="scrollKategori('right')" 
-            class="absolute -right-2 top-1/2 -translate-y-1/2 bg-white shadow-md rounded-full p-1.5 z-1 hidden md:flex items-center justify-center border border-gray-100 hover:bg-primary hover:text-white transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
-            </svg>
-        </button>
-    </div>
-</section>
+            <button onclick="scrollKategori('right')"
+                class="absolute -right-2 top-1/2 -translate-y-1/2 bg-white shadow-md rounded-full p-1.5 z-1 hidden md:flex items-center justify-center border border-gray-100 hover:bg-primary hover:text-white transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
+                </svg>
+            </button>
+        </div>
+    </section>
 
     {{-- INFO KATEGORI (Lebih Compact di Mobile) --}}
     @if($currentCatSlug)
@@ -183,7 +212,7 @@
                             <span class="ml-2 text-dark-grey">| {{ rand(1, 300) }} (ulasan)</span>
                         </div>
                         <p class="stock text-xs font-bold text-red-500 mt-2">
-                           Stok: {{ optional(optional($mainVariant)->inventories)->first()->available ?? 0 }}
+                            Stok: {{ optional(optional($mainVariant)->inventories)->first()->available ?? 0 }}
                         </p>
                     </div>
                 </a>
