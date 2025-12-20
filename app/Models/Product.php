@@ -34,4 +34,9 @@ class Product extends Model
     {
         return $this->belongsToMany(Category::class, 'product_categories')->withTimestamps()->using(\App\Models\ProductCategory::class);
     }
+
+    public function reviews()
+    {
+        return $this->hasMany(Reviews::class , 'product_id');
+    }
 }
