@@ -261,7 +261,7 @@
                         {{ $product->name }}
                     </h1>
                     <p class="text-sm text-dark-grey/80 mb-4">
-                        <span class="font-bold">0</span> Ulasan | Variant:
+                        <span class="font-bold">{{ $product->reviews->count() }}</span> Ulasan | Variant:
                         <span class="font-bold text-primary" id="current-variant-name">
                             {{ $product->variants[0]->variant_name ?? 'Pilih Varian' }}
                         </span>
