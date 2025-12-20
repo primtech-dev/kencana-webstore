@@ -66,7 +66,7 @@
         </div>
 
         <div class="mt-6 mb-6">
-        <p class="font-bold text-gray-800">Kencana Menu</p>
+            <p class="font-bold text-gray-800">Kencana Menu</p>
 
         </div>
 
@@ -129,7 +129,11 @@
 
         <nav class="mt-6 pt-4 border-t border-gray-100 space-y-1">
             <h4 class="font-bold text-gray-600 mb-3 text-sm uppercase tracking-wider">Informasi & Bantuan</h4>
-            {{-- Navigasi Informasi & Bantuan --}}
+            <!-- lokasi toko -->
+            <a href="{{ route('branches.index') }}"
+                class="flex items-center p-3.5 font-semibold text-gray-700 hover:bg-primary-light hover:text-primary rounded-xl transition duration-150">
+                <span class="mr-3 text-xl"><i class="fas fa-map-marker-alt"></i></span> Lokasi Toko
+            </a>
             <a href="{{ url('/faq') }}"
                 class="flex items-center p-3.5 font-semibold text-gray-700 hover:bg-primary-light hover:text-primary rounded-xl transition duration-150">
                 <span class="mr-3 text-xl"><i class="fas fa-question-circle"></i></span> FAQ
@@ -165,9 +169,13 @@
             </div>
 
             <div class="hidden sm:block flex-1 max-w-2xl">
-                <form action="{{ route('products.index') }}" method="GET" class="flex bg-white rounded overflow-hidden p-0.5">
-                    <input type="text" name="search" placeholder="Cari Merek, Nama, atau Tipe Produk..."
-                        class="w-full px-4 py-2 text-sm text-gray-700 focus:outline-none">
+                <form class="search-form flex bg-white rounded overflow-hidden p-0.5 shadow-sm border border-gray-100">
+                    <input type="text"
+                        class="search-input w-full px-4 py-2 text-sm text-gray-700 focus:outline-none"
+                        name="search"
+                        value="{{ request('search') }}"
+                        placeholder="Cari Merek, Nama, atau Tipe Produk..."
+                        autocomplete="off">
                     <button type="submit" class="bg-[#cc0000] text-white px-5 hover:bg-black transition">
                         <i class="fas fa-search"></i>
                     </button>
@@ -205,30 +213,37 @@
                     </div>
                     <span class=" leading-tight font-bold hidden md:block capitalize text-left">Notifikasi</span>
 
-                <!-- akun -->
-                @auth('customer')
-                <a href="{{ route('member.index') }}" class="relative group flex items-center space-x-2">
-                    <div class="relative">
-                        <i class="fas fa-user text-2xl md:text-2xl"></i>
-                    </div>
-                    <span class=" leading-tight font-bold hidden md:block capitalize text-left"> {{ Str::limit(auth('customer')->user()->full_name, 12) }}</span>
-                </a>
-                @else
-                <a href="{{ route('customer.login') }}" class="relative group flex items-center space-x-2">
-                    <div class="relative">
-                        <i class="fas fa-user text-2xl md:text-2xl"></i>
-                    </div>
-                    <span class=" leading-tight font-bold hidden md:block capitalize text-left">Akun</span>
-                </a>
-                @endauth
+                    <!-- akun -->
+                    @auth('customer')
+                    <a href="{{ route('member.index') }}" class="relative group flex items-center space-x-2">
+                        <div class="relative">
+                            <i class="fas fa-user text-2xl md:text-2xl"></i>
+                        </div>
+                        <span class=" leading-tight font-bold hidden md:block capitalize text-left"> {{ Str::limit(auth('customer')->user()->full_name, 12) }}</span>
+                    </a>
+                    @else
+                    <a href="{{ route('customer.login') }}" class="relative group flex items-center space-x-2">
+                        <div class="relative">
+                            <i class="fas fa-user text-2xl md:text-2xl"></i>
+                        </div>
+                        <span class=" leading-tight font-bold hidden md:block capitalize text-left">Akun</span>
+                    </a>
+                    @endauth
 
             </div>
         </div>
 
         <div class="px-4 mt-2 sm:hidden">
-            <form action="{{ route('products.index') }}" method="GET" class="flex bg-white rounded overflow-hidden p-0.5">
-                <input type="text" name="search" placeholder="Cari di Kencana Store..." class="w-full px-3 py-1.5 text-sm text-gray-700 focus:outline-none">
-                <button type="submit" class="bg-[#cc0000] text-white px-4"><i class="fas fa-search"></i></button>
+            <form class="search-form flex bg-white rounded overflow-hidden p-0.5 shadow-sm border border-gray-100">
+                <input type="text"
+                    class="search-input w-full px-3 py-1.5 text-sm text-gray-700 focus:outline-none"
+                    name="search"
+                    value="{{ request('search') }}"
+                    placeholder="Cari di Kencana Store..."
+                    autocomplete="off">
+                <button type="submit" class="bg-[#cc0000] text-white px-4 hover:bg-black transition">
+                    <i class="fas fa-search"></i>
+                </button>
             </form>
         </div>
     </div>

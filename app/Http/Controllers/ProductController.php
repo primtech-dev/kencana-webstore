@@ -15,82 +15,73 @@ use Illuminate\Support\Facades\Auth;
 class ProductController extends Controller
 {
     private $defaultEagerLoads = ['images', 'categories', 'variants', 'variants.images'];
+    
+
     public function index(Request $request)
     {
-        $search = $request->get('search');
-        $categorySlug = $request->get('category'); // Ambil parameter kategori dari URL
+        $branches = Branches::where('is_active', true)->get();
+        $categories = Category::where('is_active', true)->get();
+        $home_banner = HomeBanner::where('is_active', true)
+            ->where('start_at', '<=', now())
+            ->where('end_at', '>=', now())
+            ->first();
 
-        // 1. Dapatkan ID Cabang dari Session
+        return view('frontend.index', [
+            'categories' => $categories,
+            'branches' => $branches,
+            'home_banner' => $home_banner,
+            'selectedCategory' => $request->get('category'),
+        ]);
+    }
+
+    public function productJson(Request $request)
+    {
+        $categorySlug = $request->get('category');
         $selectedBranchId = session('selected_branch_id');
 
-        // 2. Mengambil Data Cabang & Kategori untuk Filter di View
-        $branches = Branches::where('is_active', true)->get();
-        $categories = Category::where('is_active', true)->get(); // Mengambil data kategori
+        $productsQuery = Product::query()->where('is_active', true);
 
-        // 3. Membangun Query Produk
-        $productsQuery = Product::query()
-            ->where('is_active', true);
-
-        // 4. Filter Berdasarkan Cabang yang Dipilih
+        // Filter Cabang
         if ($selectedBranchId) {
-            $productsQuery->whereHas('variants', function ($queryVariant) use ($selectedBranchId) {
-                $queryVariant->whereHas('inventories', function ($queryInventory) use ($selectedBranchId) {
-                    $queryInventory->whereHas('cabang', function ($queryCabang) use ($selectedBranchId) {
-                        $queryCabang->where('branch_id', $selectedBranchId);
-                    })
-                        ->where('available', '>', 0);
-                });
+            $productsQuery->whereHas('variants.inventories.cabang', function ($q) use ($selectedBranchId) {
+                $q->where('branch_id', $selectedBranchId)->where('available', '>', 0);
             });
         }
 
-        // 5. Filter Pencarian (Nama/SKU)
+        // Di Controller, pastikan trim search-nya
+        $search = trim($request->get('search'));
+
+        // Filter Search (Case-Insensitive)
         $productsQuery->when($search, function ($query, $search) {
-            $query->where(function ($subQuery) use ($search) {
-                $subQuery->where('name', 'like', '%' . $search . '%')
-                    ->orWhere('sku', 'like', '%' . $search . '%');
+            // Ubah kata kunci menjadi huruf kecil
+            $loweredSearch = strtolower($search);
+
+            $query->where(function ($sub) use ($loweredSearch) {
+                $sub->whereRaw('LOWER(name) like ?', ["%{$loweredSearch}%"])
+                    ->orWhereRaw('LOWER(sku) like ?', ["%{$loweredSearch}%"]);
             });
         });
 
-        // 6. BARU: Filter Berdasarkan Kategori
+        // Filter Kategori
         $productsQuery->when($categorySlug, function ($query, $categorySlug) {
             $query->whereHas('categories', function ($q) use ($categorySlug) {
-                $q->where('slug', $categorySlug); // Atau gunakan 'id' tergantung kebutuhan
+                $q->where('slug', $categorySlug);
             });
         });
+// Eager Load & Paginate
+$products = $productsQuery->with([
+    'images', 
+    'categories', 
+    'variants.inventories' => function ($q) use ($selectedBranchId) {
+        // Filter stok inventori sesuai cabang yang dipilih
+        if ($selectedBranchId) {
+            $q->where('branch_id', $selectedBranchId);
+        }
+    }, 
+    'reviews' // Ambil semua review agar rating muncul meski ganti cabang
+])->paginate(12);
 
-        // 7. Eager Load dengan Kondisi Cabang
-        $products = $productsQuery->with(['images', 'categories', 'variants' => function ($q) use ($selectedBranchId) {
-            $q->with(['inventories' => function ($inv) use ($selectedBranchId) {
-                if ($selectedBranchId) {
-                    $inv->whereHas('cabang', function ($c) use ($selectedBranchId) {
-                        $c->where('branch_id', $selectedBranchId);
-                    });
-                }
-            }]);
-        }])->paginate(12);
-
-        $branchesForJs = $branches->map(function ($branch) {
-            return [
-                'id' => $branch->id,
-                'name' => $branch->name,
-                'lat' => $branch->latitude,
-                'lon' => $branch->longitude,
-            ];
-        })->all();
-
-        $home_banner = HomeBanner::where('is_active', true)->where('start_at', '<=', now())->where('end_at', '>=', now())->first() ?? null;
-
-        // 8. Mengembalikan View Blade dengan tambahan variable 'categories'
-        return view('frontend.index', [
-            'products' => $products,
-            'search' => $search,
-            'categories' => $categories, // Dikirim ke blade
-            'selectedCategory' => $categorySlug, // Untuk menandai kategori yang aktif
-            'branches' => $branches,
-            'selectedBranchId' => $selectedBranchId,
-            'branchesForJs' => $branchesForJs,
-            'home_banner' => $home_banner,
-        ]);
+        return response()->json($products);
     }
 
 
@@ -285,16 +276,16 @@ class ProductController extends Controller
             ->values()
             ->toArray();
 
-     $reviews = Reviews::where('product_id', $id)
-    ->where('status','published')
-    ->with('customer', 'product','images')
-    ->orderBy('created_at', 'desc')
-    ->paginate(5);
+        $reviews = Reviews::where('product_id', $id)
+            ->where('status', 'published')
+            ->with('customer', 'product', 'images')
+            ->orderBy('created_at', 'desc')
+            ->paginate(5);
 
-// Hitung rata-rata ulasan secara manual dari database
-$averageRating = Reviews::where('product_id', $id)
-    ->where('status', 'published')
-    ->avg('rating') ?? 0;
+        // Hitung rata-rata ulasan secara manual dari database
+        $averageRating = Reviews::where('product_id', $id)
+            ->where('status', 'published')
+            ->avg('rating') ?? 0;
 
         // 3. Kirim data yang dibutuhkan ke View
         return view('frontend.detail', [
@@ -355,6 +346,84 @@ $averageRating = Reviews::where('product_id', $id)
     //         'status' => 'success',
     //         'user_location' => ['lat' => $userLat, 'lon' => $userLon],
     //         'branches' => $branches
+    //     ]);
+    // }
+
+    // public function index(Request $request)
+    // {
+    //     $search = $request->get('search');
+    //     $categorySlug = $request->get('category'); // Ambil parameter kategori dari URL
+
+    //     // 1. Dapatkan ID Cabang dari Session
+    //     $selectedBranchId = session('selected_branch_id');
+
+    //     // 2. Mengambil Data Cabang & Kategori untuk Filter di View
+    //     $branches = Branches::where('is_active', true)->get();
+    //     $categories = Category::where('is_active', true)->get(); // Mengambil data kategori
+
+    //     // 3. Membangun Query Produk
+    //     $productsQuery = Product::query()
+    //         ->where('is_active', true);
+
+    //     // 4. Filter Berdasarkan Cabang yang Dipilih
+    //     if ($selectedBranchId) {
+    //         $productsQuery->whereHas('variants', function ($queryVariant) use ($selectedBranchId) {
+    //             $queryVariant->whereHas('inventories', function ($queryInventory) use ($selectedBranchId) {
+    //                 $queryInventory->whereHas('cabang', function ($queryCabang) use ($selectedBranchId) {
+    //                     $queryCabang->where('branch_id', $selectedBranchId);
+    //                 })
+    //                     ->where('available', '>', 0);
+    //             });
+    //         });
+    //     }
+
+    //     // 5. Filter Pencarian (Nama/SKU)
+    //     $productsQuery->when($search, function ($query, $search) {
+    //         $query->where(function ($subQuery) use ($search) {
+    //             $subQuery->where('name', 'like', '%' . $search . '%')
+    //                 ->orWhere('sku', 'like', '%' . $search . '%');
+    //         });
+    //     });
+
+    //     // 6. BARU: Filter Berdasarkan Kategori
+    //     $productsQuery->when($categorySlug, function ($query, $categorySlug) {
+    //         $query->whereHas('categories', function ($q) use ($categorySlug) {
+    //             $q->where('slug', $categorySlug); // Atau gunakan 'id' tergantung kebutuhan
+    //         });
+    //     });
+
+    //     // 7. Eager Load dengan Kondisi Cabang
+    //     $products = $productsQuery->with(['images', 'categories', 'variants' => function ($q) use ($selectedBranchId) {
+    //         $q->with(['inventories' => function ($inv) use ($selectedBranchId) {
+    //             if ($selectedBranchId) {
+    //                 $inv->whereHas('cabang', function ($c) use ($selectedBranchId) {
+    //                     $c->where('branch_id', $selectedBranchId);
+    //                 });
+    //             }
+    //         }]);
+    //     }])->paginate(12);
+
+    //     $branchesForJs = $branches->map(function ($branch) {
+    //         return [
+    //             'id' => $branch->id,
+    //             'name' => $branch->name,
+    //             'lat' => $branch->latitude,
+    //             'lon' => $branch->longitude,
+    //         ];
+    //     })->all();
+
+    //     $home_banner = HomeBanner::where('is_active', true)->where('start_at', '<=', now())->where('end_at', '>=', now())->first() ?? null;
+
+    //     // 8. Mengembalikan View Blade dengan tambahan variable 'categories'
+    //     return view('frontend.index', [
+    //         'products' => $products,
+    //         'search' => $search,
+    //         'categories' => $categories, // Dikirim ke blade
+    //         'selectedCategory' => $categorySlug, // Untuk menandai kategori yang aktif
+    //         'branches' => $branches,
+    //         'selectedBranchId' => $selectedBranchId,
+    //         'branchesForJs' => $branchesForJs,
+    //         'home_banner' => $home_banner,
     //     ]);
     // }
 }

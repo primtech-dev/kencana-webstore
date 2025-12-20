@@ -425,11 +425,8 @@
             <h2 class="text-xl font-bold mb-4">Ulasan Pelanggan</h2>
 
             @php
-            // JIKA tidak mengubah controller, gunakan ini untuk menghitung total & rata-rata:
-            $totalReviews = $reviews->total(); // Mengambil total record dari pagination
-
-            // Ambil rata-rata (Jika di controller belum dihitung)
-            // Kita gunakan $averageRating dari controller jika ada, jika tidak, default 0
+           
+            $totalReviews = $reviews->total();
             $displayRating = $averageRating ?? 0;
             @endphp
 
