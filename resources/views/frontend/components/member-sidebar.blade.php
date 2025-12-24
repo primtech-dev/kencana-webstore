@@ -5,7 +5,6 @@
     $isActive = function($menuKey) use ($activeMenu) {
         return $menuKey === $activeMenu;
     };
-
     // --- Styling untuk Sidebar Vertikal (Desktop) ---
     $baseSidebarClass = 'flex items-center p-3 font-semibold rounded-lg transition ';
     $activeSidebarClass = $baseSidebarClass . 'text-primary font-bold bg-primary-50 hover:bg-primary-100/70';
@@ -57,7 +56,7 @@
 {{-- 2. MOBILE TAB MENU (Tampil di mobile, disembunyikan di lg ke atas) --}}
 {{-- ========================================================== --}}
 {{-- Tambahkan w-full dan overflow-hidden di wrapper untuk mencegah scroll halaman --}}
-<div class="block lg:hidden bg-white shadow-md rounded-lg p-0 border-b w-full overflow-hidden">
+<div class="block lg:hidden bg-white shadow-md rounded-lg p-0 w-full overflow-hidden">
     {{-- Tambahkan class 'no-scrollbar' untuk menyembunyikan scrollbar pada nav --}}
     <nav class="flex overflow-x-auto overflow-y-hidden text-sm no-scrollbar">
         
@@ -96,14 +95,11 @@
     </nav>
 </div>
 
-{{-- Style Tambahan untuk Menyembunyikan Scrollbar (Toolkit Scroll) --}}
 <style>
-/* Menyembunyikan scrollbar untuk browser berbasis Webkit (Chrome, Safari, Edge) */
 .no-scrollbar::-webkit-scrollbar {
     display: none;
 }
 
-/* Menyembunyikan scrollbar untuk Firefox */
 .no-scrollbar {
     -ms-overflow-style: none; /* IE and Edge legacy */
     scrollbar-width: none; /* Firefox */

@@ -75,49 +75,50 @@
 
 
 <script>
-   // Fungsi Global untuk Membuka Modal
-window.openBranchModal = function() {
-    const modal = document.getElementById('branch-modal');
-    if (modal) {
-        // Menghapus hidden dan memastikan menggunakan flex agar posisi di tengah
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-        
-        // Animasi halus (Opsional: jika Anda menambahkan class transition)
-        setTimeout(() => { modal.style.opacity = "1"; }, 10);
+    // Fungsi Global untuk Membuka Modal
+    window.openBranchModal = function() {
+        const modal = document.getElementById('branch-modal');
+        if (modal) {
+            // Menghapus hidden dan memastikan menggunakan flex agar posisi di tengah
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
 
-        // Reset UI Modal ke kondisi awal
-        if (typeof updateLocationStatusUI === "function") {
-            updateLocationStatusUI("Tekan **'Cari Lokasi Saya'** untuk menemukan cabang terdekat.", 'default');
+            // Animasi halus (Opsional: jika Anda menambahkan class transition)
+            setTimeout(() => {
+                modal.style.opacity = "1";
+            }, 10);
+
+            // Reset UI Modal ke kondisi awal
+            if (typeof updateLocationStatusUI === "function") {
+                updateLocationStatusUI("Tekan **'Cari Lokasi Saya'** untuk menemukan cabang terdekat.", 'default');
+            }
+
+            if (typeof fillBranchSelectDefault === "function") {
+                fillBranchSelectDefault();
+            }
         }
-        
-        if (typeof fillBranchSelectDefault === "function") {
-            fillBranchSelectDefault();
+    };
+
+    // Fungsi Global untuk Menutup Modal
+    window.closeBranchModal = function() {
+        const modal = document.getElementById('branch-modal');
+        if (modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
         }
-    }
-};
+    };
 
-// Fungsi Global untuk Menutup Modal
-window.closeBranchModal = function() {
-    const modal = document.getElementById('branch-modal');
-    if (modal) {
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
-    }
-};
+    // Tambahan: Menutup modal jika user klik di area luar (overlay)
+    window.onclick = function(event) {
+        const modal = document.getElementById('branch-modal');
+        if (event.target == modal) {
+            closeBranchModal();
+        }
+    };
 
-// Tambahan: Menutup modal jika user klik di area luar (overlay)
-window.onclick = function(event) {
-    const modal = document.getElementById('branch-modal');
-    if (event.target == modal) {
-        closeBranchModal();
-    }
-};
 
-    
     // Pastikan variabel ini ada di controller dan berisi data lat/lon cabang yang sudah di-map menjadi array of objects.
     const ALL_BRANCHES = @json($branchesForJS ?? $branches);
-    console.log("Data Cabang yang Dipakai di JS (ALL_BRANCHES):", ALL_BRANCHES);
 
     const BRANCH_SELECT = document.getElementById('branch_select');
     const MODAL = document.getElementById('branch-modal');

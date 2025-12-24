@@ -166,7 +166,7 @@
 <script>
     // Pastikan variabel ini ada di controller dan berisi data lat/lon cabang yang sudah di-map menjadi array of objects.
     const ALL_BRANCHES = @json($branchesForJS ?? $branches);
-    console.log("Data Cabang yang Dipakai di JS (ALL_BRANCHES):", ALL_BRANCHES);
+    
 
     const BRANCH_SELECT = document.getElementById('branch_select');
     const MODAL = document.getElementById('branch-modal');

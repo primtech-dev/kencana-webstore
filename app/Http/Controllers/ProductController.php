@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Auth;
 class ProductController extends Controller
 {
     private $defaultEagerLoads = ['images', 'categories', 'variants', 'variants.images'];
-    
+
 
     public function index(Request $request)
     {
@@ -68,18 +68,18 @@ class ProductController extends Controller
                 $q->where('slug', $categorySlug);
             });
         });
-// Eager Load & Paginate
-$products = $productsQuery->with([
-    'images', 
-    'categories', 
-    'variants.inventories' => function ($q) use ($selectedBranchId) {
-        // Filter stok inventori sesuai cabang yang dipilih
-        if ($selectedBranchId) {
-            $q->where('branch_id', $selectedBranchId);
-        }
-    }, 
-    'reviews' // Ambil semua review agar rating muncul meski ganti cabang
-])->paginate(12);
+        // Eager Load & Paginate
+        $products = $productsQuery->with([
+            'images',
+            'categories',
+            'variants.inventories' => function ($q) use ($selectedBranchId) {
+                // Filter stok inventori sesuai cabang yang dipilih
+                if ($selectedBranchId) {
+                    $q->where('branch_id', $selectedBranchId);
+                }
+            },
+            'reviews' // Ambil semua review agar rating muncul meski ganti cabang
+        ])->paginate(12);
 
         return response()->json($products);
     }

@@ -286,7 +286,11 @@
                 mainVariant.inventories[0].available :
                 0;
             // jika barang itu hanya ada di 1 toko berarti stok terbatas
-            let isSingleStore = product.variants.length === 1 && product.variants[0].inventories.length === 1;
+
+            let isSingleStore = true;
+            if (product.variants.length != 0) {
+                isSingleStore = product.variants.length === 1 && product.variants[0].inventories.length === 1;
+            }
 
             let stockStatus = isSingleStore ? 'Stok Terbatas' : 'Stok Tersedia';
             let stockColor = isSingleStore ? 'bg-primary' : 'bg-dark-grey';

@@ -15,7 +15,7 @@
             
             {{-- KOLOM KIRI: Sidebar Navigasi --}}
             {{-- Order-2 pada mobile agar sidebar di bawah konten utama, Order-1 pada desktop --}}
-            <div class="lg:col-span-3 mb-6 lg:mb-0 order-2 lg:order-1">
+            <div class="lg:col-span-3 mb-6 lg:mb-0 order-1 lg:order-2">
                 @include('frontend.components.member-sidebar', ['activeMenu' => 'transaksi'])
             </div>
 
