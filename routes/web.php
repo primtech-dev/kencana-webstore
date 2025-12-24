@@ -131,6 +131,14 @@ Route::get('/daftar-produk', [ProductController::class, 'productJson'])->name('p
 // Rute untuk menampilkan detail produk
 Route::get('/products/{id}', [ProductController::class, 'show'])->name('products.show');
 
+// Contoh Home Route
+Route::get('/promo-produk', function () {
+    return view('frontend.promo-produk'); // Ganti dengan halaman utama Anda
+});
+Route::get('/promo-voucher', function () {
+    return view('frontend.promo-voucher'); // Ganti dengan halaman utama Anda
+});
+
 // customer dashboard
 // routes/web.php
 
