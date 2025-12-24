@@ -5,11 +5,22 @@
 @source '../**/*.blade.php';
 @source '../**/*.js';
 
+
+@font-face {
+    font-family: Fustat;
+    src: url('/font/Fustat[wght].ttf');
+    font-weight: 400; /* Regular */
+    font-style: normal;
+    font-display: swap;
+}
+
 @theme {
     /* MENGGANTI FONT DEFAULT (Menggantikan var(--font-main)) */
     --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif,
         "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
         "Noto Color Emoji";
+    
+    --font-secondary: "Fustat", sans-serif;
 
     /* MENGGANTI WARNA DEFAULT (Menggantikan :root) */
     --color-primary: #ee0d0d;
