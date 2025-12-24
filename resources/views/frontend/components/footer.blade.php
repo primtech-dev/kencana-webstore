@@ -1,10 +1,10 @@
-<footer class="bg-white border-t border-gray-100 pt-16 pb-8 text-gray-600">
-    <div class="w-[90%] mx-auto px-6 lg:px-12">
+<footer class="bg-white border-t border-gray-100 pt-16 pb-8 text-gray-600 ">
+    <div class="container mx-auto px-4 lg:px-[8%]">
         
         <div class="flex flex-col md:flex-row justify-between items-center pb-10 border-b border-gray-100 gap-6">
             <div class="flex flex-col items-center md:items-start text-center md:text-left">
                 <img src="{{asset('asset/Kencana Store.png')}}" alt="Kencana Store" class="w-24 mb-2 transition duration-300">
-                <p class="text-xs tracking-widest uppercase font-medium text-gray-400">
+                <p class="font-secondary font-light text-xs font-medium text-gray-400">
                     Sahabat Rumah & <br> Bangunan
                 </p>
             </div>

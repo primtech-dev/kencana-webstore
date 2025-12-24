@@ -249,7 +249,7 @@
     </div>
 
     <div class="bg-white px-[1%] md:px-[3.5%] border-b border-gray-200 py-1 md:py-2">
-        <div class="container mx-auto px-4 lg:px-[5%] flex items-center justify-between">
+        <div class="container mx-auto px-4 lg:px-[8%] flex items-center justify-between">
             <nav class="flex items-center space-x-5 text-[12px] md:text-[13px] font-bold text-gray-700 overflow-x-auto no-scrollbar whitespace-nowrap">
                 <button class="flex items-center text-primary js-dropdown-trigger" data-dropdown-id="category-dropdown-content">
                     SEMUA KATEGORI
