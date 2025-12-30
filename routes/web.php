@@ -1,0 +1,201 @@
+<?php
+
+use App\Http\Controllers\BranchController;
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\CheckoutController;
+use Illuminate\Support\Facades\Route;
+
+use App\Http\Controllers\CustomerAuthController;
+use App\Http\Controllers\GoogleLoginController;
+use App\Http\Controllers\HistoryTransactionController;
+use App\Http\Controllers\MemberAddressController;
+use App\Http\Controllers\MemberController;
+use App\Http\Controllers\ProductController;
+
+// Route::get('/', function () {
+//     return view('frontend.index');
+// });
+
+Route::get('/detail-produk', function () {
+    return view('frontend.detail');
+});
+
+Route::get('/keranjang', function () {
+    return view('frontend.keranjang');
+});
+
+Route::get('/checkout', function () {
+    return view('frontend.checkout');
+});
+
+Route::get('/promo', function () {
+    return view('frontend.promo');
+});
+
+Route::get('/profile', function () {
+    return view('frontend.member.profile');
+});
+
+Route::get('/transaksi-member', function () {
+    return view('frontend.member.transaksi');
+});
+
+Route::get('/detail-transaksi/TRX-20251105-001', function () {
+    return view('frontend.member.detail-transaksi');
+});
+
+// Route::get('/daftar-alamat', function () {
+//     return view('frontend.member.daftar-alamat');
+// });
+
+Route::get('/wishlist', function () {
+    return view('frontend.member.wishlist');
+});
+
+Route::get('/point-rewards', function () {
+    return view('frontend.member.point-rewards');
+});
+
+Route::get('/faq', function () {
+    return view('frontend.faq');
+});
+
+
+
+// Route::get('/register', [CustomerAuthController::class, 'showRegistrationForm'])->name('customer.register.form');
+// Route::post('/register', [CustomerAuthController::class, 'register'])->name('customer.register');
+
+// Route::get('/login', [CustomerAuthController::class, 'showLoginForm'])->name('login');
+// Route::post('/login', [CustomerAuthController::class, 'login'])->name('customer.login');
+
+// Route::post('/logout', [CustomerAuthController::class, 'logout'])->name('customer.logout');
+
+// Route::get('login/google/callback', [GoogleLoginController::class, 'redirectToGoogle'])->name('login.google');
+// Route::get('login/auth/google/callback', [GoogleLoginController::class, 'handleGoogleCallback']);
+
+// Route::get('/otp', [CustomerAuthController::class, 'otp'])->name('login.otp');
+// Route::post('/verify-otp', [CustomerAuthController::class, 'verifyOtp'])->name('customer.verify.otp');
+// Route::post('/send-otp', [CustomerAuthController::class, 'sendOtp'])->name('customer.resend.otp');
+
+// Route::get('/lupa-password', function () {
+//     return view('frontend.lupa-password');
+// })->name('password.request');
+
+// Route::get('/reset-password', function () {
+//     return view('frontend.reset-password');
+// })->name('password.reset');
+
+
+// Contoh Home Route
+Route::get('/', function () {
+    return view('welcome'); // Ganti dengan halaman utama Anda
+});
+Route::get('/customer/login', [CustomerAuthController::class, 'showLoginForm'])->name('login');
+// =================================================================
+// CUSTOMER AUTH ROUTES (Menggunakan Nomor HP dan OTP)
+// =================================================================
+Route::prefix('customer')->group(function () {
+
+    // --- REGISTER FLOW (Alur 1) ---
+    Route::get('register', [CustomerAuthController::class, 'showRegistrationForm'])->name('customer.register.show');
+    Route::post('register', [CustomerAuthController::class, 'register'])->name('customer.register');
+
+    // --- LOGIN FLOW (Alur 2) ---
+    // Route::get('login', [CustomerAuthController::class, 'showLoginForm'])->name('customer.login.show');
+    Route::post('login', [CustomerAuthController::class, 'login'])->name('customer.login');
+
+    // --- LOGOUT ---
+    Route::post('logout', [CustomerAuthController::class, 'logout'])->name('customer.logout');
+
+    // --- OTP VERIFICATION ---
+    Route::get('otp-verification', [CustomerAuthController::class, 'showOtpForm'])->name('customer.otp.show');
+    Route::post('otp-verification', [CustomerAuthController::class, 'verifyOtp'])->name('customer.otp.verify');
+    // Tambahkan route untuk kirim ulang OTP (jika Anda mengimplementasikannya di controller)
+    // Route::post('resend-otp', [CustomerAuthController::class, 'resendOtp'])->name('customer.otp.resend'); 
+
+    // --- FORGOT PASSWORD FLOW (Alur 3) ---
+    Route::get('forgot-password', [CustomerAuthController::class, 'showForgotPasswordForm'])->name('customer.forgot.password.show');
+    Route::post('forgot-password', [CustomerAuthController::class, 'forgotPassword'])->name('customer.forgot.password');
+    
+    // --- RESET PASSWORD (SETELAH OTP VERIFIED) ---
+    Route::get('reset-password', [CustomerAuthController::class, 'showResetPasswordForm'])->name('customer.password.reset.show');
+    Route::post('reset-password', [CustomerAuthController::class, 'resetPassword'])->name('customer.password.reset');
+
+});
+
+
+// Rute untuk menampilkan daftar produk
+Route::get('/', [ProductController::class, 'index'])->name('products.index');
+Route::get('/daftar-produk', [ProductController::class, 'productJson'])->name('products.json');
+
+// Rute untuk menampilkan detail produk
+Route::get('/products/{id}', [ProductController::class, 'show'])->name('products.show');
+
+// Contoh Home Route
+Route::get('/promo-produk', function () {
+    return view('frontend.promo-produk'); // Ganti dengan halaman utama Anda
+});
+Route::get('/promo-voucher', function () {
+    return view('frontend.promo-voucher'); // Ganti dengan halaman utama Anda
+});
+
+// customer dashboard
+// routes/web.php
+
+// Route untuk API yang menghitung jarak dan mengurutkan cabang
+// Route::post('/branches/nearby', [ProductController::class, 'getNearbyBranches'])->name('branches.nearby'); 
+
+// Route untuk menyimpan pilihan cabang dari modal
+Route::post('/set-selected-branch', [ProductController::class, 'setBranch'])->name('set.branch');
+
+Route::get('/daftar-toko', [BranchController::class, 'index'])->name('branches.index');
+
+Route::middleware(['auth:customer'])->group(function () {
+    Route::get('/dashboard', function () {
+        // Akses pengguna yang sedang login
+        $customer = auth('customer')->user();
+        return view('customer.dashboard');
+    })->name('customer.dashboard');
+
+    Route::group(['prefix' => 'member'], function () {
+        Route::get('/', [MemberController::class, 'index'])->name('member.index');
+        // Route::get('/profile', [MemberController::class, 'profile'])->name('member.profile');
+        Route::post('/update-profile', [MemberController::class, 'updateProfile'])->name('member.update-profile');
+        Route::get('/daftar-alamat', [MemberAddressController::class, 'index'])->name('member.addresses.index');
+        Route::post('/daftar-alamat', [MemberAddressController::class, 'store'])->name('member.addresses.store');
+        Route::put('/daftar-alamat/{address}', [MemberAddressController::class, 'update'])->name('member.addresses.update');
+
+        // Route untuk Jadikan Utama
+        Route::put('/daftar-alamat/{address}/default', [MemberAddressController::class, 'setAsDefault'])->name('member.addresses.default');
+
+        // Route untuk Hapus (Destroy)
+        Route::delete('/daftar-alamat/{address}', [MemberAddressController::class, 'destroy'])->name('member.addresses.destroy');
+
+        
+        // Route::get('/transaksi-member', [MemberController::class, 'index'])->name('member.transactions');
+        Route::get('/transaksi-member/{id}', [MemberController::class, 'showTransaction'])->name('member.transactions.show');
+    });
+
+    Route::group(['prefix' => 'keranjang'], function () {
+        Route::get('/', [CartController::class, 'index'])->name('cart.index');
+        Route::post('/add', [CartController::class, 'addToCart'])->name('cart.add');
+        Route::delete('/hapus/{itemId}', [CartController::class, 'destroy'])->name('cart.destroy');
+        Route::post('/update', [CartController::class, 'updateCart'])->name('cart.update');
+        Route::post('/update-quantity/{itemId}', [CartController::class, 'updateQuantity'])
+            ->name('cart.update-quantity');
+    });
+
+    Route::group(['prefix' => 'checkout'], function () {
+        Route::post('/', [CheckoutController::class, 'index'])->name('checkout.index');
+        Route::get('/now', [CheckoutController::class, 'buyNow'])->name('checkout.now');
+        Route::post('/process', [CheckoutController::class, 'store'])->name('checkout.store');
+    });
+
+    Route::group(['prefix' => 'history-transactions'], function () {
+        Route::get('/', [HistoryTransactionController::class, 'index'])->name('history.transactions.index');
+        Route::get('/{order_no}', [HistoryTransactionController::class, 'show'])->name('history.transactions.show');
+        Route::post('/{order_no}/complete', [HistoryTransactionController::class, 'complete'])->name('history.transactions.complete');
+    });
+
+    Route::post('/review-store/{orderId}', [HistoryTransactionController::class, 'storeReview'])->name('history.transactions.review');
+});

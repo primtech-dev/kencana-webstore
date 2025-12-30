@@ -1,0 +1,27 @@
+# 1. Nonaktifkan Directory Listing
+Options -Indexes
+
+# 2. Pengaturan PHP (Pertahankan konfigurasi spesifik host Anda)
+# JANGAN UBAH BARIS INI KECUALI ANDA YAKIN
+<FilesMatch "\.(php4|php5|php3|php2|php|phtml)$">
+    SetHandler application/x-httpd-alt-php82___lsphp
+</FilesMatch>
+
+# 3. Pengalihan URL (Aturan Standard Framework)
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    # JANGAN LAKUKAN APA-APA JIKA FILE ATAU DIREKTORI SUDAH ADA.
+    # Ini memastikan file CSS, JS, Gambar di folder 'public' bisa diakses.
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # JANGAN LAKUKAN APA-APA JIKA PERMINTAAN SUDAH MENGANDUNG PUBLIC.
+    RewriteCond %{REQUEST_URI} !^/public/ [NC] 
+    
+    # ATURAN KUNCI: Arahkan semua permintaan lainnya ke public/index.php
+    # Ini memastikan routing aplikasi Anda di PHP yang menangani URL seperti /?page=2
+    RewriteRule ^(.*)$ public/index.php [L]
+</IfModule>

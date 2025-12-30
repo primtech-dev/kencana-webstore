@@ -1,0 +1,113 @@
+<div id="location-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 opacity-0 pointer-events-none transition-opacity duration-300" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-lg m-4 transition-transform duration-300 scale-95" role="document">
+        
+        {{-- Header Modal --}}
+        <div class="flex justify-between items-center p-4 border-b">
+            <h3 class="text-xl font-bold text-dark-grey">Pilih Lokasi Cabang</h3>
+            <button type="button" class="text-dark-grey/50 hover:text-dark-grey" aria-label="Tutup Modal Lokasi" onclick="closeLocationModal()">
+                &times;
+            </button>
+        </div>
+
+        {{-- Konten Modal (Tabs) --}}
+        <div class="p-4 flex flex-col h-[70vh]">
+            <div class="border-b mb-4">
+                <nav class="flex space-x-4" role="tablist">
+                    <button class="tab-button pb-2 border-b-2 border-primary text-primary font-semibold" data-target="tab-shipping-address" aria-selected="true" role="tab">Alamat Anda</button>
+                    <button class="tab-button pb-2 text-dark-grey/80" data-target="tab-store-list" aria-selected="false" role="tab" style="border-bottom-width: 0px;">Daftar Cabang</button>
+                </nav>
+            </div>
+
+            {{-- Tab: Alamat Pelanggan --}}
+            <div id="tab-shipping-address" class="tab-content">
+                @if (Auth::guard('customer')->check())
+                    <p class="mb-3 text-sm text-dark-grey">Pilih alamat pengiriman Anda untuk menghitung jarak ke cabang terdekat.</p>
+                    <div class="flex flex-col space-y-3 max-h-40 overflow-y-auto pr-2">
+                        @forelse ($customer_addresses as $address)
+                            @php
+                                $isDefault = $address->is_default;
+                                $addressColorClass = $isDefault ? 'border-primary border-2' : 'border-light-grey border';
+                            @endphp
+                            <label class="p-3 {{ $addressColorClass }} rounded-lg hover:bg-light-bg/50 transition duration-150 cursor-pointer flex items-start justify-between">
+                                <div class="flex-grow pr-4">
+                                    <p class="font-bold text-dark-grey text-sm">
+                                        {{ $address->label }} 
+                                        @if ($isDefault)
+                                            <span class="ml-2 px-2 py-0.5 text-xs font-semibold bg-primary text-white rounded-full">Utama</span>
+                                        @endif
+                                    </p>
+                                    <p class="text-xs text-dark-grey/80">{{ $address->street }}, {{ $address->city }}, {{ $address->province }}</p>
+                                </div>
+                                <div class="flex-shrink-0 pt-1">
+                                    <input type="radio" name="selected_customer_address" 
+                                        value="{{ $address->id }}" 
+                                        data-lat="{{ $address->latitude ?? 0 }}"
+                                        data-lon="{{ $address->longitude ?? 0 }}"
+                                        class="text-primary focus:ring-primary h-4 w-4 border-light-grey"
+                                        {{ $isDefault ? 'checked' : '' }}>
+                                </div>
+                            </label>
+                        @empty
+                            <p class="text-sm text-red-500">Anda belum memiliki alamat tersimpan. Silakan tambahkan alamat terlebih dahulu.</p>
+                        @endforelse
+                    </div>
+                    <div class="mt-4 pt-4 border-t">
+                        <button type="button" id="confirm-address-button" class="btn-primary w-full opacity-50 cursor-not-allowed" disabled>
+                            Gunakan Alamat Ini & Cek Cabang Terdekat
+                        </button>
+                    </div>
+                @else
+                    <p class="text-sm text-center py-8">Anda harus **<a href="/login" class="text-primary underline">Login</a>** untuk melihat alamat Anda yang tersimpan.</p>
+                @endif
+            </div>
+
+            {{-- Tab: Daftar Cabang --}}
+            <div id="tab-store-list" class="tab-content hidden flex-grow overflow-hidden flex flex-col">
+                <p class="mb-3 text-sm text-dark-grey">Pilih salah satu cabang di bawah ini. Cabang akan diurutkan berdasarkan jarak terdekat dari alamat default Anda.</p>
+                
+                {{-- Container Lokasi Cabang (Diisi oleh PHP dan disortir oleh JS) --}}
+                <div class="flex-grow overflow-y-auto space-y-3 pr-2">
+                    @forelse ($inventory_data as $data)
+                        @php
+                            $statusColor = $data['status_color_class'];
+                            // Jarak sudah dihitung dan diformat di Controller
+                            $distance = $data['distance_display']; 
+                        @endphp
+                        <label class="p-4 border border-light-grey rounded-lg hover:bg-light-bg/50 transition duration-150 cursor-pointer flex items-center justify-between"
+                            data-store-id="{{ $data['branch_id'] }}"
+                            data-store-name="{{ $data['branch_name'] }}"
+                            data-store-full-status="{{ $data['status_label'] }}"
+                            data-status-color="{{ $data['status_color_class'] }}"
+                            data-distance-value="{{ $data['distance_value'] }}"> {{-- NILAI NUMERIK UNTUK SORTING JS --}}
+                            
+                            <div class="flex-grow pr-4">
+                                <p class="font-bold text-dark-grey text-sm">{{ $data['branch_name'] }}</p>
+                                <p class="text-xs text-dark-grey/80">{{ $data['branch_address'] }}</p>
+                                <p class="text-xs text-primary font-semibold mt-1">{{ $distance }}</p> {{-- Jarak sudah ada --}}
+                                <p class="text-xs {{ $statusColor }} font-semibold mt-1">
+                                    {{ $data['status_label'] }} ({{ $data['total_available_stock'] }} Unit)
+                                </p>
+                            </div>
+                            <div class="flex-shrink-0">
+                                <input type="radio" name="selected_store"
+                                    value="{{ $data['branch_id'] }}"
+                                    data-store-distance="{{ $distance }}" {{-- NILAI TAMPILAN UNTUK JS --}}
+                                    data-store-full-status="{{ $data['status_label'] }}"
+                                    class="text-primary focus:ring-primary h-4 w-4 border-light-grey">
+                            </div>
+                        </label>
+                    @empty
+                        <p class="text-center py-8 text-dark-grey/80">Mohon maaf, stok produk ini sedang habis di semua cabang.</p>
+                    @endforelse
+                </div>
+                
+                {{-- Footer Modal --}}
+                <div class="mt-4 pt-4 border-t">
+                    <button type="button" id="select-store-button" class="btn-primary w-full opacity-50 cursor-not-allowed" disabled>
+                        Pilih Toko Ini
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

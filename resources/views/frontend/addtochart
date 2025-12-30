@@ -1,0 +1,96 @@
+ // --- 6. Transaksi (AJAX & Buy Now) ---
+       // --- 6. Transaksi (AJAX & Buy Now) ---
+// if (addToCartButton) {
+//     addToCartButton.addEventListener('click', function(e) {
+//         e.preventDefault();
+
+//         const qtyRequested = parseInt(productQtyInput.value);
+//         const stockAvailable = getStockForSelectedVariant();
+//         const branchId = document.querySelector('input[name="selected_store"]:checked')?.value;
+//         const branchName = document.querySelector('input[name="selected_store"]:checked')?.dataset.storeName || "Cabang";
+//         const variantId = productVariantIdInput.value;
+
+//         if (!branchId) return Swal.fire('Error', 'Pilih lokasi toko dahulu', 'error');
+
+//         // Fungsi internal untuk memproses AJAX ke server
+//         const processAjaxCart = () => {
+//             addToCartButton.textContent = 'Memproses...';
+//             addToCartButton.disabled = true;
+
+//             fetch("{{ route('cart.add') }}", {
+//                 method: 'POST',
+//                 headers: {
+//                     'Content-Type': 'application/json',
+//                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+//                     'Accept': 'application/json'
+//                 },
+//                 body: JSON.stringify({
+//                     variant_id: variantId,
+//                     quantity: qtyRequested,
+//                     branch_id: branchId
+//                 })
+//             })
+//             .then(async res => {
+//                 const data = await res.json();
+//                 if (res.status === 401) throw new Error('UNAUTHORIZED');
+//                 if (!res.ok) throw new Error(data.message || 'Terjadi kesalahan sistem');
+//                 return data;
+//             })
+//             .then(data => {
+//                 if (data.success) {
+//                     Swal.fire({
+//                         title: 'Berhasil!',
+//                         text: data.message,
+//                         icon: 'success',
+//                         showCancelButton: true,
+//                         confirmButtonText: 'Lihat Keranjang',
+//                         cancelButtonText: 'Tetap Belanja'
+//                     }).then((result) => {
+//                         if (result.isConfirmed) window.location.href = "{{ route('cart.index') }}";
+//                     });
+//                 }
+//             })
+//             .catch(error => {
+//                 if (error.message === 'UNAUTHORIZED') {
+//                     Swal.fire('Belum Login', 'Silakan login terlebih dahulu untuk menambah ke keranjang', 'warning');
+//                 } else {
+//                     Swal.fire('Gagal', error.message, 'error');
+//                 }
+//             })
+//             .finally(() => {
+//                 addToCartButton.textContent = '+ Keranjang';
+//                 addToCartButton.disabled = false;
+//             });
+//         };
+
+//         // CEK STOK
+//         if (qtyRequested > stockAvailable) {
+//             // TAMPILKAN 3 PILIHAN JIKA STOK KURANG
+//             Swal.fire({
+//                 title: 'Stok Kurang / Indent',
+//                 html: `Stok tersedia: <b>${stockAvailable} pcs</b>.<br>Anda meminta: <b>${qtyRequested} pcs</b>.<br><br>Tetap lanjutkan sebagai pesanan Indent?`,
+//                 icon: 'warning',
+//                 showCancelButton: true,
+//                 showDenyButton: true,
+//                 confirmButtonColor: '#3085d6', // Warna Biru (WA)
+//                 denyButtonColor: '#10b981',    // Warna Hijau (Tetap Belanja/Pesan)
+//                 cancelButtonColor: '#d33',     // Warna Merah (Batal)
+//                 confirmButtonText: 'Hubungi Admin (WA)',
+//                 denyButtonText: 'Masukkan Keranjang',
+//                 cancelButtonText: 'Batal'
+//             }).then((result) => {
+//                 if (result.isConfirmed) {
+//                     // Opsi 1: Hubungi WhatsApp
+//                     const waMessage = `Halo Admin ${branchName}, saya ingin indent produk ${currentVariantNameElement.textContent} sebanyak ${qtyRequested} pcs.`;
+//                     window.open(`https://wa.me/6282245328590?text=${encodeURIComponent(waMessage)}`, '_blank');
+//                 } else if (result.isDenied) {
+//                     // Opsi 2: LANJUTKAN BELANJA (Tetap eksekusi AJAX)
+//                     processAjaxCart();
+//                 }
+//             });
+//         } else {
+//             // Stok mencukupi, langsung proses
+//             processAjaxCart();
+//         }
+//     });
+// }

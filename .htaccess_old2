@@ -1,0 +1,26 @@
+# 1. Nonaktifkan Directory Listing
+Options -Indexes
+
+# 2. Pengaturan PHP (Pertahankan Konfigurasi Host Spesifik Anda)
+<FilesMatch "\.(php4|php5|php3|php2|php|phtml)$">
+    SetHandler application/x-httpd-alt-php82___lsphp
+</FilesMatch>
+
+# 3. Pengalihan URL (Rewrite yang Mencegah Loop)
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    # JANGAN REWRITE JIKA FILE ATAU FOLDER SUDAH ADA.
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # ATURAN KRITIS (Mencegah 403 / Loop): 
+    # JANGAN REWRITE JIKA PERMINTAAN SUDAH MENGANDUNG "/public/" DI PATH.
+    # Ini menghentikan aturan memproses path yang sudah dialihkan.
+    RewriteCond %{REQUEST_URI} !^/public/ [NC] 
+
+    # ATURAN ANDA: Arahkan semua yang tersisa ke public/$1.
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
