@@ -1,44 +1,40 @@
 @extends('frontend.components.layout')
 @section('content')
 <main class="container px-1 lg:px-[7%] mx-auto mt-8">
-    @php
+@php
     $currentCatSlug = request('category');
     $catName = "Rekomendasi Spesial";
     $categoryDesc = "Temukan koleksi produk terbaik kami dengan harga distributor dan kualitas terjamin.";
-
-    // Default fallback jika tidak ada banner sama sekali
     $fallbackImg = "https://cdn.ruparupa.io/filters:quality(80)/media/promotion/ruparupa/payday-oct-25/ms/header-d.png";
 
-    // Inisialisasi variabel banner
-    $desktopBanner = $fallbackImg;
-    $mobileBanner = $fallbackImg;
+    // Pastikan $slides selalu menjadi Collection yang "Rata" (Flat)
+    $slides = collect();
 
-    // 1. Prioritas: Banner Kategori (Jika ada kategori yang dipilih)
     if($currentCatSlug) {
-    $categoryData = $categories->where('slug', $currentCatSlug)->first();
+        $categoryData = $categories->where('slug', $currentCatSlug)->first();
+        if($categoryData && $categoryData->banner_path) {
+            $catName = $categoryData->name;
+            $slides->push((object)[
+                'image_path' => $categoryData->banner_path,
+                'image_mobile_path' => $categoryData->thumbnail ?? $categoryData->banner_path,
+                'link_url' => '#',
+                'title' => $catName
+            ]);
+        }
+    }
 
-    if($categoryData && $categoryData->banner_path) {
-    $catName = $categoryData->name;
-    $categoryDesc = "Menampilkan koleksi lengkap untuk kebutuhan " . $catName . " Anda.";
-
-    $desktopBanner = env('APP_URL_BE'). '/' . $categoryData->banner_path;
-    // Gunakan thumbnail atau banner_path jika tidak ada mobile_path khusus di kategori
-    $mobileBanner = isset($categoryData->thumbnail)
-    ? env('APP_URL_BE'). '/' . $categoryData->thumbnail
-    : $desktopBanner;
+    // Jika di Home (tidak ada kategori), bongkar $banners yang nested tadi
+    if($slides->isEmpty()) {
+        if(isset($banners)) {
+            // FUNGSI INI AKAN MENGHILANGKAN ERROR "Property does not exist on collection"
+            // Karena dia membongkar Collection di dalam Collection menjadi satu deret banner
+            $slides = collect($banners)->flatten(1);
+        } elseif(isset($home_banner)) {
+            // Jika home_banner adalah single object, bungkus jadi collection
+            $slides = collect([$home_banner])->flatten(1);
+        }
     }
-    // 2. Jika Kategori dipilih tapi tidak punya banner, gunakan Home Banner dari Controller
-    elseif($home_banner) {
-    $desktopBanner = env('APP_URL_BE'). '/' . $home_banner->image_path;
-    $mobileBanner = env('APP_URL_BE'). '/' . ($home_banner->image_mobile_path ?? $home_banner->image_path);
-    }
-    }
-    // 3. Jika di Home (Tanpa Kategori), gunakan Home Banner dari Controller
-    elseif($home_banner) {
-    $desktopBanner = env('APP_URL_BE'). '/' . $home_banner->image_path;
-    $mobileBanner = env('APP_URL_BE'). '/' . ($home_banner->image_mobile_path ?? $home_banner->image_path);
-    }
-    @endphp
+@endphp
 
     @if($currentCatSlug)
     <nav class="flex px-4 mb-3 md:mb-4 text-gray-500 text-[10px] md:text-xs capitalize font-bold">
@@ -56,25 +52,46 @@
     </nav>
     @endif
 
-    <section class="banner px-4 mb-4 md:mb-8">
-        <div class="relative rounded-xl md:rounded-2xl overflow-hidden shadow-md border border-gray-100 bg-gray-100">
-            <a href="{{ $currentCatSlug ? '#' : ($home_banner->link_url ?? '#') }}">
-                <picture>
-                    {{-- Source untuk Mobile --}}
-                    <source media="(max-width: 767px)" srcset="{{ $mobileBanner }}">
+   <section class="banner px-4 mb-4 md:mb-8 group">
+    <div class="swiper bannerSwiper relative rounded-xl md:rounded-2xl overflow-hidden shadow-md border border-gray-100 bg-gray-100">
+        <div class="swiper-wrapper">
+            @forelse($slides as $slide)
+                <div class="swiper-slide">
+                    {{-- PASTIKAN MENGGUNAKAN $slide, BUKAN $home_banner --}}
+                    <a href="{{ $slide->link_url ?? '#' }}">
+                        <picture>
+                            @php
+                                $pathD = $slide->image_path;
+                                $pathM = $slide->image_mobile_path ?? $slide->image_path;
+                                
+                                $dBanner = str_starts_with($pathD, 'http') ? $pathD : env('APP_URL_BE'). '/' . ltrim($pathD, '/');
+                                $mBanner = str_starts_with($pathM, 'http') ? $pathM : env('APP_URL_BE'). '/' . ltrim($pathM, '/');
+                            @endphp
+                            
+                            <source media="(max-width: 767px)" srcset="{{ $mBanner }}">
+                            <source media="(min-width: 768px)" srcset="{{ $dBanner }}">
 
-                    {{-- Source untuk Desktop --}}
-                    <source media="(min-width: 768px)" srcset="{{ $desktopBanner }}">
-
-                    {{-- Img Fallback --}}
-                    <img src="{{ $desktopBanner }}"
-                        alt="Banner {{ $catName }}"
-                        class="w-full h-auto block transition-transform duration-700 hover:scale-105"
-                        onerror="this.onerror=null;this.src='{{ $fallbackImg }}';">
-                </picture>
-            </a>
+                            <img src="{{ $dBanner }}"
+                                alt="Banner"
+                                class="w-full h-auto block transition-transform duration-700 hover:scale-105"
+                                onerror="this.onerror=null;this.src='{{ $fallbackImg }}';">
+                        </picture>
+                    </a>
+                </div>
+            @empty
+                <div class="swiper-slide">
+                    <img src="{{ $fallbackImg }}" class="w-full h-auto">
+                </div>
+            @endforelse
         </div>
-    </section>
+
+        @if($slides->count() > 1)
+            <div class="swiper-pagination"></div>
+            <!-- <div class="swiper-button-next !text-white after:!text-sm hidden md:flex"></div>
+            <div class="swiper-button-prev !text-white after:!text-sm hidden md:flex"></div> -->
+        @endif
+    </div>
+</section>
 
 
     <section class="mb-6 md:mb-10 px-4 relative group">
@@ -434,6 +451,22 @@
         }
 
         fetchProducts(); // Initial Load
+    });
+
+    
+</script>
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script>
+    $(document).ready(function() {
+        const swiper = new Swiper('.bannerSwiper', {
+            autoHeight: true,
+            loop: true,
+            autoplay: { delay: 5000, disableOnInteraction: false },
+            pagination: { el: '.swiper-pagination', clickable: true },
+            navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
+            effect: 'fade',
+            fadeEffect: { crossFade: true }
+        });
     });
 </script>
 @endpush

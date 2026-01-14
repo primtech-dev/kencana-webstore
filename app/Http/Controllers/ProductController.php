@@ -24,7 +24,7 @@ class ProductController extends Controller
         $home_banner = HomeBanner::where('is_active', true)
             ->where('start_at', '<=', now())
             ->where('end_at', '>=', now())
-            ->first();
+            ->get();
 
         return view('frontend.index', [
             'categories' => $categories,

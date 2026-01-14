@@ -29,6 +29,11 @@
             scrollbar-width: none;
         }
     </style>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+<style>
+    .swiper-pagination-bullet-active { background: #B4252A !important; } /* Warna brand Anda */
+</style>
 </head>
 
 <body class="bg-cream-custom">
