@@ -142,10 +142,10 @@
                 class="flex items-center p-3.5 font-semibold text-gray-700 hover:bg-primary-light hover:text-primary rounded-xl transition duration-150">
                 <span class="mr-3 text-xl"><i class="fas fa-comments"></i></span> Pusat Bantuan
             </a>
-            <a href="#" class="flex items-center p-3.5 font-semibold text-gray-700 hover:bg-primary-light hover:text-primary rounded-xl transition duration-150">
+            <!-- <a href="#" class="flex items-center p-3.5 font-semibold text-gray-700 hover:bg-primary-light hover:text-primary rounded-xl transition duration-150">
                 <span class="mr-3 text-xl"><i class="fas fa-briefcase"></i></span> Official Partner
                 <span class="text-xs bg-red-500 text-white font-medium px-2 py-0.5 ml-2 rounded-full transform -translate-y-px">NEW</span>
-            </a>
+            </a> -->
         </nav>
 
     </div>
@@ -176,7 +176,7 @@
                         value="{{ request('search') }}"
                         placeholder="Cari Merek, Nama, atau Tipe Produk..."
                         autocomplete="off">
-                    <button type="submit" class="bg-[#cc0000] text-white px-5 hover:bg-black transition">
+                    <button type="submit" class="bg-primary text-white px-5 hover:bg-black transition">
                         <i class="fas fa-search"></i>
                     </button>
                 </form>
@@ -255,7 +255,7 @@
                     SEMUA KATEGORI
                 </button>
                 <div class="h-4 w-[1px] bg-gray-300 hidden md:block"></div>
-                <a href="#" class="hover:text-primary hidden md:block">Official Partner</a>
+                <!-- <a href="#" class="hover:text-primary hidden md:block">Official Partner</a> -->
                 <a href="{{url('/promo')}}" class="hover:text-primary hidden md:block">Promo</a>
                 <a href="{{url('/faq')}}" class="hover:text-primary hidden md:block">FAQ</a>
                 <a href="{{route('branches.index')}}" class="hover:text-primary hidden md:block">Lokasi Toko</a>

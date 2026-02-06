@@ -14,6 +14,36 @@
         z-index: 1;
     }
 
+    /* Wadah utama marker */
+    .custom-marker-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    /* Bentuk Pin Putih */
+    .pin-container {
+        width: 50px;
+        height: 50px;
+        background: red;
+        border-radius: 50% 50% 50% 0; /* Membuat bentuk teardrop */
+        transform: rotate(-45deg);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        border: 2px solid red;
+    }
+
+    /* Menjaga Logo tetap tegak di dalam pin yang miring */
+    .pin-container img {
+        width: 35px;
+        height: 35px;
+        object-fit: contain;
+        transform: rotate(45deg); 
+        border-radius: 50%;
+    }
+
     @media (min-width: 1024px) {
         #storeMap { height: 600px; }
     }
@@ -98,11 +128,23 @@
             attribution: '© OpenStreetMap contributors'
         }).addTo(map);
 
-        const storeIcon = L.icon({
-            iconUrl: '{{asset("asset/Kencana Store.png")}}', 
-            iconSize: [45, 38],
-            iconAnchor: [19, 38],
-            popupAnchor: [0, -38]
+        // const storeIcon = L.icon({
+        //     iconUrl: '{{asset("asset/Kencana Store.png")}}', 
+        //     iconSize: [45, 38],
+        //     iconAnchor: [19, 38],
+        //     popupAnchor: [0, -38]
+        // });
+
+        const storeIcon = L.divIcon({
+            className: 'custom-marker-wrapper', // Class CSS
+            html: `
+                <div class="pin-container">
+                    <img src="{{asset('asset/Kencana Store Putih.png')}}" alt="logo">
+                </div>
+            `,
+            iconSize: [50, 50],       // Ukuran total marker
+            iconAnchor: [25, 50],     // Titik tengah bawah (ujung pin)
+            popupAnchor: [0, -50]     // Posisi popup agar pas di atas pin
         });
 
         const branchMarkers = [];
