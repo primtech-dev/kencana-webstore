@@ -329,7 +329,7 @@
             <img src="${imageUrl}" 
                  alt="${product.name}" 
                  onerror="this.src='https://placehold.co/600x400/000/ffffff?text=Product+Image';"
-                 class="h-25 sm:h-32 md:h-32 w-full object-cover rounded-t-lg">
+                 class="h-25 sm:h-32 md:h-32 w-full p-2 object-contain rounded-t-lg p-2">
             <div class="absolute top-2 right-2 ${stockColor} text-white text-[10px] font-bold px-2 py-1 rounded">
                 ${stockStatus}
             </div>

@@ -225,7 +225,7 @@
                             <img id="main-product-image"
                                 src="{{ $product_main_image }}"
                                 alt="{{ $product->name }}"
-                                class="object-cover w-full h-full transition-opacity duration-300">
+                                class="object-contain w-full h-full transition-opacity duration-300">
                         </div>
                     </div>
 
@@ -244,7 +244,7 @@
                                 tabindex="0"
                                 role="button"
                                 aria-label="Gambar Produk {{ $index + 1 }}: {{ $product->name }}">
-                                <img src="{{ $image['url'] }}" alt="{{ $product->name }} Thumbnail {{ $index + 1 }}" class="object-cover w-full h-full">
+                                <img src="{{ $image['url'] }}" alt="{{ $product->name }} Thumbnail {{ $index + 1 }}" class="object-contain p-2 w-full h-full">
                             </div>
                             @endforeach
                         </div>
@@ -296,7 +296,7 @@
                                     class="sr-only"
                                     {{ $isChecked ? 'checked' : '' }}>
 
-                                <img src="{{ $variant_image }}" alt="{{ $variant->variant_name }}" class="w-8 h-8 object-cover rounded-md flex-shrink-0">
+                                <img src="{{ $variant_image }}" alt="{{ $variant->variant_name }}" class="w-8 h-8 object-contain rounded-md flex-shrink-0">
                                 <span class="text-dark-grey">{{ $variant->variant_name }} ({{ $variant->unit->name ?? '-' }})</span>
                             </label>
                             @endforeach
@@ -472,7 +472,7 @@
                             @foreach($item->images as $img)
                             <img src="{{ asset('storage/' . $img->image_path) }}"
                             onclick="openLightbox('{{ asset('storage/' . $img->image_path) }}')"
-                                class="w-20 h-20 object-cover rounded-md border border-light-grey">
+                                class="w-20 h-20 object-contain rounded-md border border-light-grey">
                             @endforeach
                         </div>
                         @endif
