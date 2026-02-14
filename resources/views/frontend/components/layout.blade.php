@@ -36,7 +36,12 @@
 </style>
 
 <link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#B4252A">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="application-name" content="Kencana">
+<meta name="apple-mobile-web-app-title" content="Kencana">
+<meta name="theme-color" content="#ffff"> <meta name="msapplication-navbutton-color" content="#ffff">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <script type="text/javascript">
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/serviceworker.js').then(function (registration) {
