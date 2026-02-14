@@ -1,10 +1,10 @@
 {
     "name": "PWA",
     "short_name": "Kencana PWA",
-    "start_url": "/index.php",
+    "start_url": "/",
     "background_color": "#ffffff",
     "description": "Kencana Webstore adalah platform e-commerce yang menyediakan berbagai produk berkualitas untuk memenuhi kebutuhan pelanggan. Dengan antarmuka yang user-friendly dan layanan pelanggan yang responsif, kami berkomitmen untuk memberikan pengalaman belanja online yang menyenangkan dan memuaskan.",
-    "display": "fullscreen",
+    "display": "standalone",
     "theme_color": "#ffffff",
     "icons": [
         {
