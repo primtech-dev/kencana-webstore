@@ -121,6 +121,10 @@ Route::prefix('customer')->group(function () {
     Route::get('reset-password', [CustomerAuthController::class, 'showResetPasswordForm'])->name('customer.password.reset.show');
     Route::post('reset-password', [CustomerAuthController::class, 'resetPassword'])->name('customer.password.reset');
 
+    // login otp
+    Route::get('/login/otp', [CustomerAuthController::class, 'showLoginOtpForm'])->name('customer.login.otp.show');
+    Route::post('/login/otp', [CustomerAuthController::class, 'sendLoginOtp'])->name('customer.login.otp.send');
+
 });
 
 

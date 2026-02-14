@@ -88,10 +88,13 @@ class CustomerAuthController extends Controller
     public function register(Request $request)
     {
         $request->validate([
+            'email' => 'required|email|max:255|unique:customers,email',
             'full_name' => 'required|string|max:255',
             'phone' => 'required|string|max:20|unique:customers,phone',
             'password' => 'required|string|min:8|confirmed',
+
         ], [
+            'email.unique' => 'Email ini sudah terdaftar.',
             'phone.unique' => 'Nomor HP ini sudah terdaftar.',
             'password.confirmed' => 'Konfirmasi kata sandi tidak cocok.',
         ]);
@@ -99,6 +102,7 @@ class CustomerAuthController extends Controller
         Session::put('customer_registration_data', [
             'full_name' => $request->full_name,
             'phone' => $request->phone,
+            'email' => $request->email,
             'password_hash' => Hash::make($request->password),
         ]);
 
@@ -332,5 +336,31 @@ class CustomerAuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         return redirect('/customer/login')->with('success', 'Sampai jumpa lagi ya!');
+    }
+
+    // show login otp 
+    public function showLoginOtpForm()
+    {
+        return view('frontend.login-otp');
+    }
+
+    public function sendLoginOtp(Request $request)
+    {
+        $request->validate([
+            'phone' => 'required|string|max:20|exists:customers,phone',
+        ], [
+            'phone.exists' => 'Nomor HP tidak terdaftar.',
+        ]);
+
+        if (!$this->generateAndSendOtp($request->phone, 'login')) {
+            return back()->with('error', 'Gagal mengirim kode verifikasi WhatsApp. Silakan coba lagi.');
+        }
+
+        Session::put('customer_login_id', Customer::where('phone', $request->phone)->first()->id);
+
+        return redirect()->route('customer.otp.show')->with([
+            'success' => 'Kode verifikasi untuk login telah dikirimkan ke Nomor HP Anda melalui WhatsApp.',
+            'phone' => $request->phone,
+        ]);
     }
 }

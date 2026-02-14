@@ -67,7 +67,25 @@
                         Masuk
                     </button>
                 </form>
+<div class="relative py-4">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-gray-300"></div>
+                    </div>
+                    <div class="relative flex justify-center text-sm">
+                        <span class="px-2 bg-white text-gray-500 font-medium">Atau</span>
+                    </div>
+                </div>
 
+                <div class="space-y-3">
+                    <a href="{{ route('customer.login.otp.show') }}" 
+                        class="w-full flex justify-center items-center py-2 px-4 border border-primary rounded-md shadow-sm text-base font-semibold text-primary bg-white hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition duration-150">
+                        <i class="fas fa-comment-dots mr-2"></i>
+                        Masuk dengan Kode OTP
+                    </a>
+                    <p class="text-[11px] text-gray-400 text-center italic">
+                        *Gunakan OTP jika Anda pelanggan lama yang belum memiliki kata sandi.
+                    </p>
+                </div>
                 <div class="text-center pt-4">
                     <p class="text-sm text-gray-600">
                         Belum punya akun?
