@@ -1,494 +1,407 @@
-<div id="mobile-menu" class="fixed top-0 left-0 w-full h-full bg-light-grey bg-opacity-75 z-[99] hidden">
+<style>
+    /* Menghilangkan scrollbar tapi tetap bisa di-scroll */
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+</style>
+<div id="mobile-menu"
+    class="fixed top-0 left-0 w-full h-full bg-slate-900/60 backdrop-blur-sm z-[99] hidden transition-opacity duration-300 ease-in-out"
+    aria-modal="true"
+    role="dialog">
+
     <div id="mobile-menu-drawer"
-        class="w-72 sm:w-80 h-full bg-white shadow-2xl p-4 transform -translate-x-full transition-transform duration-300 ease-in-out overflow-y-auto">
-        <div class="flex justify-between items-center pb-4 border-b border-light-grey">
-            <a href="{{ url('/') }}" class="text-lg font-extrabold text-primary">KENCANA</a>
-            <button id="close-menu-btn"
-                class="text-dark-grey hover:text-primary p-2 rounded-full hover:bg-light-bg transition">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+        class="w-full h-full bg-white shadow-2xl p-6 transform -translate-x-full transition-transform duration-300 ease-in-out overflow-y-auto">
+
+        <div class="flex justify-between items-center pb-5 border-b border-gray-100">
+            <a href="{{ url('/') }}" class="text-xl font-extrabold text-primary">
+                <img src="{{ asset('asset/Kencana Store.png') }}" alt="Logo Kencana" class="w-28 h-auto">
+            </a>
+            <button id="close-menu-btn" aria-label="Tutup Menu"
+                class="text-gray-500 hover:text-primary p-2 rounded-full transition duration-150 ease-in-out">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                     xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
                     </path>
                 </svg>
             </button>
+
         </div>
-        <div class="pt-4 space-y-3">
-            <a href="#"
-                class="block text-center border border-primary text-primary font-semibold py-2 rounded-lg transition duration-150 hover:bg-light-bg">Masuk</a>
-            <a href="#"
-                class="block text-center bg-primary text-white font-semibold py-2 rounded-lg transition duration-150 hover:bg-primary-dark">Daftar</a>
+
+        <div class="pt-6 pb-6 border-b border-gray-100">
+            @auth('customer')
+            <div class="flex items-center space-x-3 mb-4">
+                <span class="w-10 h-10 flex items-center justify-center bg-primary text-white text-lg font-bold rounded-full">
+                    {{ substr(auth('customer')->user()->full_name, 0, 1) }}
+                </span>
+                <div>
+                    <p class="font-bold text-gray-800 truncate">{{ auth('customer')->user()->full_name }}</p>
+                    <p class="text-sm text-gray-500">{{ auth('customer')->user()->email }}</p>
+                </div>
+            </div>
+
+            <a href="{{ route('member.index') }}" aria-label="Dashboard Akun"
+                class="block text-center border-2 border-primary bg-primary text-white font-bold py-2.5 rounded-xl transition duration-150 hover:bg-primary-dark hover:shadow-lg">
+                Dashboard Akun
+            </a>
+            <form action="{{ route('customer.logout') }}" method="POST" class="mt-2">
+                @csrf
+                <button type="submit" aria-label="Keluar dari Akun"
+                    class="w-full text-center bg-gray-200 text-gray-700 font-bold py-2.5 rounded-xl transition duration-150 hover:bg-gray-300 shadow-sm">
+                    Keluar (Logout)
+                </button>
+            </form>
+            @else
+            <div class="pt-2 space-y-3">
+                <a href="{{ route('customer.login') }}" aria-label="Masuk ke Akun Anda"
+                    class="block text-center border-2 border-primary text-primary font-bold py-2.5 rounded-xl transition duration-150 hover:bg-primary hover:text-white hover:shadow-lg">Masuk</a>
+                <a href="{{ route('customer.register') }}" aria-label="Daftar Akun Baru"
+                    class="block text-center bg-gray-200 text-gray-700 font-bold py-2.5 rounded-xl transition duration-150 hover:bg-gray-300 shadow-sm">Daftar</a>
+            </div>
+            @endauth
         </div>
-        <nav class="mt-6 space-y-2">
-            <a href="{{url('/')}}" class="block p-3 font-semibold text-dark-grey hover:bg-light-bg rounded-lg">Home</a>
-            <a href="{{url('/')}}" class="block p-3 font-semibold text-primary bg-light-bg rounded-lg">Kategori Produk</a>
-            <a href="{{url('/promo')}}" class="block p-3 font-semibold text-dark-grey hover:bg-light-bg rounded-lg">Promo</a>
-            <a href="{{url('/keranjang')}}" class="block p-3 font-semibold text-dark-grey hover:bg-light-bg rounded-lg">Keranjang</a>
-            <!-- <a href="#" class="block p-3 font-semibold text-dark-grey hover:bg-light-bg rounded-lg">Inspirasi & Ide</a> -->
-            <a href="#" class="block p-3 font-semibold text-dark-grey hover:bg-light-bg rounded-lg">Pusat
-                Bantuan</a>
+
+        <div class="mt-6 mb-6">
+            <p class="font-bold text-gray-800">Kencana Menu</p>
+
+        </div>
+
+        <nav class="mt-6 space-y-1">
+            {{-- Home --}}
+            <a href="{{ url('/') }}"
+                class="flex items-center p-3.5 font-semibold text-gray-700 hover:bg-gray-50 rounded-xl transition duration-150">
+                <span class="mr-3 text-xl w-8 text-center"><i class="fas fa-home text-gray-700"></i></span> Home
+            </a>
+
+            {{-- Kategori Produk (Accordion Style) --}}
+            <div class="relative">
+                <button id="mobile-category-btn"
+                    class="w-full flex items-center justify-between p-3.5 font-semibold text-gray-700 hover:bg-gray-50 rounded-xl transition duration-150">
+                    <div class="flex items-center">
+                        <span class="mr-3 text-xl w-8 text-center"><i class="fas fa-tags text-gray-700"></i></span>
+                        Kategori Produk
+                    </div>
+                    <i class="fas fa-chevron-down text-xs transition-transform duration-300" id="cat-chevron"></i>
+                </button>
+
+                {{-- Dropdown Content --}}
+                <div id="mobile-category-list" class="hidden overflow-hidden bg-gray-50 rounded-xl mt-1 ml-4 border-l-2 border-primary/20">
+                    @foreach($categoriesHeader as $category)
+                    <div class="border-b border-gray-100 last:border-0">
+                        <a href="{{ route('products.index', ['category' => $category->slug]) }}"
+                            class="flex items-center p-3 text-sm font-bold text-gray-700 hover:text-primary">
+                            {{ $category->name }}
+                        </a>
+
+                        @if($category->children->count() > 0)
+                        <ul class="pb-2 pl-4">
+                            @foreach($category->children as $child)
+                            <li>
+                                <a href="{{ route('products.index', ['category' => $child->slug]) }}"
+                                    class="block p-2 text-xs text-gray-500 hover:text-primary active:font-bold">
+                                    {{ $child->name }}
+                                </a>
+                            </li>
+                            @endforeach
+                        </ul>
+                        @endif
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+
+            {{-- Promo --}}
+            <a href="{{ url('/promo') }}"
+                class="flex items-center p-3.5 font-semibold text-gray-700 hover:bg-gray-50 rounded-xl transition duration-150">
+                <span class="mr-3 text-xl w-8 text-center"><i class="fas fa-fire text-gray-700"></i></span> Promo
+            </a>
+
+            {{-- Keranjang --}}
+            <a href="{{ url('/keranjang') }}"
+                class="flex items-center p-3.5 font-semibold text-gray-700 hover:bg-gray-50 rounded-xl transition duration-150">
+                <span class="mr-3 text-xl w-8 text-center"><i class="fas fa-shopping-cart text-gray-700"></i></span> Keranjang
+            </a>
         </nav>
-        <div class="mt-6 pt-4 border-t border-light-grey">
-            <h4 class="font-bold text-dark-grey mb-3">Layanan Lainnya</h4>
-            <a href="#" class="block text-sm p-3 text-dark-grey hover:bg-light-bg rounded-lg">Kencana Bisnis <span
-                    class="text-xs bg-primary text-white px-1 ml-1 rounded">NEW</span></a>
-            <!-- <a href="#" class="block text-sm p-3 text-dark-grey hover:bg-light-bg rounded-lg">Jasa Desain
-                    Interior</a> -->
-        </div>
+
+        <nav class="mt-6 pt-4 border-t border-gray-100 space-y-1">
+            <h4 class="font-bold text-gray-600 mb-3 text-sm uppercase tracking-wider">Informasi & Bantuan</h4>
+            <!-- lokasi toko -->
+            <a href="{{ route('branches.index') }}"
+                class="flex items-center p-3.5 font-semibold text-gray-700 hover:bg-primary-light hover:text-primary rounded-xl transition duration-150">
+                <span class="mr-3 text-xl"><i class="fas fa-map-marker-alt"></i></span> Lokasi Toko
+            </a>
+            <a href="{{ url('/faq') }}"
+                class="flex items-center p-3.5 font-semibold text-gray-700 hover:bg-primary-light hover:text-primary rounded-xl transition duration-150">
+                <span class="mr-3 text-xl"><i class="fas fa-question-circle"></i></span> FAQ
+            </a>
+            <a href="#"
+                class="flex items-center p-3.5 font-semibold text-gray-700 hover:bg-primary-light hover:text-primary rounded-xl transition duration-150">
+                <span class="mr-3 text-xl"><i class="fas fa-comments"></i></span> Pusat Bantuan
+            </a>
+            <!-- <a href="#" class="flex items-center p-3.5 font-semibold text-gray-700 hover:bg-primary-light hover:text-primary rounded-xl transition duration-150">
+                <span class="mr-3 text-xl"><i class="fas fa-briefcase"></i></span> Official Partner
+                <span class="text-xs bg-red-500 text-white font-medium px-2 py-0.5 ml-2 rounded-full transform -translate-y-px">NEW</span>
+            </a> -->
+        </nav>
+
     </div>
 </div>
 
+<header class="w-full shadow-md sticky top-0 z-[5] font-sans">
 
-<header class="shadow-md sticky top-0 z-50">
-    <!-- Top Bar (Hanya muncul di desktop/tablet) -->
-    <div class="bg-primary text-white text-sm hidden md:block">
-        <div class="container mx-auto px-4 py-2 flex justify-between items-center">
-            <div class="flex space-x-4">
-                <a href="#" class="flex items-center hover:text-primary">Download aplikasi</a>
-                <a href="#" class="flex items-center hover:text-primary">Pusat Bantuan</a>
-                <a href="#" class="flex items-center hover:text-primary">Kencana.com</a>
+    <div class="bg-primary py-2 md:py-3">
+        <div class="container mx-auto px-4 lg:px-[8%] flex items-center gap-3 md:gap-6">
+
+            <button id="open-menu-btn" class="md:hidden text-white">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+
+            <div class="shrink-0">
+                <a href="{{ url('/') }}">
+                    <img src="{{ asset('asset/Kencana Store Putih.png') }}" alt="Logo" class="w-10 md:w-28 h-auto">
+                </a>
             </div>
-            <div class="flex space-x-4">
-                <a href="#" class="flex items-center hover:text-primary">Kencana bisnis <span
-                        class="text-xs bg-primary text-white px-1 ml-1 rounded">NEW</span></a>
-                <!-- <a href="#" class="hover:text-primary">Jasa Desain Interior</a> -->
-                <a href="#" class="hover:text-primary">Gratis Ongkir</a>
+
+            <div class="hidden sm:block flex-1 max-w-2xl">
+                <form class="search-form flex bg-white rounded overflow-hidden p-0.5 shadow-sm border border-gray-100">
+                    <input type="text"
+                        class="search-input w-full px-4 py-2 text-sm text-gray-700 focus:outline-none"
+                        name="search"
+                        value="{{ request('search') }}"
+                        placeholder="Cari Merek, Nama, atau Tipe Produk..."
+                        autocomplete="off">
+                    <button type="submit" class="bg-primary text-white px-5 hover:bg-black transition">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
             </div>
+
+            <div class="flex items-center space-x-3 md:space-x-6 text-white ml-auto md:ml-0">
+
+
+                <a href="{{ url('/keranjang') }}" class="relative group flex items-center space-x-2">
+                    <div class="relative">
+                        <i class="fas fa-shopping-cart text-2xl md:text-2xl"></i>
+                        @if($cartCount > 0)
+                        <span class="absolute -top-2 -right-2 bg-yellow-400 text-black  font-black h-5 w-5 flex items-center justify-center rounded-full border-2 border-primary">{{ $cartCount }}</span>
+                        @endif
+                    </div>
+                    <span class=" leading-tight font-bold hidden md:block capitalize text-left">Keranjang</span>
+                </a>
+
+                <!-- whistlist -->
+                <a href="#" class="relative group flex items-center space-x-2">
+                    <div class="relative">
+                        <i class="fas fa-heart text-2xl md:text-2xl"></i>
+                    </div>
+                    <span class=" leading-tight font-bold hidden md:block capitalize text-left">Wishlist</span>
+                </a>
+
+                <!-- Notifikasi -->
+                <a href="#" class="relative group flex items-center space-x-2">
+                    <div class="relative">
+                        <i class="fas fa-bell text-2xl md:text-2xl"></i>
+                        @if($notificationCount ?? 0)
+                        <span class="absolute -top-2 -right-2 bg-yellow-400 text-black  font-black h-5 w-5 flex items-center justify-center rounded-full border-2 border-primary">{{ $notificationCount }}</span>
+                        @endif
+                    </div>
+                    <span class=" leading-tight font-bold hidden md:block capitalize text-left">Notifikasi</span>
+
+                    <!-- akun -->
+                    @auth('customer')
+                    <a href="{{ route('member.index') }}" class="relative group flex items-center space-x-2">
+                        <div class="relative">
+                            <i class="fas fa-user text-2xl md:text-2xl"></i>
+                        </div>
+                        <span class=" leading-tight font-bold hidden md:block capitalize text-left"> {{ Str::limit(auth('customer')->user()->full_name, 12) }}</span>
+                    </a>
+                    @else
+                    <a href="{{ route('customer.login') }}" class="relative group flex items-center space-x-2">
+                        <div class="relative">
+                            <i class="fas fa-user text-2xl md:text-2xl"></i>
+                        </div>
+                        <span class=" leading-tight font-bold hidden md:block capitalize text-left">Akun</span>
+                    </a>
+                    @endauth
+
+            </div>
+        </div>
+
+        <div class="px-4 mt-2 sm:hidden">
+            <form class="search-form flex bg-white rounded overflow-hidden p-0.5 shadow-sm border border-gray-100">
+                <input type="text"
+                    class="search-input w-full px-3 py-1.5 text-sm text-gray-700 focus:outline-none"
+                    name="search"
+                    value="{{ request('search') }}"
+                    placeholder="Cari di Kencana Store..."
+                    autocomplete="off">
+                <button type="submit" class="bg-[#cc0000] text-white px-4 hover:bg-black transition">
+                    <i class="fas fa-search"></i>
+                </button>
+            </form>
         </div>
     </div>
 
-    <div class="bg-primary text-white border-b border-gray-100">
-        <div class="container mx-auto px-4 py-3 md:py-4 flex items-center justify-between">
+    <div class="bg-white px-[1%] md:px-[3.5%] border-b border-gray-200 py-1 md:py-2">
+        <div class="container mx-auto px-4 lg:px-[8%] flex items-center justify-between">
+            <nav class="flex items-center space-x-5 text-[12px] md:text-[13px] font-bold text-gray-700 overflow-x-auto no-scrollbar whitespace-nowrap">
+                <button class="flex items-center text-primary js-dropdown-trigger" data-dropdown-id="category-dropdown-content">
+                    SEMUA KATEGORI
+                </button>
+                <div class="h-4 w-[1px] bg-gray-300 hidden md:block"></div>
+                <!-- <a href="#" class="hover:text-primary hidden md:block">Official Partner</a> -->
+                <a href="{{url('/promo')}}" class="hover:text-primary hidden md:block">Promo</a>
+                <a href="{{url('/faq')}}" class="hover:text-primary hidden md:block">FAQ</a>
+                <a href="{{route('branches.index')}}" class="hover:text-primary hidden md:block">Lokasi Toko</a>
+                <a href="#" class="hover:text-primary hidden md:block">Download APP</a>
+            </nav>
 
-            <div class="flex items-center space-x-2 md:space-x-6 flex-shrink-0">
-                <button id="open-menu-btn" class="md:hidden text-white p-1 hover:text-primary">☰</button>
+            <div class="flex items-center space-x-2 ml-4">
+                @auth('customer')
+                {{-- Tampilan Cabang --}}
+                <div class="flex flex-col items-end mr-4">
+                    <!-- <span class="text-[10px] text-gray-400 font-bold leading-none uppercase tracking-tight">Lokasi Belanja:</span> -->
 
-                <a href="#" class="flex flex-col items-center leading-none flex-shrink-0 mr-4">
-                    <div class="flex items-center bg-transparent p-1 rounded-md">
-                        <span class="text-2xl font-extrabold text-white ml-1">KENCANA</span>
-                    </div>
-                    <span class="text-xs text-white mt-0.5 hidden sm:block">sahabat bangunan anda</span>
-                </a>
-
-                <!-- <div class="hidden lg:flex font-semibold text-gray-700 space-x-6 text-base">
-                    <a href="{{url('/')}}" class="hover:text-primary transition duration-150">Kategori</a>
-                    <a href="{{url('/promo')}}" class="hover:text-primary transition duration-150">Promo</a>
-                </div> -->
-            </div>
-
-            <div class="flex-grow mx-2 md:mx-6 w-full max-w-lg lg:max-w-2xl">
-                <div class="flex border border-gray-300 rounded-lg overflow-hidden h-10">
-                    <input type="text" placeholder="Cari bantal"
-                        class="w-full py-2 px-4 text-sm text-gray-700 focus:outline-none focus:ring-0 bg-white placeholder-gray-400">
-                    <button
-                        class="bg-primary hover:bg-primary-dark text-white w-10 md:w-16 flex items-center justify-center transition duration-200 flex-shrink-0">
-                        <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                        </svg>
+                    {{-- Klik pada nama cabang langsung membuka modal --}}
+                    <button type="button" onclick="openBranchModal()"
+                        class="flex items-center text-primary hover:text-primary-dark transition-colors duration-200 group" title="{{ $currentBranch->name ?? 'pilih cabang'}}">
+                        <i class="fas fa-map-marker-alt mr-1.5 text-xs"></i>
+                        <span class="text-sm font-bold border-b border-dotted border-primary group-hover:border-primary-dark">
+                            {{$currentBranch != null ? Str::limit($currentBranch->name, 18, '...') : 'Pilih Cabang' }}
+                        </span>
+                        <i class="fas fa-chevron-down ml-1.5 text-[10px] opacity-50 group-hover:rotate-180 transition-transform"></i>
                     </button>
                 </div>
+                @else
+                {{-- Tampilan Cabang --}}
+                <div class="flex flex-col items-end mr-4">
+                    <!-- <span class="text-[10px] text-gray-400 font-bold leading-none uppercase tracking-tight">Lokasi Belanja:</span> -->
+
+                    {{-- Klik pada nama cabang langsung membuka modal --}}
+                    <button type="button" onclick="openBranchModal()"
+                        class="flex items-center text-primary hover:text-primary-dark transition-colors duration-200 group" title="{{ $currentBranch->name ?? 'pilih cabang'}}">
+                        <i class="fas fa-map-marker-alt mr-1.5 text-xs"></i>
+                        <span class="text-sm font-bold border-b border-dotted border-primary group-hover:border-primary-dark">
+                            {{$currentBranch != null ? Str::limit($currentBranch->name, 8, '...') : 'Pilih Cabang' }}
+                        </span>
+                        <i class="fas fa-chevron-down ml-1.5 text-[10px] opacity-50 group-hover:rotate-180 transition-transform"></i>
+                    </button>
+                </div>
+                <a href="{{ route('customer.login') }}" class="border border-primary text-primary px-5 py-1.5 rounded font-bold text-xs capitalize hover:bg-blue-50 transition">Login</a>
+                <a href="{{ route('customer.register') }}" class=" hidden md:block bg-primary text-white px-5 py-1.5 rounded font-bold text-xs capitalize hover:bg-[#002a54] transition shadow-sm">Daftar</a>
+                @endauth
             </div>
-
-            <div class="flex items-center space-x-3 md:space-x-4 flex-shrink-0 ml-4">
-
-                <button class="text-white hover:text-white relative p-1 md:p-2 hidden sm:block">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v2a2 2 0 11-4 0v-2m4 0H9"></path>
-                    </svg>
-                    <span class="absolute top-0 right-0 inline-flex items-center justify-center h-4 w-4 text-[10px] font-bold leading-none text-primary transform translate-x-1/2 -translate-y-1/2 bg-white rounded-full">3</span>
-                </button>
-
-                <button class="text-white hover:text-white relative p-1 md:p-2 hidden sm:block">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3-7 3V5z"></path>
-                    </svg>
-                </button>
-
-                <a href="{{ url('keranjang') }}" class="text-white hover:text-white relative p-1 md:p-2">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                    </svg>
-                    <span class="absolute top-0 right-0 inline-flex items-center justify-center h-4 w-4 text-[10px] font-bold leading-none text-primary transform translate-x-1/2 -translate-y-1/2 bg-white rounded-full">1</span>
-                </a>
-
-                <a href="#"
-                    class="bg-gray-200 text-gray-700 font-semibold py-1 px-3 rounded-full text-sm flex items-center space-x-1 hover:bg-gray-300 transition duration-150 hidden lg:flex">
-                    <svg class="w-4 h-4 text-gray-700" fill="currentColor" viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path d="M10 2a8 8 0 100 16 8 8 0 000-16zm-5 8a5 5 0 1110 0 5 5 0 01-10 0zM8 8a2 2 0 104 0 2 2 0 00-4 0z"></path>
-                    </svg>
-                    <span>Silver</span>
-                    <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                    </svg>
-                </a>
-
-                <div class="flex items-center space-x-1 text-white font-semibold hover:text-light-grey cursor-pointer hidden md:flex">
-                   
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                    </svg>
-                     <a href="{{url('/profile')}}">
-                    <span>Hi, Hairul Bahri</span>
-                     </a>
-                    <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                    </svg>
-                   
-                </div>
-            </div>
-        </div>
-
-
-    </div>
-
-    <!-- Bottom Bar (Category Slider & Dropdowns) -->
-    <div id="bottom-bar" class="bg-primary border-t border-b border-light-grey shadow-sm hidden md:block">
-        <div class="container mx-auto flex items-center relative">
-
-            <!-- Panah Kiri Slider Kategori (Fungsional) -->
-            <button id="category-scroll-left"
-                class=" hidden absolute left-0 top-0 bottom-0 px-2 bg-primary h-full flex items-center border-r border-light-grey shadow-lg cursor-pointer z-10 hover:bg-light-bg transition duration-150">
-                <svg class="w-4 h-4 text-dark-grey" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7">
-                    </path>
-                </svg>
-            </button>
-
-            <div id="category-list"
-                class="flex flex-1 mx-10 px-2 lg:mx-12 overflow-x-auto whitespace-nowrap scrollbar-hide scroll-smooth py-3">
-
-                <div class="group flex-shrink-0 category-link-container">
-                    <a href="#"
-                        class="category-link hover:text-light-grey font-medium py-1 inline-block transition duration-150 text-white">
-                        Kencana Bisnis <span class="text-xs bg-white text-primary px-1 ml-1 rounded">NEW</span>
-                    </a>
-                    <div id="dropdown-1" data-width="384px" class="js-dropdown-source hidden">
-                        <div class="flex p-5 text-dark-grey">
-                            <div class="w-1/2 pr-4 border-r border-light-grey">
-                                <h4 class="font-bold mb-2 text-sm">Layanan B2B</h4>
-                                <ul class="space-y-1 text-sm">
-                                    <li><a href="#" class="block hover:text-primary">Pengadaan Proyek</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Invoice & Pajak</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Kredit Term Of Payment</a></li>
-                                </ul>
-                            </div>
-                            <div class="w-1/2 pl-4">
-                                <h4 class="font-bold mb-2 text-sm">Keuntungan</h4>
-                                <ul class="space-y-1 text-sm">
-                                    <li><a href="#" class="block hover:text-primary">Harga Distributor</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Konsultasi Teknis</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Prioritas Pengiriman</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="group flex-shrink-0 category-link-container">
-                    <a href="#"
-                        class="category-link hover:text-light-grey font-medium py-1 inline-block transition duration-150 text-white">
-                        Official Partner
-                    </a>
-                    <div id="dropdown-2" data-width="384px" class="js-dropdown-source hidden">
-                        <div class="flex p-5 text-dark-grey">
-                            <div class="w-1/2 pr-4 border-r border-light-grey">
-                                <h4 class="font-bold mb-2 text-sm">Brand Baja</h4>
-                                <ul class="space-y-1 text-sm">
-                                    <li><a href="#" class="block hover:text-primary">Krakatau Steel</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Gunung Garuda</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Taso & Canal C</a></li>
-                                </ul>
-                            </div>
-                            <div class="w-1/2 pl-4">
-                                <h4 class="font-bold mb-2 text-sm">Layanan Partner</h4>
-                                <ul class="space-y-1 text-sm">
-                                    <li><a href="#" class="block hover:text-primary">Sertifikat SNI</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Program Loyalti</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Dukungan Garansi</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="group flex-shrink-0 category-link-container">
-                    <a href="{{url('/promo')}}"
-                        class="category-link hover:text-light-grey font-medium py-1 inline-block transition duration-150 text-white">
-                        Promo
-                    </a>
-                    <div id="dropdown-3" data-width="384px" class="js-dropdown-source hidden">
-                        <div class="flex p-5 text-dark-grey">
-                            <div class="w-1/2 pr-4 border-r border-light-grey">
-                                <h4 class="font-bold mb-2 text-sm">Diskon Baja</h4>
-                                <ul class="space-y-1 text-sm">
-                                    <li><a href="#" class="block hover:text-primary">Baja Ringan Promo</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Flash Sale Besi Beton</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Voucher Pengiriman</a></li>
-                                </ul>
-                            </div>
-                            <div class="w-1/2 pl-4">
-                                <h4 class="font-bold mb-2 text-sm">Penawaran Spesial</h4>
-                                <div
-                                    class="relative rounded-lg overflow-hidden h-20 bg-primary flex items-center justify-center text-center text-white p-2 shadow-md">
-                                    <h5 class="font-bold text-sm">Beli 5 Ton, Gratis 1 Kawat!</h5>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-              
-
-                <div class="group flex-shrink-0 category-link-container">
-                    <a href="{{url('/')}}"
-                        class="category-link hover:text-light-grey font-medium py-1 inline-block text-white border-b-2 border-white transition duration-150">
-                        Kategori
-                    </a>
-                    <div id="dropdown-5" data-width="900px" data-layout="center" class="js-dropdown-source hidden">
-                        <div class="flex p-6 text-dark-grey">
-                            <div class="w-1/5 pr-4 border-r border-light-grey">
-                                <h4 class="font-bold text-primary mb-3">Besi Beton</h4>
-                                <ul class="space-y-2 text-sm">
-                                    <li><a href="#" class="block hover:text-primary">Besi Polos SNI</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Besi Ulir SNI</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Besi Non-SNI</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Begel (Cincin)</a></li>
-                                </ul>
-
-                                <h4 class="font-bold text-primary mb-3 mt-4">Kawat & Mesh</h4>
-                                <ul class="space-y-2 text-sm">
-                                    <li><a href="#" class="block hover:text-primary">Kawat Bendrat</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Wiremesh</a></li>
-                                </ul>
-                            </div>
-                            <div class="w-1/5 px-4 border-r border-light-grey">
-                                <h4 class="font-bold text-primary mb-3">Baja Struktural</h4>
-                                <ul class="space-y-2 text-sm">
-                                    <li><a href="#" class="block hover:text-primary">Besi WF (Wide Flange)</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Besi H-Beam</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Plat Besi</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Besi Siku</a></li>
-                                </ul>
-
-                                <h4 class="font-bold text-primary mb-3 mt-4">Material Pondasi</h4>
-                                <ul class="space-y-2 text-sm">
-                                    <li><a href="#" class="block hover:text-primary">Semen</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Pasir & Agregat</a></li>
-                                </ul>
-                            </div>
-                            <div class="w-1/5 px-4 border-r border-light-grey">
-                                <h4 class="font-bold text-primary mb-3">Pipa & Profil</h4>
-                                <ul class="space-y-2 text-sm">
-                                    <li><a href="#" class="block hover:text-primary">Pipa Hitam</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Pipa Galvanis</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Besi UNP (Kanal U)</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Besi CNP (Kanal C)</a></li>
-                                </ul>
-
-                                <h4 class="font-bold text-primary mb-3 mt-4">Pagar & Tralis</h4>
-                                <ul class="space-y-2 text-sm">
-                                    <li><a href="#" class="block hover:text-primary">Pagar BRC</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Material Tralis</a></li>
-                                </ul>
-                            </div>
-                            <div class="w-2/5 pl-6">
-                                <h4 class="font-bold mb-3">Panduan dan Inspirasi Proyek</h4>
-                                <div class="space-y-4">
-                                    <div
-                                        class="flex items-center space-x-3 bg-light-bg rounded-lg p-3 hover:bg-light-bg/70 transition">
-                                        <div class="h-16 w-16 bg-light-grey rounded-lg flex-shrink-0">
-
-
-                                            [Image]
-
-                                        </div>
-                                        <div>
-                                            <p class="font-semibold text-sm">Cara Menghitung Kebutuhan Besi Beton</p>
-                                            <span class="text-xs text-primary">Lihat Kalkulator →</span>
-                                        </div>
-                                    </div>
-                                    <div
-                                        class="flex items-center space-x-3 bg-light-bg rounded-lg p-3 hover:bg-light-bg/70 transition">
-                                        <div class="h-16 w-16 bg-light-grey rounded-lg flex-shrink-0">
-
-
-                                            [Image]
-
-                                        </div>
-                                        <div>
-                                            <p class="font-semibold text-sm">Perbedaan Baja WF, H-Beam, dan Kanal C</p>
-                                            <span class="text-xs text-primary">Baca Artikel Teknis →</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="group flex-shrink-0 category-link-container">
-                    <a href="#"
-                        class="category-link hover:text-light-grey font-medium py-1 inline-block transition duration-150 text-white">
-                        Kegiatan
-                    </a>
-                    <!-- <div id="dropdown-6" data-width="384px" class="js-dropdown-source hidden">
-                        <div class="flex p-5 text-dark-grey">
-                            <div class="w-1/2 pr-4 border-r border-light-grey">
-                                <h4 class="font-bold mb-2 text-sm">Atap Metal</h4>
-                                <ul class="space-y-1 text-sm">
-                                    <li><a href="#" class="block hover:text-primary">Spandek</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Genteng Metal</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Seng Galvalum</a></li>
-                                </ul>
-                            </div>
-                            <div class="w-1/2 pl-4">
-                                <h4 class="font-bold mb-2 text-sm">Material Lain</h4>
-                                <ul class="space-y-1 text-sm">
-                                    <li><a href="#" class="block hover:text-primary">Genteng Beton</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Insulasi Atap</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Material Talang</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div> -->
-                </div>
-
-                <div class="group flex-shrink-0 category-link-container">
-                    <a href="{{url('faq')}}"
-                        class="category-link hover:text-light-grey font-medium py-1 inline-block transition duration-150 text-white">
-                        FAQ
-                    </a>
-                    <!-- <div id="dropdown-7" data-width="384px" class="js-dropdown-source hidden">
-                        <div class="flex p-5 text-dark-grey">
-                            <div class="w-1/2 pr-4 border-r border-light-grey">
-                                <h4 class="font-bold mb-2 text-sm">Alat & Mesin</h4>
-                                <ul class="space-y-1 text-sm">
-                                    <li><a href="#" class="block hover:text-primary">Mesin Las</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Gerinda Pemotong</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Perkakas Tangan</a></li>
-                                </ul>
-                            </div>
-                            <div class="w-1/2 pl-4">
-                                <h4 class="font-bold mb-2 text-sm">Perlengkapan K3</h4>
-                                <ul class="space-y-1 text-sm">
-                                    <li><a href="#" class="block hover:text-primary">Helm Proyek</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Sarung Tangan Safety</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Sepatu Safety</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div> -->
-                </div>
-
-                <!-- <div class="group flex-shrink-0 category-link-container">
-                    <a href="#"
-                        class="category-link hover:text-light-grey font-medium py-1 inline-block transition duration-150 text-dark-grey">
-                        Finishing & Pengecatan
-                    </a>
-                    <div id="dropdown-8" data-width="384px" class="js-dropdown-source hidden">
-                        <div class="flex p-5 text-dark-grey">
-                            <div class="w-1/2 pr-4 border-r border-light-grey">
-                                <h4 class="font-bold mb-2 text-sm">Cat & Pelapis</h4>
-                                <ul class="space-y-1 text-sm">
-                                    <li><a href="#" class="block hover:text-primary">Cat Anti Karat</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Cat Dasar (Primer)</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Cat Besi/Kayu</a></li>
-                                </ul>
-                            </div>
-                            <div class="w-1/2 pl-4">
-                                <h4 class="font-bold mb-2 text-sm">Aksesoris</h4>
-                                <ul class="space-y-1 text-sm">
-                                    <li><a href="#" class="block hover:text-primary">Kuas & Roller</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Tiner & Pelarut</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Amplifier</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="group flex-shrink-0 category-link-container">
-                    <a href="#"
-                        class="category-link hover:text-light-grey font-medium py-1 inline-block transition duration-150 text-dark-grey">
-                        Pintu & Jendela
-                    </a>
-                    <div id="dropdown-9" data-width="384px" class="js-dropdown-source hidden">
-                        <div class="flex p-5 text-dark-grey">
-                            <div class="w-1/2 pr-4 border-r border-light-grey">
-                                <h4 class="font-bold mb-2 text-sm">Pintu</h4>
-                                <ul class="space-y-1 text-sm">
-                                    <li><a href="#" class="block hover:text-primary">Pintu Baja</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Pintu PVC/Aluminium</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Kunci & Engsel</a></li>
-                                </ul>
-                            </div>
-                            <div class="w-1/2 pl-4">
-                                <h4 class="font-bold mb-2 text-sm">Jendela</h4>
-                                <ul class="space-y-1 text-sm">
-                                    <li><a href="#" class="block hover:text-primary">Kusen Aluminium</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Jendela Kaca</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Aksesoris Jendela</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="group flex-shrink-0 category-link-container">
-                    <a href="#"
-                        class="category-link hover:text-light-grey font-medium py-1 inline-block transition duration-150 text-dark-grey">
-                        Peralatan Plumbing
-                    </a>
-                    <div id="dropdown-10" data-width="384px" class="js-dropdown-source hidden">
-                        <div class="flex p-5 text-dark-grey">
-                            <div class="w-1/2 pr-4 border-r border-light-grey">
-                                <h4 class="font-bold mb-2 text-sm">Pipa</h4>
-                                <ul class="space-y-1 text-sm">
-                                    <li><a href="#" class="block hover:text-primary">Pipa PVC</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Pipa Air Panas</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Fitting Pipa</a></li>
-                                </ul>
-                            </div>
-                            <div class="w-1/2 pl-4">
-                                <h4 class="font-bold mb-2 text-sm">Sanitasi</h4>
-                                <ul class="space-y-1 text-sm">
-                                    <li><a href="#" class="block hover:text-primary">Keran & Valve</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Wastafel</a></li>
-                                    <li><a href="#" class="block hover:text-primary">Saluran Air</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div> -->
-            </div>
-
-            <!-- Panah Kanan Slider Kategori (Fungsional) -->
-            <button id="category-scroll-right"
-                class=" hidden absolute right-0 top-0 bottom-0 px-2 bg-white h-full flex items-center border-l border-light-grey shadow-lg cursor-pointer z-10 hover:bg-light-bg transition duration-150">
-                <svg class="w-4 h-4 text-dark-grey" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                </svg>
-            </button>
         </div>
     </div>
 </header>
 
-<!-- GLOBAL DROPDOWN CONTAINER -->
-<div id="global-dropdown" class="fixed hidden bg-white shadow-2xl rounded-lg border border-light-grey z-[90]"
-    style="transition: opacity 0.1s ease;">
-    <!-- Konten akan di-inject di sini oleh JavaScript -->
+<div id="category-dropdown-content" class="hidden">
+    <div class="w-[280px] bg-white rounded-b-lg border-t-2 border-primary py-2">
+        @foreach($categoriesHeader as $category)
+        <a href="{{ route('products.index', ['category' => $category->slug]) }}" class="flex items-center justify-between px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-red-50 hover:text-primary border-b border-gray-50 last:border-0">
+            {{ $category->name }}
+            <i class="fas fa-chevron-right  opacity-30"></i>
+        </a>
+        @endforeach
+    </div>
 </div>
+
+
+
+<div id="global-dropdown" class="fixed hidden bg-white shadow-xl rounded-b-xl border border-gray-100 z-[100] opacity-0 transition-opacity duration-200"></div>
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const mobileMenu = document.getElementById('mobile-menu');
+        const drawer = document.getElementById('mobile-menu-drawer');
+        const openBtn = document.getElementById('open-menu-btn');
+        const closeBtn = document.getElementById('close-menu-btn');
+
+        // Drawer Logic
+        const toggleMenu = (isOpen) => {
+            if (isOpen) {
+                mobileMenu.classList.remove('hidden');
+                setTimeout(() => {
+                    mobileMenu.classList.add('opacity-100');
+                    drawer.classList.remove('-translate-x-full');
+                }, 10);
+                document.body.style.overflow = 'hidden'; // Lock scroll
+            } else {
+                mobileMenu.classList.remove('opacity-100');
+                drawer.classList.add('-translate-x-full');
+                setTimeout(() => {
+                    mobileMenu.classList.add('hidden');
+                }, 300);
+                document.body.style.overflow = '';
+            }
+        };
+
+        openBtn.addEventListener('click', () => toggleMenu(true));
+        closeBtn.addEventListener('click', () => toggleMenu(false));
+        mobileMenu.addEventListener('click', (e) => {
+            if (e.target === mobileMenu) toggleMenu(false);
+        });
+
+        // Accordion Kategori Mobile
+        const catBtn = document.getElementById('mobile-category-btn');
+        const catList = document.getElementById('mobile-category-list');
+        const chevron = document.getElementById('cat-chevron');
+
+        if (catBtn) {
+            catBtn.addEventListener('click', () => {
+                const isHidden = catList.classList.toggle('hidden');
+                chevron.style.transform = isHidden ? 'rotate(0deg)' : 'rotate(180deg)';
+            });
+        }
+
+        // Global Dropdown Logic (Tetap seperti sebelumnya namun dengan style update)
+        // ... (Logika showDropdown Anda sudah bagus, biarkan tetap ada)
+        // --- DESKTOP DROPDOWN LOGIC ---
+        const globalDropdown = document.getElementById('global-dropdown');
+        const triggers = document.querySelectorAll('.js-dropdown-trigger');
+        let hideTimeout;
+
+        const showDropdown = (trigger) => {
+            clearTimeout(hideTimeout);
+            const contentId = trigger.getAttribute('data-dropdown-id');
+            const source = document.getElementById(contentId);
+
+            if (source) {
+                globalDropdown.innerHTML = source.innerHTML;
+                globalDropdown.classList.remove('hidden');
+
+                const rect = trigger.getBoundingClientRect();
+                globalDropdown.style.top = `${rect.bottom}px`;
+                globalDropdown.style.left = `${rect.left}px`;
+                globalDropdown.style.width = `300px`; // Set fixed width
+
+                setTimeout(() => globalDropdown.style.opacity = '1', 50);
+            }
+        };
+
+        triggers.forEach(t => {
+            t.addEventListener('mouseenter', () => showDropdown(t));
+            t.addEventListener('mouseleave', () => {
+                hideTimeout = setTimeout(() => {
+                    globalDropdown.style.opacity = '0';
+                    setTimeout(() => globalDropdown.classList.add('hidden'), 200);
+                }, 150);
+            });
+        });
+
+        globalDropdown.addEventListener('mouseenter', () => clearTimeout(hideTimeout));
+        globalDropdown.addEventListener('mouseleave', () => {
+            globalDropdown.style.opacity = '0';
+            setTimeout(() => globalDropdown.classList.add('hidden'), 200);
+        });
+
+    });
+</script>
+@endpush

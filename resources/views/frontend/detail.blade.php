@@ -2,14 +2,13 @@
 
 @section('content')
 
-<div class="modal-location fixed inset-0 bg-transparent bg-opacity-50 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-opacity duration-300"
+<div class="modal-location fixed inset-0  bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-opacity duration-300"
     id="location-modal"
     role="dialog"
     aria-modal="true"
     aria-labelledby="modal-title">
 
     <div class="bg-white rounded-xl w-full max-w-lg shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300 max-h-[90vh] flex flex-col" role="document">
-
         {{-- Header Modal --}}
         <div class="p-5 border-b border-light-grey/50 flex justify-between items-center flex-shrink-0">
             <h2 id="modal-title" class="text-xl font-extrabold text-dark-grey">Daftar Lokasi</h2>
@@ -36,37 +35,55 @@
             </div>
         </div>
 
-        {{-- Location List --}}
-        <div class="flex-grow overflow-y-auto px-5 pb-5 space-y-3">
 
+
+        {{-- Location List di dalam Modal --}}
+        <div class="flex-grow overflow-y-auto px-5 pb-5 space-y-3">
+            @forelse ($inventory_data as $data)
             @php
-            $locations = [
-            ['name' => 'INFORMA Pondok Indah', 'address' => 'Jl. Sultan Iskandar Muda no 19 Arteri Pondok Indah 12240', 'distance' => '1.84 km', 'status' => 'Tersedia', 'color' => 'text-green-600'],
-            ['name' => 'INFORMA Living Plaza Palem Semi', 'address' => 'Jl. Palem Raja Raya, RT.001/RW.009, Bencongan Indah, Kec. Klp. Dua, Kota Tangerang, Banten', 'distance' => '19.88 km', 'status' => 'Tersedia', 'color' => 'text-green-600'],
-            ['name' => 'INFORMA Grand Metropolitan', 'address' => 'MALL GRAND METROPOLITAN LANTAI 1, Jl. K.H. Noer Ali RT.007/RW.003, Pekayon Jaya, Kec. Bekasi Selatan, Kota Bekasi, Jawa Barat 17148', 'distance' => '22.15 km', 'status' => 'Tersedia', 'color' => 'text-green-600'],
-            ['name' => 'INFORMA Aeon Mall BSD', 'address' => 'AEON Mall BSD City Lantai 3, Jl. BSD Raya Utama, Pagedangan, Tangerang, Banten 15339', 'distance' => '25.50 km', 'status' => 'Terbatas', 'color' => 'text-orange-500'],
-            ['name' => 'INFORMA Cihampelas Walk', 'address' => 'Cihampelas Walk Cihampelas Walk Lantai LG, Jl. Cihampelas No.160, Bandung', 'distance' => '150.00 km', 'status' => 'Tidak Tersedia', 'color' => 'text-red-600'],
-            ];
+            $statusColor = $data['status_color_class'];
+            $distance = $data['distance_display'];
+            // Cek apakah ini branch yang sedang aktif
+            $isSelected = ($currentBranch && $currentBranch->id == $data['branch_id']);
             @endphp
 
-            @foreach ($locations as $location)
-            <label class="p-4 border border-light-grey rounded-lg hover:bg-light-bg/50 transition duration-150 cursor-pointer flex items-center justify-between"
-                data-store-name="{{ $location['name'] }}"
-                data-store-status="{{ $location['status'] }}"
-                data-status-color="{{ $location['color'] }}"> {{-- Tambahkan data status --}}
+
+
+            <label class="p-4 border {{ $isSelected ? 'border-primary bg-primary/5' : 'border-light-grey' }} rounded-lg hover:bg-light-bg/50 transition duration-150 cursor-pointer flex items-center justify-between"
+                data-store-id="{{ $data['branch_id'] }}"
+                data-store-name="{{ $data['branch_name'] }}"
+                data-store-full-status="{{ $data['status_label'] }}"
+                data-status-color="{{ $data['status_color_class'] }}"
+                data-distance-value="{{ $data['distance_value'] }}">
+
                 <div class="flex-grow pr-4">
-                    <p class="font-bold text-dark-grey text-sm">{{ $location['name'] }}</p>
-                    <p class="text-xs text-dark-grey/80">{{ $location['address'] }}</p>
-                    <p class="text-xs text-primary font-semibold mt-1">{{ $location['distance'] }}</p>
-                    <p class="text-xs {{ $location['color'] }} font-semibold mt-1" data-status-text>{{ $location['status'] }}</p> {{-- Tampilkan status --}}
+                    <p class="font-bold text-dark-grey text-sm">
+                        {{ $data['branch_name'] }}
+                        @if($isSelected)
+                        <span class="ml-2 px-2 py-0.5 text-xs font-semibold bg-green-500 text-white rounded-full">Aktif</span>
+                        @endif
+                    </p>
+                    <p class="text-xs text-dark-grey/80">{{ $data['branch_address'] }}</p>
+                    <!-- <p class="text-xs text-primary font-semibold mt-1">{{ $distance }}</p> -->
+                    <p class="text-xs {{ $statusColor }} font-semibold mt-1">
+                        {{ $data['status_label'] }}
+                    </p>
                 </div>
+
                 <div class="flex-shrink-0">
-                    <input type="radio" name="selected_store" value="{{ $location['name'] }}" data-store-distance="{{ $location['distance'] }}" data-store-full-status="{{ $location['status'] }}" class="text-primary focus:ring-primary h-4 w-4 border-light-grey">
+                    <input type="radio" name="selected_store"
+                        value="{{ $data['branch_id'] }}"
+                        {{ $isSelected ? 'checked' : '' }} {{-- AUTO CHECK DISINI --}}
+                        data-store-distance="{{ $distance }}"
+                        data-store-full-status="{{ $data['status_label'] }}"
+                        class="text-primary focus:ring-primary h-4 w-4 border-light-grey">
                 </div>
             </label>
-            @endforeach
-
+            @empty
+            <p class="text-center py-8 text-dark-grey/80">Mohon maaf, stok produk ini sedang habis di semua cabang.</p>
+            @endforelse
         </div>
+
 
         {{-- Footer Modal --}}
         <div class="p-5 border-t border-light-grey/50 flex justify-end space-x-3 flex-shrink-0">
@@ -80,74 +97,226 @@
     </div>
 </div>
 
+{{-- 🖼️ IMAGE LIGHTBOX/MODAL (Tidak diubah) --}}
+<div class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-[9999] opacity-0 pointer-events-none transition-opacity duration-300"
+    id="image-lightbox"
+    role="dialog"
+    aria-modal="true"
+    aria-hidden="true"
+    aria-labelledby="lightbox-title"
+    onclick="closeLightbox()">
 
-<section class="container px-1 lg:px-[7%] mx-auto ">
+    <div class="relative max-w-5xl w-full max-h-[90vh] flex items-center justify-center" onclick="event.stopPropagation()">
+        <h2 id="lightbox-title" class="sr-only">Tampilan Penuh Gambar Produk</h2>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-10 bg-white shadow-sm mt-8 mb-8">
+        <button type="button"
+            class="absolute top-4 right-4 z-10 text-white text-3xl p-2 rounded-full bg-black/50 hover:bg-black/80 transition"
+            onclick="closeLightbox()"
+            aria-label="Tutup Tampilan Gambar">
+            <i class="fas fa-times"></i>
+        </button>
+
+        <img id="lightbox-image-content"
+            src=""
+            alt="Gambar Produk Besar"
+            class="max-w-full max-h-[90vh] object-contain cursor-pointer"
+            onclick="closeLightbox()">
+    </div>
+</div>
+
+@if(isset($customer_addresses) && count($customer_addresses) > 0)
+<div class="modal-address fixed inset-0 bg-transparent bg-opacity-50 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-opacity duration-300"
+    id="customer-address-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="address-modal-title">
+
+    <div class="bg-white rounded-xl w-full max-w-lg shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300 max-h-[90vh] flex flex-col" role="document">
+        {{-- Header Modal --}}
+        <div class="p-5 border-b border-light-grey/50 flex justify-between items-center flex-shrink-0">
+            <h2 id="address-modal-title" class="text-xl font-extrabold text-dark-grey">Pilih Alamat Pengiriman</h2>
+            <button type="button" class="text-dark-grey/50 hover:text-primary" onclick="closeAddressModal()" aria-label="Tutup Modal Alamat">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+
+        {{-- Search (Opsional) & Info --}}
+        <div class="p-5 flex flex-col space-y-4 flex-shrink-0">
+            <div class="p-3 bg-blue-100 border border-blue-300 rounded-lg text-sm flex items-start space-x-2" role="alert">
+                <i class="fas fa-info-circle text-blue-600 mt-0.5" aria-hidden="true"></i>
+                <p class="text-dark-grey/80 text-xs md:text-sm">
+                    Alamat ini akan digunakan untuk perhitungan estimasi biaya dan waktu pengiriman.
+                </p>
+            </div>
+            <a href="{{ url('customer/addresses/create') }}" class="w-full text-center py-2 text-sm bg-light-bg border border-light-grey rounded-lg text-dark-grey/80 font-semibold hover:bg-light-grey/50 transition duration-150">
+                + Tambah Alamat Baru
+            </a>
+        </div>
+
+
+        {{-- Address List --}}
+        <div class="flex-grow overflow-y-auto px-5 pb-5 space-y-3">
+
+            {{-- Ambil data dari Controller: $customer_addresses --}}
+            @foreach ($customer_addresses as $address)
+            <label class="p-4 border border-light-grey rounded-lg hover:bg-light-bg/50 transition duration-150 cursor-pointer flex items-start justify-between address-option"
+                data-address-id="{{ $address->id }}"
+                data-address-label="{{ $address->label }}"
+                data-address-street="{{ $address->street }}"
+                data-address-city="{{ $address->city }}">
+
+                <div class="flex-grow pr-4">
+                    <p class="font-bold text-dark-grey text-sm flex items-center">
+                        {{ $address->label }}
+                        @if ($address->is_default)
+                        <span class="ml-2 px-2 py-0.5 bg-primary/10 text-primary text-xs font-bold rounded-full">Utama</span>
+                        @endif
+                    </p>
+                    <p class="text-xs text-dark-grey/80 mt-1">{{ $address->street }}, {{ $address->city }}, {{ $address->province }} ({{ $address->postal_code }})</p>
+                    <p class="text-xs text-dark-grey/80 pt-1">Telp: {{ $address->phone }}</p>
+                </div>
+                <div class="flex-shrink-0 pt-1">
+                    {{-- Radio button value diset ke ID alamat --}}
+                    <input type="radio" name="selected_address"
+                        value="{{ $address->id }}"
+                        @if ($address->is_default) checked @endif
+                    class="text-primary focus:ring-primary h-4 w-4 border-light-grey address-radio">
+                </div>
+            </label>
+            @endforeach
+
+        </div>
+
+        {{-- Footer Modal --}}
+        <div class="p-5 border-t border-light-grey/50 flex justify-end space-x-3 flex-shrink-0">
+            <button class="px-6 py-2 rounded-lg border border-light-grey text-dark-grey font-semibold hover:bg-light-bg transition" onclick="closeAddressModal()">
+                Tutup
+            </button>
+            <button id="select-address-button" type="button" class="px-6 py-2 rounded-lg bg-primary text-white font-semibold transition" disabled>
+                Pilih Alamat
+            </button>
+        </div>
+    </div>
+</div>
+@endif
+
+<section class="container lg:px-[8%] mx-auto ">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 lg:py-2 bg-white shadow-sm mt-8 mb-8">
 
         <div>
-            {{-- Mengganti h1 di sini dengan nama produk sebagai h1 utama di bawah untuk SEO yang lebih baik --}}
             <h2 class="text-xl font-extrabold text-dark-grey mb-6">Detail Produk</h2>
         </div>
 
+        {{-- START: TATA LETAK 3 KOLOM UTAMA --}}
         <div class="lg:grid lg:grid-cols-12 lg:gap-8">
 
-            <div class="lg:col-span-7 space-y-4">
+            {{-- 1. KOLOM GAMBAR (lg:col-span-4) --}}
+            <div class="lg:col-span-4 space-y-4">
                 {{-- Product Image Gallery --}}
                 <div class="flex flex-col space-y-4">
-                    {{-- Main Image Area --}}
                     <div class="flex-grow">
-                        <div class="w-full aspect-square bg-light-bg rounded-lg shadow-md flex items-center justify-center overflow-hidden">
+                        {{-- Main Image Dinamis (Diklik untuk Lightbox) --}}
+                        <div class="w-full aspect-square bg-light-bg rounded-lg shadow-md flex items-center justify-center overflow-hidden cursor-pointer"
+                            onclick="openLightbox('{{ $product_main_image }}')"
+                            role="button"
+                            tabindex="0"
+                            aria-label="Klik untuk melihat gambar produk lebih besar">
                             <img id="main-product-image"
-                                src="https://image1ws.indotrading.com/s3/productimages/webp/co228746/p778217/w600-h600/385b7c34-ae39-462c-b059-a3f2b9122566.png"
-                                alt="Informa Carson Sofa Bed Moduler Sudut Fabric Kiri - Abu-abu"
-                                class="object-cover w-full h-full transition-opacity duration-300">
+                                src="{{ $product_main_image }}"
+                                alt="{{ $product->name }}"
+                                class="object-contain w-full h-full transition-opacity duration-300">
                         </div>
                     </div>
 
+                    {{-- Thumbnail Gallery Dinamis --}}
                     <div class="flex space-x-4">
                         <div class=" flex space-x-2 overflow-x-auto w-full pb-1">
-                            <div class="thumbnail flex-shrink-0 w-16 h-16 bg-light-bg border-2 border-primary rounded-lg cursor-pointer flex items-center justify-center"
-                                data-image="https://image1ws.indotrading.com/s3/productimages/webp/co228746/p778217/w600-h600/385b7c34-ae39-462c-b059-a3f2b9122566.png"
-                                tabindex="0" role="button" aria-label="Gambar Produk 1: Sofa Bed Moduler Kiri">
-                                <span class="text-xs text-light-grey">Gbr 1</span>
+                            @foreach ($product_images as $index => $image)
+                            @php
+                            $isActive = ($image['url'] == $product_main_image);
+                            $class = $isActive
+                            ? 'border-2 border-primary'
+                            : 'border border-light-grey';
+                            @endphp
+                            <div class="thumbnail flex-shrink-0 w-16 h-16 bg-light-bg {{ $class }} rounded-lg cursor-pointer flex items-center justify-center overflow-hidden"
+                                data-image="{{ $image['url'] }}"
+                                tabindex="0"
+                                role="button"
+                                aria-label="Gambar Produk {{ $index + 1 }}: {{ $product->name }}">
+                                <img src="{{ $image['url'] }}" alt="{{ $product->name }} Thumbnail {{ $index + 1 }}" class="object-contain p-2 w-full h-full">
                             </div>
-                            <div class="thumbnail flex-shrink-0 w-16 h-16 bg-light-bg border border-light-grey rounded-lg cursor-pointer flex items-center justify-center"
-                                data-image="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSV_4jimNfbjtF9fOFwBQKsuUMly0IF6-L3NA&s"
-                                tabindex="0" role="button" aria-label="Gambar Produk 2: Detail Sandaran">
-                                <span class="text-xs text-light-grey">Gbr 2</span>
-                            </div>
-                            <div class="thumbnail flex-shrink-0 w-16 h-16 bg-light-bg border border-light-grey rounded-lg cursor-pointer flex items-center justify-center"
-                                data-image="https://image1ws.indotrading.com/s3/productimages/webp/co228746/p778217/w600-h600/65a1dec1-58a1-4cfb-94bd-26454d0750ec.png"
-                                tabindex="0" role="button" aria-label="Gambar Produk 3: Sofa Dalam Mode Tidur">
-                                <span class="text-xs text-light-grey">Gbr 3</span>
-                            </div>
-
+                            @endforeach
                         </div>
                     </div>
-
                 </div>
+            </div>
 
-                <div class="p-0 sm:p-4">
-                    {{-- Product Title and Info (Primary H1 for SEO) --}}
+
+            {{-- 2. KOLOM DESKRIPSI & INFO (lg:col-span-4) --}}
+            <div class="lg:col-span-4 mt-6 lg:mt-0">
+                <div class="p-0 sm:p-0">
+                    {{-- Product Title and Info --}}
                     <h1 class="text-2xl font-extrabold text-dark-grey mb-1">
-                        Kedai Steel Door Motif Kayu
+                        {{ $product->name }}
                     </h1>
-                    <p class="text-sm text-dark-grey/80 mb-3">
-                        <span class="font-bold">1</span> Ulasan | Brand: <span class="font-bold text-primary">Kedai Steel Door</span>
+                    <p class="text-sm text-dark-grey/80 mb-4">
+                        <span class="font-bold">{{ $product->reviews->count() }}</span> Ulasan | Variant:
+                        <span class="font-bold text-primary" id="current-variant-name">
+                            {{ $product->variants[0]->variant_name ?? 'Pilih Varian' }}
+                        </span>
                     </p>
 
-                    <p class="text-3xl font-extrabold text-primary mb-2" id="current-price">Rp450.000</p>
+                    {{-- Harga Dinamis --}}
+                    <p class="text-3xl font-extrabold text-primary mb-4" id="current-price">
+                        Rp {{ number_format($product->variants[0]->price ?? 0, 0, ',', '.') }}
+                    </p>
 
+                    {{-- PEMILIHAN VARIAN --}}
+                    @if(count($product->variants) > 0)
+                    <div class="mb-4 pt-2">
+                        <p class="text-dark-grey font-semibold text-sm mb-2">Pilih Varian:</p>
+                        <div class="flex flex-wrap gap-3 variant-selection" role="radiogroup">
+                            @foreach ($product->variants as $index => $variant)
+                            @php
+                            $isChecked = $index === 0;
+                            // Pastikan URL gambar diambil dari array images variant
+                            $variant_image = (isset($variant->images) && count($variant->images) > 0)
+                            ? env('APP_URL_BE') . '/' . $variant->images[0]->url
+                            : $product_main_image;
+                            @endphp
+
+                            <label class="p-3 border rounded-lg cursor-pointer transition duration-150 ease-in-out flex items-center space-x-2 text-sm font-semibold {{ $isChecked ? 'border-primary bg-primary/10' : 'border-light-grey hover:border-dark-grey/50' }}">
+                                <input type="radio"
+                                    name="product_variant"
+                                    value="{{ $variant->id }}"
+                                    data-price="{{ number_format($variant->price, 0, '', '.') }}" {{-- Format tanpa titik untuk JS parsing --}}
+                                    data-image-url="{{ $variant_image }}"
+                                    data-variant-name="{{ $variant->variant_name }}"
+                                    class="sr-only"
+                                    {{ $isChecked ? 'checked' : '' }}>
+
+                                <img src="{{ $variant_image }}" alt="{{ $variant->variant_name }}" class="w-8 h-8 object-contain rounded-md flex-shrink-0">
+                                <span class="text-dark-grey">{{ $variant->variant_name }} ({{ $variant->unit->name ?? '-' }})</span>
+                            </label>
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
 
                     <div class="divider h-px bg-light-grey/50 mb-4"></div>
 
-                    {{-- Location Check --}}
-                    <div class="flex items-start space-x-6 text-sm text-dark-grey/80">
+                    {{-- Ketersediaan Stok (Baru) --}}
+                    <div class="mb-4 flex items-center space-x-2">
+                        <span class="text-sm font-semibold text-dark-grey">Stok di Cabang Ini:</span>
+                        <span id="variant-stock-display" class="text-sm font-bold">Memuat...</span>
+                    </div>
 
+                    {{-- Location Check --}}
+                    <div class="flex flex-col sm:flex-row items-start space-y-4 sm:space-y-0 sm:space-x-6 text-sm text-dark-grey/80">
                         <div class="flex flex-col space-y-1">
                             <div class="flex items-center space-x-2">
-                                <i class="fas fa-map-marker-alt text-primary flex-shrink-0" aria-hidden="true"></i>
+                                <i class="fas fa-map-marker-alt text-primary flex-shrink-0"></i>
                                 <span class="text-dark-grey font-semibold">Cek Lokasi Ketersediaan</span>
                             </div>
                             <div id="check-availability-button" class="cursor-pointer group" onclick="openLocationModal()">
@@ -155,229 +324,170 @@
                                     Pilih Lokasi
                                 </p>
                                 <p id="store-status" class="text-xs text-dark-grey/80 pt-1">
-                                    Produk dapat diambil atau dikirim | <a href="#" class="underline">Lihat Lokasi</a>
+                                    Memuat status lokasi... | <span class="underline text-primary">Ubah Lokasi</span>
                                 </p>
                             </div>
                         </div>
 
-                        <div class="flex items-center space-x-2 flex-col items-start hidden sm:flex">
+                        <div class="flex flex-col space-y-1 hidden sm:flex border-l border-light-grey/50 pl-6">
                             <div class="flex items-center space-x-2">
-                                <i class="fas fa-truck text-primary" aria-hidden="true"></i>
+                                <i class="fas fa-truck text-primary"></i>
                                 <span class="text-dark-grey font-semibold">Lokasi Pengiriman</span>
                             </div>
-                            <p class="text-xs text-primary pt-1">Cek estimasi pengiriman ke | <a href="#" class="underline">Atur Alamat</a></p>
+                            <div id="shipping-address-display" class="pt-1">
+                                @if(isset($customer_addresses) && count($customer_addresses) > 0)
+                                @php $default_address = collect($customer_addresses)->firstWhere('is_default', true) ?? $customer_addresses[0]; @endphp
+                                <p class="text-xs text-dark-grey/80">
+                                    Kirim ke <span class="font-bold">{{ $default_address->label }}</span>... |
+                                    <a href="#" class="underline text-primary" onclick="event.preventDefault(); openAddressModal();">Ganti</a>
+                                </p>
+                                @else
+                                <p class="text-xs text-primary">
+                                    <a href="{{ url('login') }}" class="underline">Login</a> untuk pilih alamat.
+                                </p>
+                                @endif
+                            </div>
                         </div>
                     </div>
 
-
+                    {{-- Tabs --}}
                     <div class="mt-6">
                         <div class="flex border-b border-light-grey/50 text-sm font-semibold" role="tablist">
-                            <button id="tab-spesifikasi"
-                                class="tab-button pb-3 border-b-2 border-primary text-primary px-4 transition duration-200"
-                                data-target="content-spesifikasi"
-                                role="tab"
-                                aria-selected="true"
-                                aria-controls="content-spesifikasi">
-                                Spesifikasi Produk
-                            </button>
-                            <button id="tab-informasi"
-                                class="tab-button pb-3 text-dark-grey/80 px-4 hover:text-primary transition duration-200"
-                                data-target="content-informasi"
-                                role="tab"
-                                aria-selected="false"
-                                aria-controls="content-informasi">
-                                Informasi Produk
-                            </button>
+                            <button class="tab-button pb-3  px-4" data-target="content-spesifikasi">Ringkasan</button>
+                            <button class="tab-button pb-3 text-dark-grey/80 px-4" data-target="content-informasi">Deskripsi Lengkap</button>
                         </div>
 
-                        <div id="content-spesifikasi" class="tab-content pt-4 p-4 bg-light-bg rounded-b-lg text-sm space-y-2" role="tabpanel" aria-labelledby="tab-spesifikasi">
-                            <div class="flex items-center space-x-2 text-primary font-semibold">
-                                <i class="fas fa-check-circle" aria-hidden="true"></i>
-                                <span>Anti Rayap & Tahan Cuaca | Keamanan Maksimal</span>
-                            </div>
-                            <div class="pl-4 space-y-1">
-                                <p><i class="fas fa-circle text-xs text-light-grey mr-2" aria-hidden="true"></i> Material utama: **Plat Baja (Steel)**</p>
-                                <p><i class="fas fa-circle text-xs text-light-grey mr-2" aria-hidden="true"></i> Finishing: **Wood Grain / Motif Kayu (Powder Coating)**</p>
-                                <p><i class="fas fa-circle text-xs text-light-grey mr-2" aria-hidden="true"></i> Ketebalan plat daun pintu: **0.6 mm**</p>
-                                <p><i class="fas fa-circle text-xs text-light-grey mr-2" aria-hidden="true"></i> Sistem pengunci: **Multi-Point Lock System**</p>
-                                <p><i class="fas fa-circle text-xs text-light-grey mr-2" aria-hidden="true"></i> Tahan benturan dan tidak memuai</p>
-                                <p><i class="fas fa-circle text-xs text-light-grey mr-2" aria-hidden="true"></i> Desain elegan menyerupai kayu asli</p>
-                            </div>
-                            <button class="text-primary font-semibold mt-2 hover:underline" aria-expanded="false" aria-controls="full-spesifikasi-details">Baca Selengkapnya ></button>
+                        <div id="content-spesifikasi" class="tab-content pt-4 p-4 bg-light-bg text-sm space-y-2">
+                            {!! $product->short_description !!}
                         </div>
 
-                        <div id="content-informasi" class="tab-content pt-4 p-4 bg-light-bg rounded-b-lg text-sm space-y-2 hidden" role="tabpanel" aria-labelledby="tab-informasi">
-                            <h4 class="font-bold text-lg mb-2">Informasi Lainnya</h4>
-                            <p>Pintu Baja Motif Kayu adalah solusi modern yang menggabungkan kekuatan baja dengan keindahan estetika serat kayu. Dilengkapi sistem keamanan yang canggih.</p>
-                            <ul class="list-disc list-inside pl-4 text-dark-grey/80">
-                                <li>Pemasangan mudah dan cepat (Knock Down)</li>
-                                <li>Dilengkapi kusen baja yang menyatu</li>
-                                <li>Perawatan minim, cukup dilap</li>
-                                <li>Tersedia untuk ukuran standar (Single/Double Door)</li>
-                            </ul>
+                        <div id="content-informasi" class="tab-content pt-4 p-4 text-sm bg-light-bg space-y-2 hidden">
+                            {!! $product->description !!}
                         </div>
                     </div>
                 </div>
             </div>
 
+            {{-- 3. ORDER SUMMARY (lg:col-span-4) --}}
+            <div class="lg:col-span-4 mt-6 lg:mt-0 lg:sticky lg:top-20 self-start">
+                <div class="p-6 bg-white rounded-xl shadow-md border border-light-grey/50">
+                    <p class="text-dark-grey font-bold text-lg mb-4">Ringkasan Pesanan</p>
 
-            {{-- Order Summary/Action Buttons (Made sticky on large screens) --}}
-            <div class="lg:col-span-5 mt-6 lg:mt-0 lg:order-last lg:sticky lg:top-10 self-start">
-                <div class="p-6 bg-white rounded-xl shadow-md border border-light-grey/50"> {{-- Rounded-xl untuk konsistensi --}}
-
-                    {{-- Quantity Counter & Subtotal --}}
-                    <div class="flex justify-end items-center text-xs text-dark-grey/80 mb-4 space-x-2">
-                        <span class="hidden md:inline">Atur Jumlah</span>
-
-                        <div class="border border-light-grey rounded overflow-hidden flex ml-2">
-                            <button type="button" class="w-6 h-6 border-r border-light-grey hover:bg-light-bg text-dark-grey" id="qty-minus" aria-label="Kurangi jumlah produk">-</button>
-                            <span class="w-6 h-6 flex items-center justify-center font-bold text-sm" id="product-qty" role="status" aria-live="polite">1</span>
-                            <button type="button" class="w-6 h-6 hover:bg-light-bg text-dark-grey font-bold" id="qty-plus" aria-label="Tambah jumlah produk">+</button>
-                        </div>
-
-                        <span class="ml-4 hidden md:inline">Subtotal Pembelian:</span>
-                        <span class="text-primary font-extrabold text-lg ml-2" id="subtotal-price" role="status" aria-live="polite">Rp450.000</span>
-                    </div>
-
-                    {{-- Action Buttons --}}
-                    <div class="space-y-3 mb-4">
-                        <button type="button" class="w-full py-3 rounded-xl bg-primary text-white font-bold text-lg hover:bg-primary-dark transition duration-150 shadow-lg shadow-primary/50">
-                            <a href="{{url('checkout')}}">
-                                Beli Sekarang
-                            </a>
-                        </button>
-                        <div class="flex space-x-3">
-
-                            <button type="button" class="w-full py-3 rounded-xl bg-white border border-primary text-primary font-bold text-lg hover:bg-light-bg transition duration-150">
-                                <a href="{{url('keranjang')}}">
-                                    + Keranjang
-                                </a>
-                            </button>
-
-                            <button type="button" class="w-full py-3 rounded-xl bg-white border border-light-grey text-dark-grey/80 font-semibold text-lg hover:bg-light-bg transition duration-150 flex items-center justify-center space-x-2">
-                                <i class="far fa-heart" aria-hidden="true"></i>
-                                <span>Wishlist</span>
-                            </button>
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-sm text-dark-grey font-semibold">Jumlah:</span>
+                        <div class="border border-light-grey rounded flex items-center">
+                            <button type="button" class="px-3 py-1 hover:bg-light-bg font-bold" id="qty-minus">-</button>
+                            <input type="number" id="product-qty-input" value="1" min="1"
+                                class="w-12 text-center font-bold border-none focus:ring-0 p-0">
+                            <button type="button" class="px-3 py-1 hover:bg-light-bg font-bold" id="qty-plus">+</button>
                         </div>
                     </div>
 
                     <div class="divider h-px bg-light-grey/50 my-4"></div>
 
-                    <div class="flex justify-between items-center text-sm text-dark-grey/80">
-                        <div class="flex items-center space-x-1">
-                            <i class="fas fa-share-alt" aria-hidden="true"></i>
-                            <span>Share</span>
-                        </div>
-                        <span>Metode Pembayaran</span>
+                    <div class="flex justify-between items-center mb-6">
+                        <span class="text-dark-grey font-semibold">Subtotal:</span>
+                        <span class="text-primary font-extrabold text-xl" id="subtotal-price">
+                            Rp {{ number_format($product->variants[0]->price ?? 0, 0, ',', '.') }}
+                        </span>
                     </div>
 
+                    {{-- Action Buttons --}}
+                    <div class="space-y-3">
+                        {{-- Hidden Input untuk dikirim ke Keranjang --}}
+                        <input type="hidden" id="product-variant-id" value="{{ $product->variants[0]->id ?? '' }}">
+
+                        <button type="button" id="buyNowButton" class="w-full py-3 rounded-xl bg-primary text-white font-bold text-lg hover:bg-primary-dark shadow-lg shadow-primary/30 transition">
+                            Beli Sekarang
+                        </button>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <button type="button" id="add-to-cart-button" class="py-3 rounded-xl border border-primary text-primary font-bold hover:bg-primary/5 transition">
+                                + Keranjang
+                            </button>
+                            <button type="button" class="py-3 rounded-xl border border-light-grey text-dark-grey/60 font-semibold hover:bg-light-bg transition flex items-center justify-center space-x-1">
+                                <i class="far fa-heart"></i>
+                                <span>Wishlist</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
+
+
+
         </div>
+        {{-- END: TATA LETAK 3 KOLOM UTAMA --}}
+
 
         {{-- Customer Reviews --}}
         <div class="mt-8">
             <h2 class="text-xl font-bold mb-4">Ulasan Pelanggan</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="flex items-center space-x-4 p-4 border border-light-grey rounded-lg bg-light-bg/50">
-                    <div class="text-6xl font-extrabold text-primary">5/5</div>
-                    <div>
-                        <div class="flex items-center text-yellow-500 mb-1" aria-label="Rating Bintang 5">
-                            <span class="text-3xl" aria-hidden="true">★★★★★</span>
-                        </div>
-                        <p class="text-sm text-dark-grey/80">
-                            **100%** pelanggan puas | <span class="font-bold">1</span> Ulasan
-                        </p>
-                    </div>
-                </div>
 
-                <div class="col-span-1 md:col-span-2 p-4 border border-light-grey rounded-lg bg-light-bg/50 text-sm">
-                    <div class="space-y-1">
-                        @for ($i = 5; $i >= 1; $i--)
-                        @php
-                        $rating_count = $i == 5 ? 1 : 0;
-                        $percentage = $i == 5 ? 100 : 0;
-                        @endphp
-                        <div class="flex items-center space-x-2">
-                            <span class="w-2 font-semibold">{{ $i }}</span>
-                            <span class="text-yellow-500" aria-hidden="true">★</span>
-                            <div class="w-full bg-light-grey h-2 rounded-full">
-                                <div class="bg-primary h-2 rounded-full"></div>
-                            </div>
-                            <span class="w-4 text-right">{{ $rating_count }}</span>
-                        </div>
-                        @endfor
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-        {{-- Related Products --}}
-        <div class="mt-12">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-bold text-dark-grey">Produk yang Mungkin Kamu Suka</h2>
-                <a href="#" class="text-primary text-sm font-semibold">Lihat Semua ></a>
-            </div>
-            <p class="text-sm text-dark-grey/80 mb-4">Direkomendasikan berdasarkan produk terbaru, harga terendah pada halaman detail produk</p>
             @php
-            // Data produk
-            $products_data = [
-            ['id' => 'P001', 'name' => 'Panel Ceiling 3d pu 4@1.5x', 'price' => 120000, 'category' => 'Dekoratif / Arsitektural', 'rating' => 4.8, 'ulasan' => 10, 'stok' => 'Tersedia', 'url_img' => asset('/asset/produk/ceiling 3d pu 4@1.5x.png')],
-            ['id' => 'P002', 'name' => 'Louvre Vent 100', 'price' => 85000, 'category' => 'Dekoratif / Arsitektural', 'rating' => 4.5, 'ulasan' => 15, 'stok' => 'Tersedia', 'url_img' => asset('/asset/produk/Louvre.png')],
-            ['id' => 'P003', 'name' => 'Pintu Steel Door Motif Kayu', 'price' => 450000, 'category' => 'Dekoratif / Arsitektural', 'rating' => 4.0, 'ulasan' => 3, 'stok' => 'Terbatas', 'url_img' => 'https://image1ws.indotrading.com/s3/productimages/webp/co228746/p778244/w300-h300/fe89573f-0209-4c1b-8899-94e65e2fa858.png'],
-            ['id' => 'P101', 'name' => 'Genteng Metal Roof', 'price' => 220000, 'category' => 'Roofing & Walling', 'rating' => 4.9, 'ulasan' => 200, 'stok' => 'Tersedia', 'url_img' => 'https://agenbajaringan.com/img/genteng-metal.png'],
-            ['id' => 'P102', 'name' => 'Kanal C75 baja ringan', 'price' => 75000, 'category' => 'Dekoratif & Arsitektural', 'rating' => 4.2, 'ulasan' => 58, 'stok' => 'Tersedia', 'url_img' => asset('/asset/produk/1. Kanal C75-1.png')],
-            ['id' => 'P201', 'name' => 'Reng Asimetris', 'price' => 45000, 'category' => 'Kerangka Green House', 'rating' => 3.5, 'ulasan' => 1, 'stok' => 'Tersedia', 'url_img' => asset('/asset/produk/reng-asimetris-1.jpg')],
-            ];
-
-            $products = array_map(function($product) {
-            $price_int = $product['price'];
-            $old_price_int = round($price_int / 0.8, -3);
-
-            $product['price'] = number_format($price_int, 0, ',', '.');
-            $product['old_price'] = number_format($old_price_int, 0, ',', '.');
-            return $product;
-            }, $products_data);
+           
+            $totalReviews = $reviews->total();
+            $displayRating = $averageRating ?? 0;
             @endphp
 
-            <div class="flex overflow-x-scroll space-x-4 pb-4">
-                @foreach ($products as $product)
-                <div
-                    class="flex-shrink-0 w-40 sm:w-48 bg-white p-3 rounded-lg shadow-sm border border-light-grey/50 hover:shadow-md transition duration-200 cursor-pointer">
-                    <div class="relative">
-                        <div class="w-full aspect-square bg-light-bg mb-2 rounded-md overflow-hidden">
-                            <img
-                                src="{{ $product['url_img'] }}"
-                                alt="{{ $product['name'] }}"
-                                onerror="this.onerror=null;this.src='https://placehold.co/600x400/000/ffffff?text=Product+Image';"
-                                class="h-32 sm:h-40 md:h-48 w-full object-cover rounded-t-lg">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {{-- Ringkasan Rating --}}
+                <div class="flex items-center space-x-4 p-4 border border-light-grey rounded-lg bg-light-bg/50 h-fit">
+                    {{-- Menampilkan rating yang sudah dihitung (Bukan lagi 0.0) --}}
+                    <div class="text-6xl font-extrabold text-primary">{{ number_format($displayRating, 1) }}/5</div>
+                    <div>
+                        <div class="flex items-center text-yellow-500 mb-1">
+                            <span class="text-3xl">
+                                {{-- Menampilkan bintang sesuai angka rata-rata --}}
+                                @php $fullStars = floor($displayRating); @endphp
+                                {{ str_repeat('★', $fullStars) . str_repeat('☆', 5 - $fullStars) }}
+                            </span>
                         </div>
-                        <div
-                            class="absolute top-2 right-2 {{ $product['stok'] == 'Tersedia' ? 'bg-primary' : 'bg-discount' }} text-white text-xs font-bold px-2 py-1 rounded">
-                            {{ $product['stok'] == 'Tersedia' ? 'Stok Tersedia' : 'Stok Terbatas' }}
-                        </div>
-                    </div>
-                    <div class="p-1">
-                        <p class="text-xs text-dark-grey/80 truncate mb-1">{{ $product['category'] }}</p>
-                        <p
-                            class="text-sm font-semibold text-dark-grey line-clamp-2 min-h-[1.5rem]">
-                            {{ $product['name'] }}
-                        </p>
-
-                        <p class="text-xs text-light-grey line-through mt-2">Rp{{ $product['old_price'] }}</p>
-                        <p class="text-base font-bold text-discount">Rp{{ $product['price'] }}</p>
-
-                        <div class="flex items-center text-xs text-dark-grey mt-2" aria-label="Rating {{ $product['rating'] }}">
-                            <span class="text-primary" aria-hidden="true">★</span><span class="ml-1">{{ $product['rating'] }}</span><span
-                                class="ml-2 text-dark-grey">| {{ $product['ulasan'] }} (ulasan)</span>
-                        </div>
+                        <p class="text-sm text-dark-grey/80">Dari {{ $totalReviews }} ulasan</p>
                     </div>
                 </div>
-                @endforeach
 
-                <div class="flex-shrink-0 w-8 h-full flex items-center justify-center">
-                    <i class="fas fa-chevron-right text-dark-grey/50" aria-hidden="true"></i>
+                {{-- Daftar Ulasan --}}
+                <div class="col-span-1 md:col-span-2 space-y-4">
+                    @forelse($reviews as $item)
+                    <div class="p-4 border border-light-grey rounded-lg bg-white shadow-sm">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                {{-- Akses sebagai Object karena menggunakan Eloquent get()/paginate() --}}
+                                <p class="font-bold text-dark">{{ $item->customer->full_name ?? 'Pelanggan' }}</p>
+                                <div class="flex text-yellow-500 text-sm">
+                                    {{ str_repeat('★', $item->rating) . str_repeat('☆', 5 - $item->rating) }}
+                                </div>
+                            </div>
+                            <span class="text-xs text-dark-grey/60">
+                                {{ $item->created_at->format('d M Y') }}
+                            </span>
+                        </div>
+
+                        <p class="text-dark-grey mt-2 text-sm italic">"{{ $item->body }}"</p>
+
+                        {{-- Gambar --}}
+                        @if($item->images->isNotEmpty())
+                        <div class="flex gap-2 mt-3">
+                            @foreach($item->images as $img)
+                            <img src="{{ asset('storage/' . $img->image_path) }}"
+                            onclick="openLightbox('{{ asset('storage/' . $img->image_path) }}')"
+                                class="w-20 h-20 object-contain rounded-md border border-light-grey">
+                            @endforeach
+                        </div>
+                        @endif
+                    </div>
+                    @empty
+                    <div class="p-4 border border-light-grey rounded-lg bg-light-bg/50 text-sm text-center">
+                        Belum ada ulasan untuk produk ini.
+                    </div>
+                    @endforelse
+
+                    @if ($reviews instanceof \Illuminate\Pagination\LengthAwarePaginator)
+                    <div class="mt-6">
+                        {{ $reviews->links('frontend.components.custom-pagestyle') }}
+                    </div>
+                    @endif
                 </div>
             </div>
         </div>
@@ -387,211 +497,446 @@
 
 @endsection
 
+
+
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const locationModal = document.getElementById('location-modal');
-        if (!locationModal) return;
+        // --- 1. Data & Variabel Global ---
+        const inventoryData = @json($inventory_data);
+        let currentBasePrice = 0;
 
-        const modalContent = locationModal.querySelector('[role="document"]');
+        // Elemen Lokasi & Cabang
+        const locationModal = document.getElementById('location-modal');
         const selectStoreButton = document.getElementById('select-store-button');
         const currentStoreDisplay = document.getElementById('current-store');
         const storeStatusDisplay = document.getElementById('store-status');
-        const radioButtons = document.querySelectorAll('input[name="selected_store"]');
+        const storeRadioButtons = document.querySelectorAll('input[name="selected_store"]');
 
-        const defaultStoreText = 'Pilih Lokasi';
-        const defaultStatusText = 'Produk dapat diambil atau dikirim | <a href="#" class="underline">Lihat Lokasi</a>';
+        // Elemen Produk & Varian
+        const variantRadios = document.querySelectorAll('input[name="product_variant"]');
+        const productVariantIdInput = document.getElementById('product-variant-id');
+        const basePriceTextElement = document.getElementById('current-price');
+        const currentVariantNameElement = document.getElementById('current-variant-name');
+        const variantStockDisplay = document.getElementById('variant-stock-display');
 
-        // PENTING: Mendefinisikan fungsi global agar bisa dipanggil oleh onclick="openLocationModal()" di HTML
-        window.openLocationModal = function() {
-            locationModal.classList.remove('pointer-events-none', 'opacity-0');
-            locationModal.classList.add('opacity-100');
-            modalContent.classList.remove('scale-95');
-            modalContent.classList.add('scale-100');
-            document.body.style.overflow = 'hidden';
-            // Set fokus ke elemen yang dapat ditutup, misalnya tombol tutup
-            locationModal.querySelector('button[aria-label="Tutup Modal Lokasi"]').focus();
+        // Elemen UI & Transaksi
+        const mainImage = document.getElementById('main-product-image');
+        const thumbnails = document.querySelectorAll('.thumbnail');
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const productQtyInput = document.getElementById('product-qty-input');
+        const qtyPlus = document.getElementById('qty-plus');
+        const qtyMinus = document.getElementById('qty-minus');
+        const subtotalPrice = document.getElementById('subtotal-price');
+        const addToCartButton = document.getElementById('add-to-cart-button');
+        const buyNowButton = document.getElementById('buyNowButton');
+
+        // Elemen Lightbox
+        const lightbox = document.getElementById('image-lightbox');
+        const lightboxImage = document.getElementById('lightbox-image-content');
+
+        // --- 2. Logika Helper ---
+
+        function formatRupiah(number) {
+            const cleanNumber = parseInt(number);
+            if (isNaN(cleanNumber)) return 'Rp0';
+            return 'Rp' + cleanNumber.toLocaleString('id-ID');
         }
 
-        window.closeLocationModal = function() {
-            locationModal.classList.remove('opacity-100');
-            locationModal.classList.add('opacity-0');
-            modalContent.classList.remove('scale-100');
-            modalContent.classList.add('scale-95');
-
+        function updateMainImage(imageUrl) {
+            if (!mainImage) return;
+            mainImage.style.opacity = '0';
             setTimeout(() => {
-                locationModal.classList.add('pointer-events-none');
-                document.body.style.overflow = '';
-            }, 300);
+                mainImage.src = imageUrl;
+                mainImage.style.opacity = '1';
+                const container = mainImage.closest('[onclick^="openLightbox"]');
+                if (container) container.setAttribute('onclick', `openLightbox('${imageUrl}')`);
+
+                thumbnails.forEach(t => {
+                    t.classList.toggle('border-primary', t.getAttribute('data-image') === imageUrl);
+                    t.classList.toggle('border-2', t.getAttribute('data-image') === imageUrl);
+                });
+            }, 100);
         }
 
-        window.resetStoreSelection = function() {
-            // Uncheck semua radio
-            radioButtons.forEach(radio => {
-                radio.checked = false;
-            });
-            // Reset tampilan di halaman utama
-            if (currentStoreDisplay) currentStoreDisplay.textContent = defaultStoreText;
-            if (storeStatusDisplay) {
-                storeStatusDisplay.innerHTML = defaultStatusText;
-                storeStatusDisplay.classList.remove('text-green-600', 'text-orange-500', 'text-red-600');
-                storeStatusDisplay.classList.add('text-dark-grey/80');
+        function getStockForSelectedVariant() {
+            const selectedVariant = document.querySelector('input[name="product_variant"]:checked');
+            const selectedStore = document.querySelector('input[name="selected_store"]:checked');
+            if (!selectedVariant || !selectedStore) return 0;
+
+            const variantId = parseInt(selectedVariant.value);
+            const branchId = parseInt(selectedStore.value);
+            const branchData = inventoryData.find(b => b.branch_id === branchId);
+
+            if (branchData && branchData.items) {
+                const item = branchData.items.find(i => i.variant_id === variantId);
+                return item ? item.stock : 0;
             }
-            // Nonaktifkan tombol pilih
-            selectStoreButton.disabled = true;
-            selectStoreButton.classList.add('opacity-50', 'cursor-not-allowed');
+            return 0;
         }
 
-        // Logika untuk mengaktifkan tombol 'Pilih'
-        radioButtons.forEach(radio => {
-            radio.addEventListener('change', function() {
-                if (this.checked) {
-                    selectStoreButton.disabled = false;
-                    selectStoreButton.classList.remove('opacity-50', 'cursor-not-allowed');
+        function updateStockUI() {
+            const stock = getStockForSelectedVariant();
+            if (variantStockDisplay) {
+                variantStockDisplay.textContent = stock > 0 ? `${stock} pcs` : "Stok Habis / Indent";
+                variantStockDisplay.className = stock > 0 ? "text-green-600 font-bold" : "text-red-600 font-bold";
+            }
+        }
+
+        function updateSubtotal(qty) {
+            let finalQty = parseInt(qty) || 1;
+            const stockAvailable = getStockForSelectedVariant(); // Ambil stok saat ini
+
+            if (finalQty < 1) finalQty = 1;
+
+            // Opsional: Batasi input agar tidak melebihi 100 atau stok jika perlu
+            if (finalQty > 99999) finalQty = 99999;
+
+            productQtyInput.value = finalQty;
+
+            if (basePriceTextElement) basePriceTextElement.textContent = formatRupiah(currentBasePrice);
+            if (subtotalPrice) subtotalPrice.textContent = formatRupiah(finalQty * currentBasePrice);
+        }
+
+        // --- 3. Logika Varian ---
+
+        function variantChangeListener() {
+            let variantSelected = false;
+            document.querySelectorAll('.variant-selection label').forEach(label => {
+                label.classList.remove('border-primary', 'bg-primary/10');
+            });
+
+            variantRadios.forEach(radio => {
+                if (radio.checked) {
+                    const label = radio.closest('label');
+                    if (label) label.classList.add('border-primary', 'bg-primary/10');
+
+                    currentBasePrice = parseInt(radio.dataset.price.replace(/\./g, '')) || 0;
+                    if (productVariantIdInput) productVariantIdInput.value = radio.value;
+                    if (currentVariantNameElement) currentVariantNameElement.textContent = radio.dataset.variantName;
+                    if (radio.dataset.imageUrl) updateMainImage(radio.dataset.imageUrl);
+
+                    variantSelected = true;
+                    updateStockUI();
                 }
             });
+            updateSubtotal(productQtyInput.value);
+        }
+
+        // --- 4. Logika Lokasi & Modal ---
+
+        function updateMainLocationUI(targetLabel) {
+            if (!targetLabel) return;
+
+            const radio = targetLabel.querySelector('input[name="selected_store"]');
+            if (!radio) return;
+
+            const storeName = targetLabel.dataset.storeName;
+            const storeStatus = targetLabel.dataset.storeFullStatus;
+            const statusColorClass = targetLabel.dataset.statusColor;
+            const distanceDisplay = radio.dataset.storeDistance || 'N/A';
+
+            // Update Tampilan di Halaman Utama
+            currentStoreDisplay.innerHTML = `<span class="${statusColorClass} font-bold">${storeStatus}</span> di ${storeName}`;
+
+            const distanceText = (distanceDisplay && distanceDisplay !== 'N/A') ?
+                `${distanceDisplay} dari lokasi Anda` : 'Produk dapat diambil atau dikirim';
+
+            storeStatusDisplay.innerHTML = `${distanceText} | <a href="#" class="underline" onclick="event.preventDefault(); openLocationModal();">Ubah Lokasi</a>`;
+
+            // Sinkronisasi input tersembunyi jika diperlukan dan update stok
+            updateStockUI();
+        }
+
+        function sortAndHighlightClosestStore() {
+            const container = document.querySelector('.modal-location .flex-grow.overflow-y-auto');
+            if (!container) return;
+
+            const labels = Array.from(container.querySelectorAll('label[data-store-id]'));
+
+            // Sortir berdasarkan jarak
+            labels.sort((a, b) => {
+                return (parseFloat(a.dataset.distanceValue) || Infinity) - (parseFloat(b.dataset.distanceValue) || Infinity);
+            });
+
+            // Pindahkan elemen tanpa menghapus (ini menjaga event listener tetap aman)
+            labels.forEach((label, index) => {
+                if (index === 0 && !label.querySelector('.closest-badge')) {
+                    const badge = document.createElement('span');
+                    badge.className = 'closest-badge ml-2 px-2 py-0.5 text-xs font-semibold bg-primary text-white rounded-full';
+                    badge.textContent = 'Terdekat';
+                    label.querySelector('p')?.appendChild(badge);
+                }
+                container.appendChild(label);
+            });
+        }
+
+        // --- 5. Event Listeners ---
+
+        // Logika Delegasi Klik untuk Memilih Cabang di Modal
+        document.addEventListener('change', function(e) {
+            if (e.target && e.target.name === 'selected_store') {
+                const selectButton = document.getElementById('select-store-button');
+                const allLabels = document.querySelectorAll('.modal-location label');
+
+                // 1. Aktifkan Tombol "Pilih"
+                if (selectButton) {
+                    selectButton.disabled = false;
+                    selectButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                    selectButton.classList.add('hover:bg-primary-dark'); // Opsional: tambah hover
+                }
+
+                // 2. Beri Highlight pada Label yang dipilih
+                allLabels.forEach(label => {
+                    label.classList.remove('border-primary', 'bg-primary/5');
+                    label.classList.add('border-light-grey');
+                });
+
+                const activeLabel = e.target.closest('label');
+                if (activeLabel) {
+                    activeLabel.classList.remove('border-light-grey');
+                    activeLabel.classList.add('border-primary', 'bg-primary/5');
+                }
+            }
         });
 
-        // Aksi saat tombol 'Pilih' diklik
+        // Tombol "Pilih" di Modal Lokasi
         if (selectStoreButton) {
             selectStoreButton.addEventListener('click', function() {
                 const selectedRadio = document.querySelector('input[name="selected_store"]:checked');
+
                 if (selectedRadio) {
-                    const storeName = selectedRadio.value;
-                    const distance = selectedRadio.getAttribute('data-store-distance');
-                    const status = selectedRadio.getAttribute('data-store-full-status');
+                    const label = selectedRadio.closest('label');
+                    updateMainLocationUI(label); // Update tampilan UI utama & Stock
+                    closeLocationModal(); // Tutup modal
 
-                    // Ambil warna dari elemen parent (label) yang memiliki data-status-color
-                    const storeDiv = selectedRadio.closest('[data-store-name]');
-                    const statusColor = storeDiv ? storeDiv.getAttribute('data-status-color') : 'text-dark-grey/80';
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'Lokasi berhasil diubah',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                }
+            });
+        }
 
-                    if (currentStoreDisplay) currentStoreDisplay.textContent = storeName;
-                    if (storeStatusDisplay) {
-                        storeStatusDisplay.innerHTML = `${status} (${distance}) | <a href="#" class="underline" onclick="openLocationModal()">Ubah Lokasi</a>`;
+        // --- 5. Event Listeners ---
 
-                        // Hapus semua kelas status dan tambahkan kelas status yang sesuai
-                        storeStatusDisplay.classList.remove('text-dark-grey/80', 'text-green-600', 'text-orange-500', 'text-red-600');
-                        storeStatusDisplay.classList.add(statusColor.replace('text-', 'text-')); // Tambahkan kelas warna dari data atribut
-                    }
+        variantRadios.forEach(r => r.addEventListener('change', variantChangeListener));
 
+        if (selectStoreButton) {
+            selectStoreButton.addEventListener('click', function() {
+                const selected = document.querySelector('input[name="selected_store"]:checked');
+                if (selected) {
+                    updateMainLocationUI(selected.closest('label'));
                     closeLocationModal();
                 }
             });
         }
 
+        qtyPlus?.addEventListener('click', () => updateSubtotal(parseInt(productQtyInput.value) + 1));
+        qtyMinus?.addEventListener('click', () => updateSubtotal(parseInt(productQtyInput.value) - 1));
 
-        // Menutup modal jika klik di luar area modal
-        locationModal.addEventListener('click', function(e) {
-            if (e.target.id === 'location-modal') {
-                closeLocationModal();
+        // Update harga otomatis saat angka diketik langsung
+        productQtyInput?.addEventListener('input', function() {
+            updateSubtotal(this.value);
+        });
+
+        // Update harga saat input kehilangan fokus (untuk memastikan angka tidak kosong/nol)
+        productQtyInput?.addEventListener('blur', function() {
+            if (this.value === '' || parseInt(this.value) < 1) {
+                updateSubtotal(1);
             }
         });
 
-        // Menutup modal dengan tombol ESC
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && !locationModal.classList.contains('pointer-events-none')) {
-                closeLocationModal();
-            }
+        thumbnails.forEach(thumb => {
+            thumb.addEventListener('click', function() {
+                updateMainImage(this.getAttribute('data-image'));
+            });
         });
-
-        // --- Logika Tabs ---
-        const tabButtons = document.querySelectorAll('.tab-button');
-        const tabContents = document.querySelectorAll('.tab-content');
 
         tabButtons.forEach(button => {
             button.addEventListener('click', function() {
                 const targetId = this.getAttribute('data-target');
-
-                tabButtons.forEach(btn => {
-                    btn.classList.remove('border-primary', 'text-primary');
-                    btn.classList.add('text-dark-grey/80');
-                    btn.style.borderBottomWidth = '0px';
-                    btn.setAttribute('aria-selected', 'false'); // A11y
-                });
-
-                tabContents.forEach(content => {
-                    content.classList.add('hidden');
-                });
-
+                tabButtons.forEach(btn => btn.classList.remove('border-primary', 'text-primary'));
+                tabContents.forEach(content => content.classList.add('hidden'));
                 this.classList.add('border-primary', 'text-primary');
-                this.classList.remove('text-dark-grey/80');
-                this.style.borderBottomWidth = '2px';
-                this.setAttribute('aria-selected', 'true'); // A11y
-
                 document.getElementById(targetId).classList.remove('hidden');
             });
         });
 
-        // --- Logika Galeri Thumbnail ---
-        const thumbnails = document.querySelectorAll('.thumbnail');
-        const mainImage = document.getElementById('main-product-image');
 
-        thumbnails.forEach(thumb => {
-            thumb.addEventListener('click', function() {
-                // ... (Logika yang sama, dipertahankan) ...
-                const imageUrl = this.getAttribute('data-image');
 
-                thumbnails.forEach(t => {
-                    t.classList.remove('border-primary', 'border-2');
-                    t.classList.add('border-light-grey', 'border');
-                });
+        // --- Logika Add to Cart (AJAX) ---
+        if (addToCartButton) {
+            addToCartButton.addEventListener('click', function(e) {
+                e.preventDefault();
 
-                this.classList.add('border-primary', 'border-2');
-                this.classList.remove('border-light-grey', 'border');
+                // Ambil data yang dibutuhkan
+                const quantity = parseInt(productQtyInput.value) || 1;
 
-                // Fade out, change src, fade in
-                mainImage.style.opacity = '0';
-                setTimeout(() => {
-                    mainImage.src = imageUrl;
-                    mainImage.style.opacity = '1';
-                }, 100);
+                const selectedStoreRadio = document.querySelector('input[name="selected_store"]:checked');
+                const branchId = selectedStoreRadio ? selectedStoreRadio.value : null;
+
+                // MENGAMBIL ID VARIAN YANG DIPILIH DARI INPUT TERSEMBUNYI
+                const productVariantId = productVariantIdInput ? productVariantIdInput.value : null;
+
+                if (!branchId) {
+                    //  sweetalert
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Silakan pilih lokasi toko/cabang terlebih dahulu.',
+                    })
+                    return;
+                }
+
+                if (!productVariantId) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Silakan pilih varian produk terlebih dahulu.',
+                    })
+                    return;
+                }
+
+                // Tampilkan loading state jika perlu
+                addToCartButton.textContent = 'Memproses...';
+                addToCartButton.disabled = true;
+
+                fetch("{{ route('cart.add') }}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            // ASUMSI: CSRF token ada di tag meta
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        },
+                        body: JSON.stringify({
+                            variant_id: productVariantId,
+                            quantity: quantity,
+                            branch_id: branchId
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: 'Berhasil!',
+                                    text: data.message,
+                                    timer: 4000,
+                                    showConfirmButton: true,
+                                    confirmButtonColor: '#ee0d0dd6',
+                                })
+                                .then((result) => {
+                                    if (result.dismiss === Swal.DismissReason.timer || result.isConfirmed) {
+                                        window.location.reload();
+                                    }
+                                });
+
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Gagal!',
+                                text: data.message || 'Terjadi kesalahan server.',
+                                confirmButtonColor: '#ee0d0dd6',
+                            });
+                            console.error(data.error);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal Menambahkan Ke Keranjang!',
+                            text: 'Anda harus login terlebih dahulu.',
+                            confirmButtonColor: '#ee0d0dd6',
+                        });
+                    })
+                    .finally(() => {
+                        addToCartButton.textContent = '+  Keranjang';
+                        addToCartButton.disabled = false;
+                    });
             });
-            // Tambahkan event keydown untuk aksesibilitas (Enter/Space)
-            thumb.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    this.click();
+        }
+
+        if (buyNowButton) {
+            buyNowButton.addEventListener('click', function(e) {
+                e.preventDefault(); // Kita cegah redirect otomatis dulu
+
+                const qtyRequested = parseInt(productQtyInput.value);
+                const stockAvailable = getStockForSelectedVariant();
+                const branchId = document.querySelector('input[name="selected_store"]:checked')?.value;
+                const branchName = document.querySelector('input[name="selected_store"]:checked')?.dataset.storeName || "Cabang";
+                const variantId = productVariantIdInput.value;
+
+                if (!branchId) return Swal.fire('Info', 'Pilih lokasi toko dahulu', 'warning');
+
+                // Fungsi Helper untuk redirect ke halaman checkout
+                const proceedToCheckout = () => {
+                    const url = `{{ route('checkout.now') }}?variant_id=${variantId}&quantity=${qtyRequested}&branch_id=${branchId}`;
+                    window.location.href = url;
+                };
+
+                // CEK STOK
+                if (qtyRequested > stockAvailable) {
+                    Swal.fire({
+                        title: 'Stok Terbatas / Indent',
+                        html: `Stok tersedia: <b>${stockAvailable} pcs</b>.<br>Anda ingin beli: <b>${qtyRequested} pcs</b>.<br><br>Tetap lanjutkan ke Checkout sebagai pesanan Indent?`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        showDenyButton: true,
+                        confirmButtonColor: '#3085d6', // Biru (WA)
+                        denyButtonColor: '#10b981', // Hijau (Lanjutkan)
+                        cancelButtonColor: '#d33', // Merah (Batal)
+                        confirmButtonText: 'Hubungi Admin(WA)',
+                        denyButtonText: 'Lanjutkan Beli',
+                        cancelButtonText: 'Batal'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Opsi 1: WhatsApp
+                            const waMessage = `Halo Admin ${branchName}, saya ingin beli (indent) produk ${currentVariantNameElement.textContent} sebanyak ${qtyRequested} pcs.`;
+                            window.open(`https://wa.me/6281234567890?text=${encodeURIComponent(waMessage)}`, '_blank');
+                        } else if (result.isDenied) {
+                            // Opsi 2: LANJUTKAN (Redirect ke Checkout)
+                            proceedToCheckout();
+                        }
+                    });
+                } else {
+                    // Stok mencukupi, langsung gas ke checkout
+                    proceedToCheckout();
                 }
             });
-        });
-
-        // --- Logika Quantity Counter ---
-        const qtyPlus = document.getElementById('qty-plus');
-        const qtyMinus = document.getElementById('qty-minus');
-        const productQtyElement = document.getElementById('product-qty');
-        const subtotalPrice = document.getElementById('subtotal-price');
-        // Ambil harga dari teks elemen dan konversi ke integer (Rp450.000 -> 11999000)
-        const basePriceText = document.getElementById('current-price').textContent.replace('Rp', '').replace(/\./g, '');
-        const basePrice = parseInt(basePriceText) || 11999000;
-
-        function formatRupiah(number) {
-            return 'Rp' + number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
         }
 
-        function updateSubtotal(currentQty) {
-            // Update nilai di elemen span jumlah di sebelah kanan
-            document.querySelector('.space-x-2 > span.text-sm.font-bold').textContent = currentQty;
-            productQtyElement.textContent = currentQty;
-            subtotalPrice.textContent = formatRupiah(currentQty * basePrice);
-        }
+        // --- 7. Window Globals ---
+        window.openLightbox = (url) => {
+            lightboxImage.src = url;
+            lightbox.classList.remove('opacity-0', 'pointer-events-none');
+            document.body.style.overflow = 'hidden';
+        };
+        window.closeLightbox = () => {
+            lightbox.classList.add('opacity-0', 'pointer-events-none');
+            document.body.style.overflow = '';
+        };
+        window.openLocationModal = () => {
+            locationModal.classList.remove('opacity-0', 'pointer-events-none');
+            sortAndHighlightClosestStore();
+        };
+        window.closeLocationModal = () => {
+            locationModal.classList.add('opacity-0', 'pointer-events-none');
+        };
 
-        if (qtyPlus) {
-            qtyPlus.addEventListener('click', function() {
-                let currentQty = parseInt(productQtyElement.textContent);
-                if (currentQty < 10) { // Batas maksimal 10
-                    currentQty++;
-                    updateSubtotal(currentQty);
-                }
-            });
+        // --- 8. Inisialisasi Akhir ---
+        sortAndHighlightClosestStore();
+        const initialLabel = document.querySelector('input[name="selected_store"]:checked')?.closest('label') || document.querySelector('label[data-store-id]');
+        if (initialLabel) {
+            initialLabel.querySelector('input').checked = true;
+            updateMainLocationUI(initialLabel);
         }
-
-        if (qtyMinus) {
-            qtyMinus.addEventListener('click', function() {
-                let currentQty = parseInt(productQtyElement.textContent);
-                if (currentQty > 1) {
-                    currentQty--;
-                    updateSubtotal(currentQty);
-                }
-            });
-        }
+        variantChangeListener();
     });
 </script>

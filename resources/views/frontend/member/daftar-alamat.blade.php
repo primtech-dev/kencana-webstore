@@ -11,14 +11,14 @@
 
             {{-- KOLOM KIRI: Sidebar Navigasi --}}
             <div class="lg:col-span-3 mb-6 lg:mb-0">
-                {{-- Panggil komponen, dan kirim 'daftar-alamat' sebagai menu aktif --}}
                 @include('frontend.components.member-sidebar', ['activeMenu' => 'daftar-alamat'])
             </div>
 
             {{-- KOLOM KANAN: Konten Utama (Daftar Alamat) --}}
             <div class="lg:col-span-9">
-
                 <div class="bg-white p-6 rounded-lg shadow-md border border-gray-100">
+                    
+                    {{-- Header dan Tombol Tambah Alamat --}}
                     <div class="flex justify-between items-center mb-6 border-b pb-3">
                         <h2 class="text-xl font-extrabold text-gray-800">Alamat Tersimpan</h2>
                         {{-- Tombol untuk memicu Modal Tambah Alamat --}}
@@ -27,40 +27,83 @@
                         </button>
                     </div>
 
+                   
+                    @if ($errors->any())
+                        <div class="mt-4 p-3 mb-4 text-sm text-red-700 bg-red-100 rounded-lg">
+                            <ul class="list-disc list-inside">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
                     <div class="space-y-4">
-
-                        {{-- Kartu Alamat 1 (Utama) --}}
-                        <div class="p-4 border border-primary-500 rounded-lg shadow-lg relative bg-primary-50">
+                        {{-- LOGIKA LOOPING ALAMAT --}}
+                        @forelse($addresses as $address)
+                        <div class="p-4 border {{ $address->is_default ? 'border-primary-500 shadow-lg bg-primary-50' : 'border-gray-200 shadow-sm' }} rounded-lg relative">
+                            
+                            {{-- Label Utama --}}
+                            @if ($address->is_default)
                             <span class="absolute top-0 right-0 bg-primary text-white text-xs font-bold px-3 py-1 rounded-bl-lg">UTAMA</span>
-                            <p class="font-bold text-gray-800 mt-2">Rumah Budi Setiawan</p>
-                            <p class="text-sm text-gray-700">Penerima: Budi Setiawan (0812-3456-7890)</p>
-                            <p class="text-sm text-gray-500 mt-1">Jln. Mawar No. 12, RT 01/ RW 02, Kel. Sukamaju, Kec. Cikupa, Tangerang, Banten 15710</p>
+                            @endif
+
+                            <p class="font-bold text-gray-800 {{ $address->is_default ? 'mt-2' : '' }}">{{ $address->label }}</p>
+                            <p class="text-sm text-gray-700">Telp: {{ $address->phone }}</p>
+                            <p class="text-sm text-gray-500 mt-1">
+                                {{ $address->street }},
+                                {{ $address->city }},
+                                {{ $address->province }} - {{ $address->postal_code }}
+                                ({{ number_format($address->latitude, 6) }}, {{ number_format($address->longitude, 6) }})
+                            </p>
+                            
                             <div class="mt-3 flex space-x-3 text-sm">
-                                <button class="text-primary hover:underline font-semibold">Ubah</button>
-                                <button class="text-red-600 hover:underline font-semibold">Hapus</button>
+                                
+                                {{-- TOMBOL UBAH (Memicu Modal Edit) --}}
+                                <button type="button" 
+                                    class="text-primary hover:underline font-semibold edit-address-btn" 
+                                    data-address-id="{{ $address->id }}"
+                                    data-label="{{ $address->label }}"
+                                    data-street="{{ $address->street }}"
+                                    data-city="{{ $address->city }}"
+                                    data-province="{{ $address->province }}"
+                                    data-postal-code="{{ $address->postal_code }}"
+                                    data-phone="{{ $address->phone }}"
+                                    data-latitude="{{ $address->latitude }}"
+                                    data-longitude="{{ $address->longitude }}"
+                                    data-is-default="{{ $address->is_default ? 'true' : 'false' }}"
+                                >
+                                    Ubah
+                                </button>
+                                
+                                {{-- FORM HAPUS --}}
+                                <form action="{{ route('member.addresses.destroy', $address) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus alamat ini? Jika alamat ini utama, Anda harus menetapkan yang lain sebagai utama terlebih dahulu.');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="text-red-600 hover:underline font-semibold">Hapus</button>
+                                </form>
+                                
+                                {{-- FORM JADIKAN UTAMA --}}
+                                @unless($address->is_default)
+                                <form action="{{ route('member.addresses.default', $address) }}" method="POST">
+                                    @csrf
+                                    @method('PUT')
+                                    <button type="submit" class="text-green-600 hover:underline font-semibold border-l pl-3">
+                                        Jadikan Utama
+                                    </button>
+                                </form>
+                                @endunless
                             </div>
                         </div>
-
-                        {{-- Kartu Alamat 2 (Kantor) --}}
-                        <div class="p-4 border border-gray-200 rounded-lg shadow-sm">
-                            <p class="font-bold text-gray-800">Kantor Utama</p>
-                            <p class="text-sm text-gray-700">Penerima: Sekretaris (021-xxxxxxx)</p>
-                            <p class="text-sm text-gray-500 mt-1">Jl. Sudirman Kav. 52-53, Jakarta Selatan, DKI Jakarta 12190</p>
-                            <div class="mt-3 flex space-x-3 text-sm">
-                                <button class="text-primary hover:underline font-semibold">Ubah</button>
-                                <button class="text-red-600 hover:underline font-semibold">Hapus</button>
-                                <button class="text-green-600 hover:underline font-semibold border-l pl-3">Jadikan Utama</button>
-                            </div>
-                        </div>
-
+                        @empty
                         {{-- Jika daftar kosong --}}
-                        {{-- <div class="text-center py-10 text-gray-500">
+                        <div class="text-center py-10 text-gray-500">
                             <i class="fas fa-map-marker-alt text-4xl mb-3"></i>
                             <p>Anda belum memiliki alamat tersimpan. Silakan tambahkan!</p>
-                        </div> --}}
+                        </div>
+                        @endforelse
 
                     </div>
-
                 </div>
             </div>
         </div>
@@ -68,145 +111,156 @@
     </div>
 </section>
 
-{{-- Masukkan Modal Peta di sini (akan didefinisikan di bagian selanjutnya) --}}
+{{-- Masukkan Modal Peta --}}
 @include('frontend.components.map-modal')
 
 @endsection
 
-{{-- Script untuk Leaflet.js akan diletakkan di bagian bawah layout atau file ini --}}
-{{-- Anda perlu memastikan Leaflet CSS dan JS di-load --}}
+{{-- Leaflet.js CDN --}}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
+{{-- SCRIPT UTAMA UNTUK PETA DAN MODAL --}}
+<!-- <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // === 1. PENGAMBILAN ELEMEN DOM ===
+        const mapModal = document.getElementById('mapModal');
+        const openMapModalBtn = document.getElementById('openMapModal');
+        const closeMapModalBtn = document.getElementById('closeMapModal');
+        const latlngOutput = document.getElementById('latlngOutput');
+        const inputLatitude = document.getElementById('inputLatitude');
+        const inputLongitude = document.getElementById('inputLongitude');
+        const inputLabel = document.getElementById('label');
+        const inputStreet = document.getElementById('street');
+        const inputCity = document.getElementById('city');
+        const inputProvince = document.getElementById('province');
+        const inputPostalCode = document.getElementById('postal_code');
+        const inputPhone = document.getElementById('phone');
+        const inputIsDefault = document.getElementById('is_default');
 
-<script>
-    // Pastikan kode ini diletakkan di dalam tag <script> di akhir file member/addresses.blade.php
+        // Elemen DOM untuk Pencarian & Form
+        const searchInput = document.getElementById('addressSearchInput');
+        const searchButton = document.getElementById('searchAddressBtn');
+        const searchMessage = document.getElementById('searchMessage');
+        const addressForm = document.getElementById('addressForm');
+        const formMethod = document.getElementById('formMethod');
+        const submitButton = document.getElementById('submitButton');
+        const modalTitle = document.getElementById('modalTitle');
+        const editButtons = document.querySelectorAll('.edit-address-btn');
 
-document.addEventListener('DOMContentLoaded', function() {
-    // === 1. PENGAMBILAN ELEMEN DOM ===
-    const mapModal = document.getElementById('mapModal');
-    const openMapModalBtn = document.getElementById('openMapModal');
-    const closeMapModalBtn = document.getElementById('closeMapModal');
-    const latlngOutput = document.getElementById('latlngOutput');
-    const inputLatitude = document.getElementById('inputLatitude');
-    const inputLongitude = document.getElementById('inputLongitude');
-    const fullAddressTextarea = document.getElementById('full_address');
-    
-    // Elemen DOM untuk Pencarian
-    const searchInput = document.getElementById('addressSearchInput');
-    const searchButton = document.getElementById('searchAddressBtn');
-    const searchMessage = document.getElementById('searchMessage');
 
-    // === 2. VARIABEL PETA ===
-    let map = null;
-    let marker = null;
-    const initialLat = -6.2088; // Default: Jakarta
-    const initialLng = 106.8456; // Default: Jakarta
-    let isMapInitialized = false;
+        // === 2. VARIABEL PETA ===
+        let map = null;
+        let marker = null;
+        const initialLat = -6.2088; // Default: Jakarta
+        const initialLng = 106.8456; // Default: Jakarta
+        let isMapInitialized = false;
 
-    // === 3. FUNGSI GEOCoding ===
+        // === 3. FUNGSI GEOCoding & FORM FILL ===
 
-    // FUNGSI A: Reverse Geocoding (Lat/Lng -> Alamat)
-    function reverseGeocode(lat, lng) {
-        fullAddressTextarea.value = "Mencari detail alamat...";
-        
-        // Menggunakan Nominatim API
-        const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`;
+        function fillAddressForm(components) {
+            const city = components.city || components.town || components.village || components.county || '';
+            const province = components.state || components.province || '';
+            const postcode = components.postcode || '';
 
-        fetch(url)
-            .then(response => response.json())
-            .then(data => {
-                let address = data.display_name || "Alamat tidak ditemukan.";
+            const streetDetail = [
+                components.road, 
+                components.house_number, 
+                components.suburb, 
+                components.neighbourhood
+            ].filter(part => part).join(', ');
 
-                // Format alamat yang lebih rapi dari komponen address
-                if (data.address) {
-                    const components = data.address;
-                    address = [
-                        components.road,
-                        components.suburb,
-                        components.city || components.town || components.village,
-                        components.state,
-                        components.postcode,
-                        components.country
-                    ].filter(part => part).join(', ');
-                }
-                
-                fullAddressTextarea.value = address;
-            })
-            .catch(error => {
-                console.error('Error fetching address:', error);
-                fullAddressTextarea.value = "Gagal mengambil alamat detail. Silakan isi manual.";
-            });
-    }
+            // Mengisi field form
+            inputStreet.value = streetDetail || components.display_name || ''; 
+            inputCity.value = city;
+            inputProvince.value = province;
+            inputPostalCode.value = postcode;
+            
+            // Opsional: set label default jika belum diisi
+            if (!inputLabel.value) {
+                inputLabel.value = streetDetail ? 'Rumah Baru' : 'Alamat Baru';
+            }
 
-    // FUNGSI B: Forward Geocoding (Alamat -> Lat/Lng)
-    function forwardGeocode(query) {
-        if (!map) return;
-        searchMessage.classList.add('hidden');
-        
-        // Tampilkan loading state
-        searchInput.disabled = true;
-        searchButton.disabled = true;
-        searchButton.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`;
-        
-        // Menggunakan Nominatim API
-        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`;
+            searchMessage.classList.add('hidden');
+        }
 
-        fetch(url)
-            .then(response => response.json())
-            .then(data => {
-                if (data && data.length > 0) {
-                    const lat = parseFloat(data[0].lat);
-                    const lng = parseFloat(data[0].lon);
-                    
-                    // Pindahkan marker dan pusatkan peta
-                    const newLatLng = L.latLng(lat, lng);
-                    marker.setLatLng(newLatLng);
-                    map.setView(newLatLng, 15); 
-                    
-                    // Update koordinat dan panggil reverse geocode
-                    updateCoordinates(lat, lng);
-                } else {
-                    searchMessage.innerText = "Alamat tidak ditemukan. Coba kata kunci lain.";
+
+        function reverseGeocode(lat, lng) {
+            inputStreet.value = "Mencari detail alamat...";
+            
+            const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.address) {
+                        fillAddressForm(data.address);
+                    } else {
+                        inputStreet.value = data.display_name || "Alamat tidak ditemukan. Silakan isi manual.";
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching address:', error);
+                    inputStreet.value = "Gagal mengambil alamat detail. Silakan isi manual.";
+                });
+        }
+
+        function forwardGeocode(query) {
+            if (!map) return;
+            searchMessage.classList.add('hidden');
+            
+            searchInput.disabled = true;
+            searchButton.disabled = true;
+            searchButton.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`;
+            
+            const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1&addressdetails=1`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.length > 0) {
+                        const lat = parseFloat(data[0].lat);
+                        const lng = parseFloat(data[0].lon);
+                        
+                        // Gunakan initializeMap untuk update peta
+                        initializeMap(lat, lng);
+                        
+                        updateCoordinates(lat, lng, false); // Update koordinat output, jangan panggil reverse geocode lagi
+                        fillAddressForm(data[0].address); 
+                        
+                    } else {
+                        searchMessage.innerText = "Alamat tidak ditemukan. Coba kata kunci lain.";
+                        searchMessage.classList.remove('hidden');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error searching address:', error);
+                    searchMessage.innerText = "Terjadi kesalahan saat mencari alamat.";
                     searchMessage.classList.remove('hidden');
-                }
-            })
-            .catch(error => {
-                console.error('Error searching address:', error);
-                searchMessage.innerText = "Terjadi kesalahan saat mencari alamat.";
-                searchMessage.classList.remove('hidden');
-            })
-            .finally(() => {
-                // Hentikan loading state
-                searchInput.disabled = false;
-                searchButton.disabled = false;
-                searchButton.innerHTML = `<i class="fas fa-search"></i> <span class="hidden sm:inline ml-2">Cari</span>`;
-            });
-    }
+                })
+                .finally(() => {
+                    searchInput.disabled = false;
+                    searchButton.disabled = false;
+                    searchButton.innerHTML = `<i class="fas fa-search"></i> <span class="hidden sm:inline ml-2">Cari</span>`;
+                });
+        }
 
-    // FUNGSI C: Update Koordinat dan Trigger Reverse Geocode
-    function updateCoordinates(lat, lng) {
-        latlngOutput.innerHTML = `Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}`;
-        inputLatitude.value = lat.toFixed(6);
-        inputLongitude.value = lng.toFixed(6);
+        function updateCoordinates(lat, lng, shouldReverseGeocode = true) {
+            latlngOutput.innerHTML = `Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}`;
+            inputLatitude.value = lat.toFixed(6);
+            inputLongitude.value = lng.toFixed(6);
+            
+            if (shouldReverseGeocode) {
+                reverseGeocode(lat, lng);
+            }
+        }
         
-        reverseGeocode(lat, lng);
-    }
-
-
-    // === 4. LOGIKA MODAL DAN PETA ===
-
-    openMapModalBtn.addEventListener('click', function() {
-        mapModal.classList.remove('hidden');
-        mapModal.classList.add('flex');
-        searchInput.value = ''; // Kosongkan input pencarian
-        searchMessage.classList.add('hidden'); // Sembunyikan pesan error
-
-        setTimeout(() => {
+        // FUNGSI INISIALISASI/UPDATE PETA (PENTING UNTUK MENGATASI MODAL)
+        function initializeMap(lat, lng) {
             if (!isMapInitialized) {
                 // INISIALISASI PERTAMA KALI
                 map = L.map('leafletMap', {
-                    center: [initialLat, initialLng],
+                    center: [lat, lng],
                     zoom: 15,
                     scrollWheelZoom: true
                 });
@@ -215,57 +269,293 @@ document.addEventListener('DOMContentLoaded', function() {
                     attribution: '© OpenStreetMap contributors'
                 }).addTo(map);
 
-                // Tambahkan Marker yang bisa di-drag
-                marker = L.marker([initialLat, initialLng], {
+                marker = L.marker([lat, lng], {
                     draggable: true
                 }).addTo(map);
 
-                // Event listener ketika marker di-drag
                 marker.on('dragend', function(e) {
                     const latlng = marker.getLatLng();
                     updateCoordinates(latlng.lat, latlng.lng);
                 });
 
-                // Update koordinat awal dan lakukan reverse geocode pertama kali
-                updateCoordinates(initialLat, initialLng);
-                
                 isMapInitialized = true;
-
-            } else {
-                // REFRESH PETA SAAT MODAL DIBUKA KEMBALI
-                map.invalidateSize();
-                map.setView(marker.getLatLng(), map.getZoom());
             }
-        }, 50);
-    });
-
-    closeMapModalBtn.addEventListener('click', function() {
-        mapModal.classList.add('hidden');
-        mapModal.classList.remove('flex');
-    });
-
-    mapModal.addEventListener('click', function(e) {
-        if (e.target === mapModal) {
-            closeMapModalBtn.click();
+            
+            // Update lokasi marker dan tampilan peta
+            marker.setLatLng(L.latLng(lat, lng));
+            map.setView(L.latLng(lat, lng), 15);
         }
+
+
+        // === 4. LOGIKA MODAL DAN PETA (TAMBAH/CREATE) ===
+
+        openMapModalBtn.addEventListener('click', function() {
+            // 1. Reset form ke mode TAMBAH
+            addressForm.action = "{{ route('member.addresses.store') }}";
+            formMethod.value = 'POST';
+            submitButton.innerHTML = 'Simpan Alamat';
+            modalTitle.innerText = 'Tentukan Lokasi di Peta';
+            addressForm.reset();
+            
+            // 2. Tampilkan Modal
+            mapModal.classList.remove('hidden');
+            mapModal.classList.add('flex');
+            
+            searchInput.value = ''; 
+            searchMessage.classList.add('hidden');
+
+            setTimeout(() => {
+                // 3. Inisialisasi/Update Peta ke lokasi default
+                initializeMap(initialLat, initialLng);
+                map.invalidateSize(); // BARIS KRUSIAL: Refresh ukuran setelah modal muncul
+                updateCoordinates(initialLat, initialLng);
+            }, 50);
+        });
+
+        closeMapModalBtn.addEventListener('click', function() {
+            mapModal.classList.add('hidden');
+            mapModal.classList.remove('flex');
+        });
+
+        mapModal.addEventListener('click', function(e) {
+            if (e.target === mapModal) {
+                closeMapModalBtn.click();
+            }
+        });
+
+        // === 5. LOGIKA PENCARIAN ALAMAT ===
+
+        searchButton.addEventListener('click', function() {
+            const query = searchInput.value.trim();
+            if (query) {
+                forwardGeocode(query);
+            }
+        });
+
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault(); 
+                searchButton.click();
+            }
+        });
+        
+        // === 6. LOGIKA EDIT ALAMAT (UPDATE) ===
+        editButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const data = this.dataset;
+                const addressId = data.addressId;
+                const lat = parseFloat(data.latitude);
+                const lng = parseFloat(data.longitude);
+                const isDefault = data.isDefault === 'true';
+
+                // 1. Ubah Form untuk Mode EDIT
+                addressForm.action = `{{ url('member/daftar-alamat') }}/${addressId}`;
+                formMethod.value = 'PUT';
+                submitButton.innerHTML = 'Perbarui Alamat';
+                modalTitle.innerText = 'Ubah Detail Alamat';
+                
+                // 2. Isi Data ke Form Fields
+                inputLabel.value = data.label;
+                inputStreet.value = data.street;
+                inputCity.value = data.city;
+                inputProvince.value = data.province;
+                inputPostalCode.value = data.postalCode;
+                inputPhone.value = data.phone;
+                inputIsDefault.checked = isDefault;
+
+                // 3. Tampilkan Modal
+                mapModal.classList.remove('hidden');
+                mapModal.classList.add('flex');
+                
+                // PENTING: Panggil logika peta di dalam setTimeout
+                setTimeout(() => {
+                    // 4. Inisialisasi/Update Peta ke lokasi alamat yang diedit
+                    initializeMap(lat, lng);
+                    map.invalidateSize(); // BARIS KRUSIAL: Refresh ukuran setelah modal muncul
+                    updateCoordinates(lat, lng, false); // Update koordinat output, tanpa reverse geocode
+                }, 100); 
+            });
+        });
+    });
+</script> -->
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+    // 1. DOM Elements
+    const mapModal = document.getElementById('mapModal');
+    const openBtn = document.getElementById('openMapModal'); // Sesuaikan ID tombol trigger Anda
+    const closeBtn = document.getElementById('closeMapModal');
+    const getCurrentLocationBtn = document.getElementById('getCurrentLocationBtn');
+    
+    // Form Inputs
+    const addressForm = document.getElementById('addressForm');
+    const formMethod = document.getElementById('formMethod');
+    const submitButton = document.getElementById('submitButton');
+    const modalTitle = document.getElementById('modalTitle');
+    const searchInput = document.getElementById('addressSearchInput');
+    const searchBtn = document.getElementById('searchAddressBtn');
+    const searchMsg = document.getElementById('searchMessage');
+
+    // Field Inputs
+    const fieldLat = document.getElementById('inputLatitude');
+    const fieldLng = document.getElementById('inputLongitude');
+    const fieldStreet = document.getElementById('street');
+    const fieldCity = document.getElementById('city');
+    const fieldProvince = document.getElementById('province');
+    const fieldZip = document.getElementById('postal_code');
+
+    // 2. Map Variables
+    let map = null;
+    let marker = null;
+    let isMapInit = false;
+    const defaultLat = -6.2088; 
+    const defaultLng = 106.8456;
+
+    // --- FUNGSI UTAMA ---
+
+    function initMap(lat, lng) {
+        if (!isMapInit) {
+            map = L.map('leafletMap').setView([lat, lng], 16);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap'
+            }).addTo(map);
+
+            marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+
+            marker.on('dragend', function() {
+                const pos = marker.getLatLng();
+                updateCoords(pos.lat, pos.lng, true);
+            });
+            isMapInit = true;
+        } else {
+            marker.setLatLng([lat, lng]);
+            map.setView([lat, lng], 16);
+        }
+    }
+
+    function updateCoords(lat, lng, fetchReverse = false) {
+        const fixedLat = parseFloat(lat).toFixed(6);
+        const fixedLng = parseFloat(lng).toFixed(6);
+        
+        document.getElementById('latlngOutput').innerHTML = `Lat: ${fixedLat}, Lng: ${fixedLng}`;
+        fieldLat.value = fixedLat;
+        fieldLng.value = fixedLng;
+
+        if (fetchReverse) reverseGeocode(lat, lng);
+    }
+
+    function reverseGeocode(lat, lng) {
+        fieldStreet.value = "Sedang mengambil alamat...";
+        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.address) {
+                    const addr = data.address;
+                    fieldStreet.value = data.display_name;
+                    fieldCity.value = addr.city || addr.town || addr.village || '';
+                    fieldProvince.value = addr.state || '';
+                    fieldZip.value = addr.postcode || '';
+                }
+            })
+            .catch(() => fieldStreet.value = "Gagal mengambil alamat otomatis.");
+    }
+
+    // --- EVENT LISTENERS ---
+
+    // Tombol Buka Modal (Tambah Baru)
+    if(openBtn) {
+        openBtn.addEventListener('click', () => {
+            addressForm.reset();
+            formMethod.value = 'POST';
+            modalTitle.innerText = "Tentukan Lokasi di Peta";
+            mapModal.classList.replace('hidden', 'flex');
+            
+            setTimeout(() => {
+                initMap(defaultLat, defaultLng);
+                map.invalidateSize();
+                updateCoords(defaultLat, defaultLng, true);
+            }, 200);
+        });
+    }
+
+    // Tombol Close
+    closeBtn.addEventListener('click', () => mapModal.classList.replace('flex', 'hidden'));
+
+    // Klik Diluar Modal untuk tutup
+    mapModal.addEventListener('click', (e) => { if(e.target === mapModal) closeBtn.click(); });
+
+    // Fitur Cari Alamat (Forward Geocode)
+    searchBtn.addEventListener('click', () => {
+        const query = searchInput.value;
+        if(!query) return;
+        
+        searchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1&addressdetails=1`)
+            .then(res => res.json())
+            .then(data => {
+                if(data.length > 0) {
+                    const lat = data[0].lat;
+                    const lon = data[0].lon;
+                    initMap(lat, lon);
+                    updateCoords(lat, lon, false); // false karena data nominatim search sudah lengkap
+                    
+                    const addr = data[0].address;
+                    fieldStreet.value = data[0].display_name;
+                    fieldCity.value = addr.city || addr.town || addr.village || '';
+                    fieldProvince.value = addr.state || '';
+                    fieldZip.value = addr.postcode || '';
+                    searchMsg.classList.add('hidden');
+                } else {
+                    searchMsg.classList.remove('hidden');
+                }
+            })
+            .finally(() => searchBtn.innerHTML = '<i class="fas fa-search"></i> <span class="hidden sm:inline ml-2">Cari</span>');
     });
 
-    // === 5. LOGIKA PENCARIAN ALAMAT ===
+    // Fitur Lokasi Saat Ini (Geolocation)
+    getCurrentLocationBtn.addEventListener('click', () => {
+        if (!navigator.geolocation) return alert("Geolocation tidak didukung browser ini.");
 
-    // Event listener untuk tombol 'Cari'
-    searchButton.addEventListener('click', function() {
-        const query = searchInput.value.trim();
-        if (query) {
-            forwardGeocode(query);
-        }
+        getCurrentLocationBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Mencari...';
+        navigator.geolocation.getCurrentPosition((pos) => {
+            const lat = pos.coords.latitude;
+            const lng = pos.coords.longitude;
+            initMap(lat, lng);
+            updateCoords(lat, lng, true);
+            getCurrentLocationBtn.innerHTML = '<i class="fas fa-location-arrow mr-2"></i> Gunakan Lokasi Saat Ini';
+        }, () => {
+            alert("Gagal mengakses lokasi. Pastikan GPS aktif.");
+            getCurrentLocationBtn.innerHTML = '<i class="fas fa-location-arrow mr-2"></i> Gunakan Lokasi Saat Ini';
+        });
     });
 
-    // Event listener untuk tombol 'Enter' pada input pencarian
-    searchInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault(); 
-            searchButton.click();
-        }
+    // Fitur Edit (Dipasang pada tombol edit di luar modal)
+    document.querySelectorAll('.edit-address-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const d = this.dataset;
+            addressForm.action = `/member/daftar-alamat/${d.id}`;
+            formMethod.value = 'PUT';
+            modalTitle.innerText = "Ubah Detail Alamat";
+            
+            // Fill Fields
+            document.getElementById('label').value = d.label;
+            document.getElementById('phone').value = d.phone;
+            fieldStreet.value = d.street;
+            fieldCity.value = d.city;
+            fieldProvince.value = d.province;
+            fieldZip.value = d.zip;
+            document.getElementById('is_default').checked = d.default == '1';
+
+            mapModal.classList.replace('hidden', 'flex');
+            setTimeout(() => {
+                const lat = parseFloat(d.lat);
+                const lng = parseFloat(d.lng);
+                initMap(lat, lng);
+                map.invalidateSize();
+                updateCoords(lat, lng, false);
+            }, 200);
+        });
     });
 });
 </script>
