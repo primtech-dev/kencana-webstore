@@ -34,6 +34,18 @@
 <style>
     .swiper-pagination-bullet-active { background: #B4252A !important; } /* Warna brand Anda */
 </style>
+
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#B4252A">
+<script type="text/javascript">
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/serviceworker.js').then(function (registration) {
+            console.log('ServiceWorker registration successful with scope: ', registration.scope);
+        }, function (err) {
+            console.log('ServiceWorker registration failed: ', err);
+        });
+    }
+</script>
 </head>
 
 <body class="bg-cream-custom">
