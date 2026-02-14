@@ -49,7 +49,7 @@
 <script type="text/javascript">
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', function() {
-            navigator.serviceWorker.register("{{ asset('serviceworker.js') }}").then(function (registration) {
+            navigator.serviceWorker.register("{{ asset('sw.js') }}").then(function (registration) {
                 console.log('PWA: ServiceWorker registration successful with scope: ', registration.scope);
             }, function (err) {
                 console.log('PWA: ServiceWorker registration failed: ', err);
