@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ config('app.name', 'Webstore - Kencana') }}</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap"
         rel="stylesheet">
@@ -31,32 +32,37 @@
     </style>
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-<style>
-    .swiper-pagination-bullet-active { background: #B4252A !important; } /* Warna brand Anda */
-</style>
+    <style>
+        .swiper-pagination-bullet-active {
+            background: #B4252A !important;
+        }
 
-<link rel="manifest" href="{{ asset('manifest.json') }}">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="application-name" content="Kencana">
-<meta name="apple-mobile-web-app-title" content="Kencana">
-<meta name="theme-color" content="#ffffff">
-<meta name="msapplication-navbutton-color" content="#ffffff">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+        /* Warna brand Anda */
+    </style>
 
-<link rel="apple-touch-icon" href="{{ asset('logo-192.png') }}">
+    <link rel="manifest" href="{{ asset('manifest.json') }}">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Kencana">
+    <meta name="apple-mobile-web-app-title" content="Kencana">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="msapplication-navbutton-color" content="#ffffff">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
-<script type="text/javascript">
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function() {
-            navigator.serviceWorker.register("{{ asset('sw.js') }}").then(function (registration) {
-                console.log('PWA: ServiceWorker registration successful with scope: ', registration.scope);
-            }, function (err) {
-                console.log('PWA: ServiceWorker registration failed: ', err);
+    <link rel="apple-touch-icon" href="{{ asset('logo-192.png') }}">
+
+    <script type="text/javascript">
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register("{{ asset('sw.js') }}").then(function(registration) {
+                    console.log('PWA: ServiceWorker registration successful with scope: ', registration.scope);
+                }, function(err) {
+                    console.log('PWA: ServiceWorker registration failed: ', err);
+                });
             });
-        });
-    }
-</script>
+        }
+    </script>
+
 </head>
 
 <body class="bg-cream-custom">

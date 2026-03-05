@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\CheckoutController;
 use Illuminate\Support\Facades\Route;
 
@@ -116,7 +117,7 @@ Route::prefix('customer')->group(function () {
     // --- FORGOT PASSWORD FLOW (Alur 3) ---
     Route::get('forgot-password', [CustomerAuthController::class, 'showForgotPasswordForm'])->name('customer.forgot.password.show');
     Route::post('forgot-password', [CustomerAuthController::class, 'forgotPassword'])->name('customer.forgot.password');
-    
+
     // --- RESET PASSWORD (SETELAH OTP VERIFIED) ---
     Route::get('reset-password', [CustomerAuthController::class, 'showResetPasswordForm'])->name('customer.password.reset.show');
     Route::post('reset-password', [CustomerAuthController::class, 'resetPassword'])->name('customer.password.reset');
@@ -124,7 +125,6 @@ Route::prefix('customer')->group(function () {
     // login otp
     Route::get('/login/otp', [CustomerAuthController::class, 'showLoginOtpForm'])->name('customer.login.otp.show');
     Route::post('/login/otp', [CustomerAuthController::class, 'sendLoginOtp'])->name('customer.login.otp.send');
-
 });
 
 
@@ -175,7 +175,7 @@ Route::middleware(['auth:customer'])->group(function () {
         // Route untuk Hapus (Destroy)
         Route::delete('/daftar-alamat/{address}', [MemberAddressController::class, 'destroy'])->name('member.addresses.destroy');
 
-        
+
         // Route::get('/transaksi-member', [MemberController::class, 'index'])->name('member.transactions');
         Route::get('/transaksi-member/{id}', [MemberController::class, 'showTransaction'])->name('member.transactions.show');
     });
@@ -202,4 +202,8 @@ Route::middleware(['auth:customer'])->group(function () {
     });
 
     Route::post('/review-store/{orderId}', [HistoryTransactionController::class, 'storeReview'])->name('history.transactions.review');
+
+
+    Route::post('/chatbot/query', [ChatbotController::class, 'handleQuery']);
+    Route::post('/chatbot/reset', [ChatbotController::class, 'resetSession']);
 });
