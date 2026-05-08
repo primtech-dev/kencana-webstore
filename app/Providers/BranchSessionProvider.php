@@ -32,6 +32,7 @@ class BranchSessionProvider extends ServiceProvider
 
             // Ambil semua daftar cabang untuk modal pilihan
             $allBranches = Branches::where('is_active', true)->get();
+            // testing perubahan
 
             // Lempar variabel ke SEMUA view
             $view->with([
