@@ -1,7 +1,7 @@
 @extends('frontend.components.layout')
 @section('content')
 <main class="container px-1 lg:px-[7%] mx-auto mt-8">
-@php
+    <!-- @php
     $currentCatSlug = request('category');
     $catName = "Rekomendasi Spesial";
     $categoryDesc = "Temukan koleksi produk terbaik kami dengan harga distributor dan kualitas terjamin.";
@@ -11,32 +11,32 @@
     $slides = collect();
 
     if($currentCatSlug) {
-        $categoryData = $categories->where('slug', $currentCatSlug)->first();
-        if($categoryData && $categoryData->banner_path) {
-            $catName = $categoryData->name;
-            $slides->push((object)[
-                'image_path' => $categoryData->banner_path,
-                'image_mobile_path' => $categoryData->thumbnail ?? $categoryData->banner_path,
-                'link_url' => '#',
-                'title' => $catName
-            ]);
-        }
+    $categoryData = $categories->where('slug', $currentCatSlug)->first();
+    if($categoryData && $categoryData->banner_path) {
+    $catName = $categoryData->name;
+    $slides->push((object)[
+    'image_path' => $categoryData->banner_path,
+    'image_mobile_path' => $categoryData->thumbnail ?? $categoryData->banner_path,
+    'link_url' => '#',
+    'title' => $catName
+    ]);
+    }
     }
 
     // Jika di Home (tidak ada kategori), bongkar $banners yang nested tadi
     if($slides->isEmpty()) {
-        if(isset($banners)) {
-            // FUNGSI INI AKAN MENGHILANGKAN ERROR "Property does not exist on collection"
-            // Karena dia membongkar Collection di dalam Collection menjadi satu deret banner
-            $slides = collect($banners)->flatten(1);
-        } elseif(isset($home_banner)) {
-            // Jika home_banner adalah single object, bungkus jadi collection
-            $slides = collect([$home_banner])->flatten(1);
-        }
+    if(isset($banners)) {
+    // FUNGSI INI AKAN MENGHILANGKAN ERROR "Property does not exist on collection"
+    // Karena dia membongkar Collection di dalam Collection menjadi satu deret banner
+    $slides = collect($banners)->flatten(1);
+    } elseif(isset($home_banner)) {
+    // Jika home_banner adalah single object, bungkus jadi collection
+    $slides = collect([$home_banner])->flatten(1);
     }
-@endphp
+    }
+    @endphp -->
 
-    @if($currentCatSlug)
+    <!-- @if($currentCatSlug)
     <nav class="flex px-4 mb-3 md:mb-4 text-gray-500 text-[10px] md:text-xs capitalize font-bold">
         <ol class="list-none p-0 inline-flex items-center">
             <li class="flex items-center">
@@ -52,22 +52,22 @@
     </nav>
     @endif
 
-   <section class="banner px-4 mb-4 md:mb-8 group">
-    <div class="swiper bannerSwiper relative rounded-xl md:rounded-2xl overflow-hidden shadow-md border border-gray-100 bg-gray-100">
-        <div class="swiper-wrapper">
-            @forelse($slides as $slide)
+    <section class="banner px-4 mb-4 md:mb-8 group">
+        <div class="swiper bannerSwiper relative rounded-xl md:rounded-2xl overflow-hidden shadow-md border border-gray-100 bg-gray-100">
+            <div class="swiper-wrapper">
+                @forelse($slides as $slide)
                 <div class="swiper-slide">
-                    {{-- PASTIKAN MENGGUNAKAN $slide, BUKAN $home_banner --}}
+
                     <a href="{{ $slide->link_url ?? '#' }}">
                         <picture>
                             @php
-                                $pathD = $slide->image_path;
-                                $pathM = $slide->image_mobile_path ?? $slide->image_path;
-                                
-                                $dBanner = str_starts_with($pathD, 'http') ? $pathD : env('APP_URL_BE'). '/' . ltrim($pathD, '/');
-                                $mBanner = str_starts_with($pathM, 'http') ? $pathM : env('APP_URL_BE'). '/' . ltrim($pathM, '/');
+                            $pathD = $slide->image_path;
+                            $pathM = $slide->image_mobile_path ?? $slide->image_path;
+
+                            $dBanner = str_starts_with($pathD, 'http') ? $pathD : env('APP_URL_BE'). '/' . ltrim($pathD, '/');
+                            $mBanner = str_starts_with($pathM, 'http') ? $pathM : env('APP_URL_BE'). '/' . ltrim($pathM, '/');
                             @endphp
-                            
+
                             <source media="(max-width: 767px)" srcset="{{ $mBanner }}">
                             <source media="(min-width: 768px)" srcset="{{ $dBanner }}">
 
@@ -78,20 +78,68 @@
                         </picture>
                     </a>
                 </div>
-            @empty
+                @empty
                 <div class="swiper-slide">
                     <img src="{{ $fallbackImg }}" class="w-full h-auto">
                 </div>
-            @endforelse
-        </div>
+                @endforelse
+            </div>
 
-        @if($slides->count() > 1)
+            @if($slides->count() > 1)
             <div class="swiper-pagination"></div>
-            <!-- <div class="swiper-button-next !text-white after:!text-sm hidden md:flex"></div>
-            <div class="swiper-button-prev !text-white after:!text-sm hidden md:flex"></div> -->
-        @endif
-    </div>
-</section>
+            @endif
+        </div>
+    </section> -->
+
+    @php
+    $currentCatSlug = request('category');
+    $catName = "Rekomendasi Spesial";
+    $fallbackImg = "https://cdn.ruparupa.io/filters:quality(80)/media/promotion/ruparupa/payday-oct-25/ms/header-d.png";
+
+    $slides = collect();
+
+    // JIKA TIDAK ADA CATEGORY, baru kita isi slides dengan banner promo
+    if(!$currentCatSlug) {
+    if(isset($banners)) {
+    $slides = collect($banners)->flatten(1);
+    } elseif(isset($home_banner)) {
+    $slides = collect([$home_banner])->flatten(1);
+    }
+    } else {
+    // Jika ada kategori, kita cari namanya saja untuk Breadcrumb
+    $categoryData = $categories->where('slug', $currentCatSlug)->first();
+    $catName = $categoryData->name ?? "Kategori";
+    }
+    @endphp
+
+    @if(!$currentCatSlug && $slides->isNotEmpty())
+    <section class="banner px-4 mb-4 md:mb-8 group">
+        <div class="swiper bannerSwiper relative rounded-xl md:rounded-2xl overflow-hidden shadow-md border border-gray-100 bg-gray-100">
+            <div class="swiper-wrapper">
+                @foreach($slides as $slide)
+                <div class="swiper-slide">
+                    <a href="{{ $slide->link_url ?? '#' }}">
+                        <picture>
+                            @php
+                            $pathD = $slide->image_path;
+                            $pathM = $slide->image_mobile_path ?? $slide->image_path;
+                            $dBanner = str_starts_with($pathD, 'http') ? $pathD : env('APP_URL_BE'). '/' . ltrim($pathD, '/');
+                            $mBanner = str_starts_with($pathM, 'http') ? $pathM : env('APP_URL_BE'). '/' . ltrim($pathM, '/');
+                            @endphp
+                            <source media="(max-width: 767px)" srcset="{{ $mBanner }}">
+                            <source media="(min-width: 768px)" srcset="{{ $dBanner }}">
+                            <img src="{{ $dBanner }}" alt="Banner" class="w-full h-auto block transition-transform duration-700 hover:scale-105" onerror="this.onerror=null;this.src='{{ $fallbackImg }}';">
+                        </picture>
+                    </a>
+                </div>
+                @endforeach
+            </div>
+            @if($slides->count() > 1)
+            <div class="swiper-pagination"></div>
+            @endif
+        </div>
+    </section>
+    @endif
 
 
     <section class="mb-6 md:mb-10 px-4 relative group">
@@ -452,8 +500,6 @@
 
         fetchProducts(); // Initial Load
     });
-
-    
 </script>
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script>
@@ -461,11 +507,22 @@
         const swiper = new Swiper('.bannerSwiper', {
             autoHeight: true,
             loop: true,
-            autoplay: { delay: 5000, disableOnInteraction: false },
-            pagination: { el: '.swiper-pagination', clickable: true },
-            navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
+            autoplay: {
+                delay: 5000,
+                disableOnInteraction: false
+            },
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true
+            },
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev'
+            },
             effect: 'fade',
-            fadeEffect: { crossFade: true }
+            fadeEffect: {
+                crossFade: true
+            }
         });
     });
 </script>
