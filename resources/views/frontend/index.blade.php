@@ -97,22 +97,20 @@
     $fallbackImg = "https://cdn.ruparupa.io/filters:quality(80)/media/promotion/ruparupa/payday-oct-25/ms/header-d.png";
 
     $slides = collect();
-
-    // JIKA TIDAK ADA CATEGORY, baru kita isi slides dengan banner promo
-    if(!$currentCatSlug) {
-    if(isset($banners)) {
+    if (isset($banners)) {
     $slides = collect($banners)->flatten(1);
-    } elseif(isset($home_banner)) {
+    } elseif (isset($home_banner)) {
     $slides = collect([$home_banner])->flatten(1);
     }
-    } else {
-    // Jika ada kategori, kita cari namanya saja untuk Breadcrumb
+
+    // Terpisah, jika ada kategori, ambil namanya untuk Breadcrumb
+    if ($currentCatSlug) {
     $categoryData = $categories->where('slug', $currentCatSlug)->first();
     $catName = $categoryData->name ?? "Kategori";
     }
     @endphp
 
-    @if(!$currentCatSlug && $slides->isNotEmpty())
+    @if( $slides->isNotEmpty())
     <section class="banner px-4 mb-4 md:mb-8 group">
         <div class="swiper bannerSwiper relative rounded-xl md:rounded-2xl overflow-hidden shadow-md border border-gray-100 bg-gray-100">
             <div class="swiper-wrapper">
