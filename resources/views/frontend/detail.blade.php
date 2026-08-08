@@ -1,5 +1,16 @@
 @extends('frontend.components.layout')
 
+
+@push('meta')
+@if($product->meta_keyword)
+<meta name="keywords" content="{{ $product->meta_keyword }}">
+@endif
+
+@if($product->short_description)
+<meta name="description" content="{{ $product->short_description }}">
+@endif
+@endpush
+
 @section('content')
 
 <div class="modal-location fixed inset-0  bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-opacity duration-300"
@@ -425,7 +436,7 @@
             <h2 class="text-xl font-bold mb-4">Ulasan Pelanggan</h2>
 
             @php
-           
+
             $totalReviews = $reviews->total();
             $displayRating = $averageRating ?? 0;
             @endphp
@@ -471,7 +482,7 @@
                         <div class="flex gap-2 mt-3">
                             @foreach($item->images as $img)
                             <img src="{{ asset('storage/' . $img->image_path) }}"
-                            onclick="openLightbox('{{ asset('storage/' . $img->image_path) }}')"
+                                onclick="openLightbox('{{ asset('storage/' . $img->image_path) }}')"
                                 class="w-20 h-20 object-contain rounded-md border border-light-grey">
                             @endforeach
                         </div>
