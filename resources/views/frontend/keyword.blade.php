@@ -218,23 +218,42 @@
         }
 
         function generatePageLinks(res) {
-            let links = '';
+            const current = res.current_page;
+            const last = res.last_page;
+            const delta = 2; // jumlah halaman di kiri/kanan halaman aktif
 
-            for (let i = 1; i <= res.last_page; i++) {
-                if (i === res.current_page) {
+            // Bangun daftar nomor halaman yang wajib tampil: 1, terakhir, & sekitar halaman aktif
+            const pages = new Set([1, last]);
+            for (let i = current - delta; i <= current + delta; i++) {
+                if (i > 1 && i < last) pages.add(i);
+            }
+            const sortedPages = Array.from(pages).sort((a, b) => a - b);
+
+            let links = '';
+            let previous = null;
+
+            sortedPages.forEach(function(page) {
+                if (previous !== null && page - previous > 1) {
+                    links += `
+                <span class="relative inline-flex items-center px-4 py-2 -ml-px text-sm font-medium text-gray-400 bg-white border border-gray-300">...</span>`;
+                }
+
+                if (page === current) {
                     links += `
                 <span aria-current="page">
                     <span class="relative inline-flex items-center px-4 py-2 -ml-px text-sm font-medium text-white bg-primary border border-primary cursor-default rounded-md">
-                        ${i}
+                        ${page}
                     </span>
                 </span>`;
                 } else {
                     links += `
-                <button onclick="fetchProducts(${i})" class="relative inline-flex items-center px-4 py-2 -ml-px text-sm font-medium text-dark-grey bg-white border border-gray-300 hover:bg-light-grey">
-                    ${i}
+                <button onclick="fetchProducts(${page})" class="relative inline-flex items-center px-4 py-2 -ml-px text-sm font-medium text-dark-grey bg-white border border-gray-300 hover:bg-light-grey">
+                    ${page}
                 </button>`;
                 }
-            }
+
+                previous = page;
+            });
             return links;
         }
 
