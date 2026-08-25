@@ -12,7 +12,7 @@ class Product extends Model
     use HasFactory,SoftDeletes;
 
     protected $fillable = [
-        'sku','name','short_description','description','meta_keyword','attributes','weight_gram','is_active'
+        'sku','name','short_description','description','attributes','weight_gram','is_active'
     ];
 
     protected $casts = [
@@ -33,6 +33,11 @@ class Product extends Model
     public function categories()
     {
         return $this->belongsToMany(Category::class, 'product_categories')->withTimestamps()->using(\App\Models\ProductCategory::class);
+    }
+
+    public function metaKeywords()
+    {
+        return $this->belongsToMany(MetaKeyword::class, 'product_meta_keywords', 'product_id', 'meta_keyword_id')->withTimestamps();
     }
 
     public function reviews()

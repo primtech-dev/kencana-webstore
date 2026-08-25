@@ -131,6 +131,8 @@ Route::prefix('customer')->group(function () {
 // Rute untuk menampilkan daftar produk
 Route::get('/', [ProductController::class, 'index'])->name('products.index');
 Route::get('/daftar-produk', [ProductController::class, 'productJson'])->name('products.json');
+Route::get('/produk/suggest', [ProductController::class, 'suggest'])->name('products.suggest');
+Route::get('/kata-kunci/{slug}', [ProductController::class, 'byKeyword'])->name('products.by-keyword');
 
 // Rute untuk menampilkan detail produk
 Route::get('/products/{id}', [ProductController::class, 'show'])->name('products.show');

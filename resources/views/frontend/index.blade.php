@@ -204,6 +204,17 @@
             <h1 class="text-lg md:text-2xl font-black text-dark-grey uppercase ">
                 {{ $catName }}
             </h1>
+
+            @if(!empty($topMetaKeywords) && $topMetaKeywords->isNotEmpty())
+            <div class="flex flex-wrap gap-1.5 md:gap-2 mt-2">
+                @foreach($topMetaKeywords as $keyword)
+                <a href="{{ route('products.by-keyword', $keyword['slug']) }}"
+                    class="inline-flex items-center px-2.5 py-1 text-[10px] md:text-xs font-bold text-blue-700 hover:text-blue-500 transition-colors">
+                    #{{ $keyword['name'] }}
+                </a>
+                @endforeach
+            </div>
+            @endif
             {{-- Ukuran Deskripsi: text-[11px] di mobile, text-sm di desktop --}}
             <p class="text-[11px] md:text-sm text-gray-500 mt-1 md:mt-2 leading-snug md:leading-relaxed max-w-2xl line-clamp-2 md:line-clamp-none">
                 {{ $categoryDesc }}
