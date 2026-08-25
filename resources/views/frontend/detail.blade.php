@@ -2,8 +2,8 @@
 
 
 @push('meta')
-@if($product->meta_keyword)
-<meta name="keywords" content="{{ $product->meta_keyword }}">
+@if($product->metaKeywords->isNotEmpty())
+<meta name="keywords" content="{{ $product->metaKeywords->pluck('name')->implode(', ') }}">
 @endif
 
 @if($product->short_description)
@@ -271,6 +271,7 @@
                     <h1 class="text-2xl font-extrabold text-dark-grey mb-1">
                         {{ $product->name }}
                     </h1>
+
                     <p class="text-sm text-dark-grey/80 mb-4">
                         <span class="font-bold">{{ $product->reviews->count() }}</span> Ulasan | Variant:
                         <span class="font-bold text-primary" id="current-variant-name">

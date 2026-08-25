@@ -169,17 +169,20 @@
             </div>
 
             <div class="hidden sm:block flex-1 max-w-2xl">
-                <form class="search-form flex bg-white rounded overflow-hidden p-0.5 shadow-sm border border-gray-100">
-                    <input type="text"
-                        class="search-input w-full px-4 py-2 text-sm text-gray-700 focus:outline-none"
-                        name="search"
-                        value="{{ request('search') }}"
-                        placeholder="Cari Merek, Nama, atau Tipe Produk..."
-                        autocomplete="off">
-                    <button type="submit" class="bg-primary text-white px-5 hover:bg-black transition">
-                        <i class="fas fa-search"></i>
-                    </button>
-                </form>
+                <div class="search-form-wrapper relative">
+                    <form class="search-form flex bg-white rounded overflow-hidden p-0.5 shadow-sm border border-gray-100">
+                        <input type="text"
+                            class="search-input w-full px-4 py-2 text-sm text-gray-700 focus:outline-none"
+                            name="search"
+                            value="{{ request('search') }}"
+                            placeholder="Cari Merek, Nama, atau Tipe Produk..."
+                            autocomplete="off">
+                        <button type="submit" class="bg-primary text-white px-5 hover:bg-black transition">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </form>
+                    <div class="search-suggestions absolute left-0 right-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-100 z-50 hidden max-h-96 overflow-y-auto text-left"></div>
+                </div>
             </div>
 
             <div class="flex items-center space-x-3 md:space-x-6 text-white ml-auto md:ml-0">
@@ -234,17 +237,20 @@
         </div>
 
         <div class="px-4 mt-2 sm:hidden">
-            <form class="search-form flex bg-white rounded overflow-hidden p-0.5 shadow-sm border border-gray-100">
-                <input type="text"
-                    class="search-input w-full px-3 py-1.5 text-sm text-gray-700 focus:outline-none"
-                    name="search"
-                    value="{{ request('search') }}"
-                    placeholder="Cari di Kencana Store..."
-                    autocomplete="off">
-                <button type="submit" class="bg-[#cc0000] text-white px-4 hover:bg-black transition">
-                    <i class="fas fa-search"></i>
-                </button>
-            </form>
+            <div class="search-form-wrapper relative">
+                <form class="search-form flex bg-white rounded overflow-hidden p-0.5 shadow-sm border border-gray-100">
+                    <input type="text"
+                        class="search-input w-full px-3 py-1.5 text-sm text-gray-700 focus:outline-none"
+                        name="search"
+                        value="{{ request('search') }}"
+                        placeholder="Cari di Kencana Store..."
+                        autocomplete="off">
+                    <button type="submit" class="bg-[#cc0000] text-white px-4 hover:bg-black transition">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
+                <div class="search-suggestions absolute left-0 right-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-100 z-50 hidden max-h-96 overflow-y-auto text-left"></div>
+            </div>
         </div>
     </div>
 
@@ -402,6 +408,96 @@
             setTimeout(() => globalDropdown.classList.add('hidden'), 200);
         });
 
+    });
+</script>
+
+<script>
+    // --- SARAN PRODUK (AUTOCOMPLETE) SAAT MENGETIK DI KOLOM SEARCH ---
+    document.addEventListener('DOMContentLoaded', function() {
+        const suggestUrl = "{{ route('products.suggest') }}";
+        const MIN_CHARS = 2;
+        const DEBOUNCE_MS = 300;
+
+        document.querySelectorAll('.search-form-wrapper').forEach(function(wrapper) {
+            const input = wrapper.querySelector('.search-input');
+            const box = wrapper.querySelector('.search-suggestions');
+            if (!input || !box) return;
+
+            let debounceTimer = null;
+            let abortController = null;
+
+            function hideBox() {
+                box.classList.add('hidden');
+                box.innerHTML = '';
+            }
+
+            function renderMessage(message) {
+                box.innerHTML = `<div class="p-3 text-sm text-gray-400 text-center">${message}</div>`;
+                box.classList.remove('hidden');
+            }
+
+            function renderItems(items) {
+                if (!items || items.length === 0) {
+                    renderMessage('Produk tidak ditemukan');
+                    return;
+                }
+
+                box.innerHTML = items.map(function(item) {
+                    return `
+                        <a href="${item.url}" class="flex items-center gap-3 p-2 hover:bg-gray-50 border-b border-gray-50 last:border-0">
+                            <img src="${item.image}" alt="${item.name}"
+                                class="w-10 h-10 object-contain rounded border border-gray-100 shrink-0"
+                                onerror="this.src='https://placehold.co/100x100/ccc/fff?text=No+Image';">
+                            <div class="min-w-0">
+                                <p class="text-sm text-gray-800 line-clamp-1">${item.name}</p>
+                                <p class="text-xs font-bold text-primary">${item.price_formatted}</p>
+                            </div>
+                        </a>`;
+                }).join('');
+                box.classList.remove('hidden');
+            }
+
+            input.addEventListener('input', function() {
+                const query = input.value.trim();
+                clearTimeout(debounceTimer);
+
+                if (query.length < MIN_CHARS) {
+                    hideBox();
+                    return;
+                }
+
+                debounceTimer = setTimeout(function() {
+                    if (abortController) abortController.abort();
+                    abortController = new AbortController();
+
+                    renderMessage('Mencari...');
+
+                    fetch(suggestUrl + '?q=' + encodeURIComponent(query), {
+                            signal: abortController.signal,
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        })
+                        .then(function(res) {
+                            return res.json();
+                        })
+                        .then(renderItems)
+                        .catch(function(err) {
+                            if (err.name !== 'AbortError') hideBox();
+                        });
+                }, DEBOUNCE_MS);
+            });
+
+            input.addEventListener('focus', function() {
+                if (input.value.trim().length >= MIN_CHARS && box.innerHTML.trim() !== '') {
+                    box.classList.remove('hidden');
+                }
+            });
+
+            document.addEventListener('click', function(e) {
+                if (!wrapper.contains(e.target)) hideBox();
+            });
+        });
     });
 </script>
 @endpush

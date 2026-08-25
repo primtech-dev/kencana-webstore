@@ -7,6 +7,7 @@ use App\Models\Branches;
 use App\Models\Category;
 use App\Models\HomeBanner;
 use App\Models\Inventory;
+use App\Models\MetaKeyword;
 use App\Models\Product;
 use App\Models\Reviews;
 use Illuminate\Http\Request;
@@ -26,17 +27,43 @@ class ProductController extends Controller
             ->where('end_at', '>=', now())
             ->get();
 
+        $categorySlug = $request->get('category');
+        $topMetaKeywords = collect();
+
+        if ($categorySlug) {
+            $inCategory = function ($query) use ($categorySlug) {
+                $query->where('is_active', true)
+                    ->whereHas('categories', function ($q) use ($categorySlug) {
+                        $q->where('slug', $categorySlug);
+                    });
+            };
+
+            $topMetaKeywords = MetaKeyword::query()
+                ->where('is_active', true)
+                ->whereHas('products', $inCategory)
+                ->withCount(['products' => $inCategory])
+                ->orderByDesc('products_count')
+                ->limit(5)
+                ->get(['id', 'name', 'slug'])
+                ->map(fn ($keyword) => [
+                    'name' => $keyword->name,
+                    'slug' => $keyword->slug,
+                ]);
+        }
+
         return view('frontend.index', [
             'categories' => $categories,
             'branches' => $branches,
             'home_banner' => $home_banner,
-            'selectedCategory' => $request->get('category'),
+            'selectedCategory' => $categorySlug,
+            'topMetaKeywords' => $topMetaKeywords,
         ]);
     }
 
     public function productJson(Request $request)
     {
         $categorySlug = $request->get('category');
+        $keywordSlug = $request->get('keyword');
         $selectedBranchId = session('selected_branch_id');
 
         $productsQuery = Product::query()->where('is_active', true);
@@ -58,7 +85,10 @@ class ProductController extends Controller
 
             $query->where(function ($sub) use ($loweredSearch) {
                 $sub->whereRaw('LOWER(name) like ?', ["%{$loweredSearch}%"])
-                    ->orWhereRaw('LOWER(sku) like ?', ["%{$loweredSearch}%"]);
+                    ->orWhereRaw('LOWER(sku) like ?', ["%{$loweredSearch}%"])
+                    ->orWhereHas('metaKeywords', function ($q) use ($loweredSearch) {
+                        $q->whereRaw('LOWER(name) like ?', ["%{$loweredSearch}%"]);
+                    });
             });
         });
 
@@ -66,6 +96,13 @@ class ProductController extends Controller
         $productsQuery->when($categorySlug, function ($query, $categorySlug) {
             $query->whereHas('categories', function ($q) use ($categorySlug) {
                 $q->where('slug', $categorySlug);
+            });
+        });
+
+        // Filter Meta Keyword
+        $productsQuery->when($keywordSlug, function ($query, $keywordSlug) {
+            $query->whereHas('metaKeywords', function ($q) use ($keywordSlug) {
+                $q->where('slug', $keywordSlug);
             });
         });
         // Eager Load & Paginate
@@ -84,6 +121,66 @@ class ProductController extends Controller
         return response()->json($products);
     }
 
+    public function byKeyword($slug)
+    {
+        $keyword = MetaKeyword::where('slug', $slug)
+            ->where('is_active', true)
+            ->firstOrFail();
+
+        return view('frontend.keyword', [
+            'keyword' => $keyword,
+        ]);
+    }
+
+
+    public function suggest(Request $request)
+    {
+        $search = trim($request->get('q', $request->get('search', '')));
+
+        if (mb_strlen($search) < 2) {
+            return response()->json([]);
+        }
+
+        $loweredSearch = strtolower($search);
+
+        $products = Product::query()
+            ->where('is_active', true)
+            ->where(function ($sub) use ($loweredSearch) {
+                $sub->whereRaw('LOWER(name) like ?', ["%{$loweredSearch}%"])
+                    ->orWhereHas('metaKeywords', function ($q) use ($loweredSearch) {
+                        $q->whereRaw('LOWER(name) like ?', ["%{$loweredSearch}%"]);
+                    });
+            })
+            ->with([
+                'images' => function ($q) {
+                    $q->orderBy('is_main', 'desc')->orderBy('position', 'asc');
+                },
+                'variants' => function ($q) {
+                    $q->where('is_active', true)->orderBy('price', 'asc');
+                },
+            ])
+            ->limit(8)
+            ->get();
+
+        $imageBase = rtrim(env('APP_URL_BE'), '/') . '/';
+
+        $result = $products->map(function ($product) use ($imageBase) {
+            $variant = $product->variants->first();
+            $price = round($variant->price ?? $product->price ?? 0);
+            $image = $product->images->first();
+
+            return [
+                'id' => $product->id,
+                'name' => $product->name,
+                'price' => $price,
+                'price_formatted' => 'Rp' . number_format($price, 0, ',', '.'),
+                'image' => $image ? $imageBase . ltrim($image->url, '/') : 'https://placehold.co/100x100/ccc/fff?text=No+Image',
+                'url' => url('/products/' . $product->id),
+            ];
+        });
+
+        return response()->json($result);
+    }
 
     private function calculateHaversineDistance($lat1, $lon1, $lat2, $lon2)
     {
@@ -113,6 +210,7 @@ class ProductController extends Controller
                 $query->orderBy('is_main', 'desc')->orderBy('position', 'asc');
             },
             'categories',
+            'metaKeywords',
             'variants' => function ($query) {
                 $query->with('images')->where('is_active', true)->where('is_sellable', true);
             }
