@@ -105,8 +105,7 @@
 
     // Terpisah, jika ada kategori, ambil namanya untuk Breadcrumb
     if ($currentCatSlug) {
-    $categoryData = $categories->where('slug', $currentCatSlug)->first();
-    $catName = $categoryData->name ?? "Kategori";
+    $catName = $activeCategoryName ?? "Kategori";
     }
     @endphp
 
@@ -156,7 +155,7 @@
 
             <div id="category-container" class="flex overflow-x-auto pb-2 gap-2 md:gap-3 snap-x snap-mandatory no-scrollbar scroll-smooth">
                 @foreach ($categories as $category)
-                @php $isActive = $category->slug == $currentCatSlug; @endphp
+                @php $isActive = $category->slug == $activeParentSlug; @endphp
 
                 <a href="{{ route('products.index', ['category' => $category->slug]) }}"
                     class="flex-none w-[160px] md:w-[210px] snap-start group/card">
@@ -193,6 +192,9 @@
         </div>
     </section>
 
+    {{-- SUB KATEGORI (tampil setelah kategori induk diklik) --}}
+
+
     {{-- INFO KATEGORI (Lebih Compact di Mobile) --}}
     @if($currentCatSlug)
     <div class="px-4 mb-6 md:mb-8">
@@ -221,6 +223,23 @@
             </p>
         </div>
     </div>
+    @endif
+
+    @if($subCategories->isNotEmpty())
+    <section class="mb-6 md:mb-8 px-4 -mt-2">
+        <div id="subcategory-container" class="flex overflow-x-auto pb-1 gap-2 no-scrollbar scroll-smooth">
+            @foreach($subCategories as $sub)
+            @php $isSubActive = $sub->slug == $currentSubSlug; @endphp
+            <a href="{{ route('products.index', ['category' => $activeParentSlug, 'subcategory' => $sub->slug]) }}"
+                class="flex-none px-4 py-2 rounded-full text-[11px] md:text-xs font-bold uppercase whitespace-nowrap transition-colors border
+                {{ $isSubActive
+                    ? 'bg-primary text-white border-primary'
+                    : 'bg-white text-gray-600 border-gray-200 hover:border-primary hover:text-primary' }}">
+                {{ $sub->name }}
+            </a>
+            @endforeach
+        </div>
+    </section>
     @endif
 
     <section class="mb-12 px-4">
@@ -301,6 +320,7 @@
         window.fetchProducts = function(page = 1) {
             const urlParams = new URLSearchParams(window.location.search);
             const currentCategory = urlParams.get('category') || '';
+            const currentSubCategory = urlParams.get('subcategory') || '';
             const currentSearch = urlParams.get('search') || '';
 
             $('#skeleton-grid').removeClass('hidden');
@@ -312,6 +332,7 @@
                 data: {
                     page,
                     category: currentCategory,
+                    subcategory: currentSubCategory,
                     search: currentSearch
                 },
                 success: function(res) {
