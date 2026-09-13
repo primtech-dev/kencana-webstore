@@ -21,20 +21,80 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $branches = Branches::where('is_active', true)->get();
-        $categories = Category::where('is_active', true)->get();
+
+        $categorySlug = $request->get('category');
+        $subCategorySlug = $request->get('subcategory');
+
+        $categories = Category::where('is_active', true)
+            ->whereNull('parent_id')
+            ->with(['children' => function ($query) {
+                $query->where('is_active', true);
+            }])
+            ->orderBy('position')
+            ->get();
+
+        $activeCategory = null;
+        $activeSubCategory = null;
+        $subCategories = collect();
+        $activeParentSlug = null;
+
+        if ($subCategorySlug) {
+            // Sub kategori dipilih langsung lewat chip subcategory
+            $activeSubCategory = Category::where('is_active', true)
+                ->where('slug', $subCategorySlug)
+                ->with(['parent.children' => function ($query) {
+                    $query->where('is_active', true);
+                }])
+                ->first();
+
+            if ($activeSubCategory && $activeSubCategory->parent) {
+                $activeCategory = $activeSubCategory->parent;
+                $subCategories = $activeCategory->children;
+                $activeParentSlug = $activeCategory->slug;
+            }
+        } elseif ($categorySlug) {
+            $resolved = Category::where('is_active', true)
+                ->where('slug', $categorySlug)
+                ->with([
+                    'parent.children' => function ($query) {
+                        $query->where('is_active', true);
+                    },
+                    'children' => function ($query) {
+                        $query->where('is_active', true);
+                    },
+                ])
+                ->first();
+
+            if ($resolved) {
+                if ($resolved->parent_id) {
+                    // Link lama yang langsung menunjuk slug sub kategori lewat ?category=
+                    $activeSubCategory = $resolved;
+                    $activeCategory = $resolved->parent;
+                    $subCategories = $activeCategory->children;
+                    $activeParentSlug = $activeCategory->slug;
+                } else {
+                    $activeCategory = $resolved;
+                    $subCategories = $resolved->children;
+                    $activeParentSlug = $resolved->slug;
+                }
+            }
+        }
+
+        // Slug yang benar-benar dipakai untuk memfilter produk & meta keyword
+        $effectiveSlug = $activeSubCategory->slug ?? $activeCategory->slug ?? null;
+
         $home_banner = HomeBanner::where('is_active', true)
             ->where('start_at', '<=', now())
             ->where('end_at', '>=', now())
             ->get();
 
-        $categorySlug = $request->get('category');
         $topMetaKeywords = collect();
 
-        if ($categorySlug) {
-            $inCategory = function ($query) use ($categorySlug) {
+        if ($effectiveSlug) {
+            $inCategory = function ($query) use ($effectiveSlug) {
                 $query->where('is_active', true)
-                    ->whereHas('categories', function ($q) use ($categorySlug) {
-                        $q->where('slug', $categorySlug);
+                    ->whereHas('categories', function ($q) use ($effectiveSlug) {
+                        $q->where('slug', $effectiveSlug);
                     });
             };
 
@@ -55,14 +115,18 @@ class ProductController extends Controller
             'categories' => $categories,
             'branches' => $branches,
             'home_banner' => $home_banner,
-            'selectedCategory' => $categorySlug,
+            'selectedCategory' => $effectiveSlug,
             'topMetaKeywords' => $topMetaKeywords,
+            'subCategories' => $subCategories,
+            'activeParentSlug' => $activeParentSlug,
+            'currentSubSlug' => $activeSubCategory->slug ?? null,
+            'activeCategoryName' => $activeSubCategory->name ?? $activeCategory->name ?? null,
         ]);
     }
 
     public function productJson(Request $request)
     {
-        $categorySlug = $request->get('category');
+        $categorySlug = $request->get('subcategory') ?: $request->get('category');
         $keywordSlug = $request->get('keyword');
         $selectedBranchId = session('selected_branch_id');
 

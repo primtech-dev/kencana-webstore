@@ -25,7 +25,10 @@ class CategoryProvider extends ServiceProvider
         View::composer('*', function ($view) {
             $categories = Cache::remember('global_categories', 3600, function () {
                 return Category::where('is_active', true)
-                    ->with('children')
+                    ->whereNull('parent_id')
+                    ->with(['children' => function ($query) {
+                        $query->where('is_active', true);
+                    }])
                     ->orderBy('name', 'asc')
                     ->get();
             });
